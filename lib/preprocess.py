@@ -1,78 +1,101 @@
 import os
 import re
-import markdown
+import markdown2
 from bs4 import BeautifulSoup
-import html2text
+import pandas as pd
 
-def remove_paragraph_with_style(content, style_value):
-    lines = content.split('\n')
-    cleaned_lines = [line for line in lines if not line.strip().startswith(style_value)]
-    return '\n'.join(cleaned_lines)
+def extract_relevant_text_from_md(file_path, section_title="5 Specifications and Reports"):
+    with open(file_path, 'r', encoding='utf-8') as f:
+        md_content = f.read()
+    html_content = markdown2.markdown(md_content)
+    soup = BeautifulSoup(html_content, 'html.parser')
+    text = ""
+    section_found = False
+    for element in soup.stripped_strings:
+        if section_title in element:
+            section_found = True
+        if section_found:
+            text += element + "\n"
+    return text.strip()
 
-def remove_glossary(content, glossary_title='Contents'):
-    pattern = re.compile(f'{re.escape(glossary_title)}.*?(?=\n\s*\n)', re.DOTALL)
-    return re.sub(pattern, '', content)
+def clean_text(text):
+    text = re.sub(r'[^\w\s\.\-]', '', text)
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
 
-def remove_tables(soup):
-    for table in soup.find_all('table'):
-        table.decompose()
+def save_to_txt(text_data, output_file):
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.write(text_data)
 
-def remove_images(soup):
-    for img in soup.find_all('img'):
-        img.decompose()
+def count_tables(text):
+    return text.count('|')  # Simple heuristic: count vertical bars as potential table delimiters
 
-def remove_links(soup):
-    for a in soup.find_all('a'):
-        a.replace_with(a.text)
+def analyze_dataset(root_dir):
+    total_files = 0
+    total_tables = 0
+    total_size = 0
+    file_sizes = []
 
-def remove_figure_references(content):
-    return re.sub(r'^.*Figure\s+\d+.*$', '', content, flags=re.MULTILINE)
+    for subdir, dirs, files in os.walk(os.path.join(root_dir, 'cleaned')):
+        for file in files:
+            if file.endswith(".txt"):
+                total_files += 1
+                file_path = os.path.join(subdir, file)
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    size = len(content)
+                    total_size += size
+                    file_sizes.append(size)
+                    total_tables += count_tables(content)
 
-def clean_markdown(content):
-    content = remove_paragraph_with_style(content, "Instructions")
-    content = remove_glossary(content)
-    content = remove_figure_references(content)
+    avg_size = total_size / total_files if total_files > 0 else 0
+    return {
+        "total_files": total_files,
+        "total_tables": total_tables,
+        "total_size_bytes": total_size,
+        "average_file_size_bytes": avg_size,
+        "min_file_size_bytes": min(file_sizes) if file_sizes else 0,
+        "max_file_size_bytes": max(file_sizes) if file_sizes else 0
+    }
 
-    html = markdown.markdown(content)
-    soup = BeautifulSoup(html, 'html.parser')
-
-    remove_tables(soup)
-    remove_images(soup)
-    remove_links(soup)
-
-    cleaned_html = str(soup)
-
-    h = html2text.HTML2Text()
-    h.ignore_links = True
-    h.ignore_images = True
-    h.ignore_tables = True
-    cleaned_md = h.handle(cleaned_html)
-
-    cleaned_md = re.sub(r'\n{3,}', '\n\n', cleaned_md)
-    cleaned_md = re.sub(r'<[^>]+>', '', cleaned_md)
-    cleaned_md = '\n'.join([line for line in cleaned_md.split('\n') if line.strip()])
-
-    return cleaned_md
-
-def process_directory(input_dir, output_dir):
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    processed_files = []
-
-    for filename in os.listdir(input_dir):
-        if filename.endswith('.md'):
-            input_path = os.path.join(input_dir, filename)
-            output_path = os.path.join(output_dir, filename)
-
-            with open(input_path, 'r', encoding='utf-8') as file:
-                content = file.read()
-
-            cleaned_content = clean_markdown(content)
-
-            with open(output_path, 'w', encoding='utf-8') as file:
-                file.write(cleaned_content)
-
-            processed_files.append(filename)
-
+def batch_process_md_files(root_dir, section_title="5 Specifications and Reports"):
+    processed_files = 0
+    for subdir, dirs, files in os.walk(root_dir):
+        for file in files:
+            if file.endswith(".md"):
+                md_file_path = os.path.join(subdir, file)
+                text_data = extract_relevant_text_from_md(md_file_path, section_title)
+                cleaned_text = clean_text(text_data)
+                relative_path = os.path.relpath(subdir, root_dir)
+                output_dir = os.path.join(root_dir, 'cleaned', relative_path)
+                os.makedirs(output_dir, exist_ok=True)
+                txt_file_path = os.path.join(output_dir, file.replace(".md", ".txt"))
+                save_to_txt(cleaned_text, txt_file_path)
+                processed_files += 1
+                print(f"Processed {md_file_path} and saved to {txt_file_path}")
     return processed_files
+
+def process_and_analyze(root_dir, section_title="5 Specifications and Reports"):
+    processed_files = batch_process_md_files(root_dir, section_title)
+    print(f"Processed {processed_files} files.")
+    
+    dataset_info = analyze_dataset(root_dir)
+    
+    description = f"""
+    Dataset Description:
+    This dataset consists of {dataset_info['total_files']} cleaned text files derived from 3GPP specification documents.
+    The files contain extracted and processed content from the "{section_title}" section of each document.
+    The dataset includes approximately {dataset_info['total_tables']} tables, with a total size of {dataset_info['total_size_bytes'] / (1024 * 1024):.2f} MB.
+    File sizes range from {dataset_info['min_file_size_bytes'] / 1024:.2f} KB to {dataset_info['max_file_size_bytes'] / 1024:.2f} KB, with an average size of {dataset_info['average_file_size_bytes'] / 1024:.2f} KB.
+    """
+    
+    # Save the description to a file
+    with open(os.path.join(root_dir, "dataset_description.txt"), "w") as f:
+        f.write(description)
+    
+    return dataset_info, description
+
+# Example usage:
+# import preprocess.py
+# info, desc = preprocess.process_and_analyze("path/to/your/data")
+# print(desc)
