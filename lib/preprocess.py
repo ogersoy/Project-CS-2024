@@ -1,8 +1,9 @@
 import os
 import re
+import json
 import markdown2
 from bs4 import BeautifulSoup
-import pandas as pd
+from tqdm import tqdm
 
 def extract_relevant_text_from_md(file_path, section_title="5 Specifications and Reports"):
     with open(file_path, 'r', encoding='utf-8') as f:
@@ -23,79 +24,93 @@ def clean_text(text):
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
 
-def save_to_txt(text_data, output_file):
-    with open(output_file, 'w', encoding='utf-8') as f:
-        f.write(text_data)
-
 def count_tables(text):
     return text.count('|')  # Simple heuristic: count vertical bars as potential table delimiters
 
-def analyze_dataset(root_dir):
-    total_files = 0
-    total_tables = 0
-    total_size = 0
-    file_sizes = []
+def analyze_dataset(dataset):
+    total_chunks = len(dataset)
+    total_size = sum(len(item['text']) for item in dataset)
+    chunk_sizes = [len(item['text']) for item in dataset]
+    total_tables = sum(count_tables(item['text']) for item in dataset)
 
-    for subdir, dirs, files in os.walk(os.path.join(root_dir, 'cleaned')):
-        for file in files:
-            if file.endswith(".txt"):
-                total_files += 1
-                file_path = os.path.join(subdir, file)
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                    size = len(content)
-                    total_size += size
-                    file_sizes.append(size)
-                    total_tables += count_tables(content)
-
-    avg_size = total_size / total_files if total_files > 0 else 0
     return {
-        "total_files": total_files,
+        "total_chunks": total_chunks,
         "total_tables": total_tables,
         "total_size_bytes": total_size,
-        "average_file_size_bytes": avg_size,
-        "min_file_size_bytes": min(file_sizes) if file_sizes else 0,
-        "max_file_size_bytes": max(file_sizes) if file_sizes else 0
+        "average_chunk_size_bytes": total_size / total_chunks if total_chunks > 0 else 0,
+        "min_chunk_size_bytes": min(chunk_sizes) if chunk_sizes else 0,
+        "max_chunk_size_bytes": max(chunk_sizes) if chunk_sizes else 0
     }
 
-def batch_process_md_files(root_dir, section_title="5 Specifications and Reports"):
-    processed_files = 0
-    for subdir, dirs, files in os.walk(root_dir):
+def batch_process_md_files(root_dir, section_title="5 Specifications and Reports", chunk_size=512):
+    dataset = []
+    for subdir, dirs, files in tqdm(os.walk(root_dir), desc="Processing files"):
         for file in files:
             if file.endswith(".md"):
                 md_file_path = os.path.join(subdir, file)
                 text_data = extract_relevant_text_from_md(md_file_path, section_title)
                 cleaned_text = clean_text(text_data)
-                relative_path = os.path.relpath(subdir, root_dir)
-                output_dir = os.path.join(root_dir, 'cleaned', relative_path)
-                os.makedirs(output_dir, exist_ok=True)
-                txt_file_path = os.path.join(output_dir, file.replace(".md", ".txt"))
-                save_to_txt(cleaned_text, txt_file_path)
-                processed_files += 1
-                print(f"Processed {md_file_path} and saved to {txt_file_path}")
-    return processed_files
+                
+                # Split into chunks
+                chunks = [cleaned_text[i:i+chunk_size] for i in range(0, len(cleaned_text), chunk_size)]
+                
+                for i, chunk in enumerate(chunks):
+                    dataset.append({
+                        "id": f"{file}_{i}",
+                        "text": chunk,
+                        "metadata": {
+                            "source": file,
+                            "section": section_title,
+                            "chunk_number": i
+                        }
+                    })
+    
+    return dataset
 
-def process_and_analyze(root_dir, section_title="5 Specifications and Reports"):
-    processed_files = batch_process_md_files(root_dir, section_title)
-    print(f"Processed {processed_files} files.")
-    
-    dataset_info = analyze_dataset(root_dir)
-    
+def save_dataset(dataset, output_dir):
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, "processed_dataset.json")
+    with open(output_file, "w", encoding='utf-8') as f:
+        json.dump(dataset, f, indent=2, ensure_ascii=False)
+    print(f"Dataset saved to {output_file}")
+
+def generate_dataset_description(dataset_info, output_dir):
     description = f"""
     Dataset Description:
-    This dataset consists of {dataset_info['total_files']} cleaned text files derived from 3GPP specification documents.
-    The files contain extracted and processed content from the "{section_title}" section of each document.
+    This dataset consists of {dataset_info['total_chunks']} text chunks derived from 3GPP specification documents.
+    The chunks contain extracted and processed content from the "5 Specifications and Reports" section of each document.
     The dataset includes approximately {dataset_info['total_tables']} tables, with a total size of {dataset_info['total_size_bytes'] / (1024 * 1024):.2f} MB.
-    File sizes range from {dataset_info['min_file_size_bytes'] / 1024:.2f} KB to {dataset_info['max_file_size_bytes'] / 1024:.2f} KB, with an average size of {dataset_info['average_file_size_bytes'] / 1024:.2f} KB.
+    Chunk sizes range from {dataset_info['min_chunk_size_bytes'] / 1024:.2f} KB to {dataset_info['max_chunk_size_bytes'] / 1024:.2f} KB, with an average size of {dataset_info['average_chunk_size_bytes'] / 1024:.2f} KB.
     """
     
-    # Save the description to a file
-    with open(os.path.join(root_dir, "dataset_description.txt"), "w") as f:
+    description_file = os.path.join(output_dir, "dataset_description.txt")
+    with open(description_file, "w", encoding='utf-8') as f:
         f.write(description)
+    print(f"Dataset description saved to {description_file}")
+
+def process_and_analyze(input_dir, output_dir, section_title="5 Specifications and Reports", chunk_size=512):
+    print("Starting preprocessing...")
+    dataset = batch_process_md_files(input_dir, section_title, chunk_size)
+    print(f"Processed {len(dataset)} chunks.")
     
-    return dataset_info, description
+    save_dataset(dataset, output_dir)
+    
+    dataset_info = analyze_dataset(dataset)
+    generate_dataset_description(dataset_info, output_dir)
+    
+    print("Preprocessing completed successfully.")
+    return dataset, dataset_info
 
 # Example usage:
-# import preprocess.py
-# info, desc = preprocess.process_and_analyze("path/to/your/data")
-# print(desc)
+import preprocess
+
+# Define both input and output directories
+# input_dir = "C:/Users/Mahta/projectcs/TSpec-LLM/test"
+# output_dir = "C:/Users/Mahta/projectcs/TSpec-LLM/testcleaned"
+
+# # Call process_and_analyze with both input_dir and output_dir
+# dataset, dataset_info = preprocess.process_and_analyze(input_dir, output_dir)
+
+# # Now you can use the dataset and dataset_info as needed
+# print(f"Processed {len(dataset)} chunks")
+# print(f"Total size: {dataset_info['total_size_bytes'] / (1024 * 1024):.2f} MB")
