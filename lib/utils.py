@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from transformers import AlbertTokenizer, AlbertModel, AlbertForSequenceClassification
 from sklearn.metrics.pairwise import cosine_similarity
 import torch
@@ -11,9 +12,13 @@ from lib.markdown_cleaner import clean_markdown
 
 def load_and_clean_docs(directory):
     """Load and clean markdown documents from a directory."""
-    loader = DirectoryLoader(directory, glob="**/*.md")
+    directory = Path(directory)
+    loader = DirectoryLoader(str(directory), glob="**/*.md")
     documents = loader.load()
-    cleaned_docs = [clean_markdown(doc.page_content) for doc in documents]
+    cleaned_docs = []
+    for doc in documents:
+        cleaned_content, _ = clean_markdown(doc.page_content)
+        cleaned_docs.append(cleaned_content)
     return cleaned_docs
 
 def split_texts(texts, chunk_size=1000, chunk_overlap=200):
@@ -29,12 +34,12 @@ def setup_albert_models():
     """Set up ALBERT models for embedding and classification."""
     tokenizer = AlbertTokenizer.from_pretrained('albert-base-v2')
     embedding_model = AlbertModel.from_pretrained('albert-base-v2')
-    classification_model = AlbertForSequenceClassification.from_pretrained('albert-base-v2')
+    classification_model = AlbertForSequenceClassification.from_pretrained('albert-base-v2', num_labels=3)
     return tokenizer, embedding_model, classification_model
 
 def get_embedding(text, tokenizer, model):
     """Get ALBERT embedding for a given text."""
-    inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512, padding=True)
     with torch.no_grad():
         outputs = model(**inputs)
     return outputs.last_hidden_state.mean(dim=1).squeeze().numpy()
@@ -52,7 +57,7 @@ def find_most_relevant_chunk(query, chunks, doc_embeddings, tokenizer, model):
 
 def classify_relevance(query, context, tokenizer, model):
     """Classify the relevance of the context to the query."""
-    inputs = tokenizer(query, context, return_tensors="pt", truncation=True, max_length=512)
+    inputs = tokenizer(query, context, return_tensors="pt", truncation=True, max_length=512, padding=True)
     with torch.no_grad():
         outputs = model(**inputs)
     logits = outputs.logits
