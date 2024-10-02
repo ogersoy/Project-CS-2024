@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome and Ask your questions</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #chatbox { height: 300px; border: 1px solid #ddd; overflow-y: scroll; padding: 10px; margin-bottom: 10px; }
+        #userInput { width: 70%; padding: 5px; }
+        #sendButton { padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <h1>Welcome and Ask your questions</h1>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Ask a question...">
+    <button id="sendButton">Send</button>
+
+    <script>
+        $(document).ready(function() {
+            function sendMessage() {
+                var userInput = $('#userInput').val();
+                if (userInput.trim() === '') return;
+
+                $('#chatbox').append('<p><strong>You:</strong> ' + userInput + '</p>');
+                $('#userInput').val('');
+
+                $.ajax({
+                    url: '/ask',
+                    method: 'POST',
+                    data: { question: userInput },
+                    success: function(response) {
+                        $('#chatbox').append('<p><strong>Bot:</strong> ' + response.answer + '</p>');
+                        $('#chatbox').append('<p><em>Relevance: ' + response.relevance + '</em></p>');
+                        $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
+                    }
+                });
+            }
+
+            $('#sendButton').click(sendMessage);
+            $('#userInput').keypress(function(e) {
+                if (e.which == 13) { // Enter key
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
