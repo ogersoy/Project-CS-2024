@@ -1,46 +1,76 @@
-from transformers import AlbertTokenizer, AlbertModel
+import os
+from transformers import AlbertTokenizer, AlbertModel, AlbertForSequenceClassification
+from sklearn.metrics.pairwise import cosine_similarity
+import torch
+import numpy as np
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import Chroma
-from langchain.chains import RetrievalQA
-from langchain.llms import HuggingFacePipeline
+from langchain_community.document_loaders import DirectoryLoader
 
-# 1. Tokenization
-tokenizer = AlbertTokenizer.from_pretrained('albert-base-v2')
+# Import the clean_markdown function from your markdown_cleaner
+from lib.markdown_cleaner import clean_markdown
 
-# 2. Text splitting
-text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=1000,
-    chunk_overlap=200,
-    length_function=len,
-)
-chunks = text_splitter.split_text(your_cleaned_text)
+def load_and_clean_docs(directory):
+    """Load and clean markdown documents from a directory."""
+    loader = DirectoryLoader(directory, glob="**/*.md")
+    documents = loader.load()
+    cleaned_docs = [clean_markdown(doc.page_content) for doc in documents]
+    return cleaned_docs
 
-# 3. Embedding generation
-embeddings = HuggingFaceEmbeddings(model_name="albert-base-v2")
+def split_texts(texts, chunk_size=1000, chunk_overlap=200):
+    """Split texts into chunks."""
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        length_function=len,
+    )
+    return text_splitter.split_texts(texts)
 
-# 4. Vector store creation
-vectorstore = Chroma.from_texts(chunks, embeddings)
+def setup_albert_models():
+    """Set up ALBERT models for embedding and classification."""
+    tokenizer = AlbertTokenizer.from_pretrained('albert-base-v2')
+    embedding_model = AlbertModel.from_pretrained('albert-base-v2')
+    classification_model = AlbertForSequenceClassification.from_pretrained('albert-base-v2')
+    return tokenizer, embedding_model, classification_model
 
-# 5. Retriever setup
-retriever = vectorstore.as_retriever()
+def get_embedding(text, tokenizer, model):
+    """Get ALBERT embedding for a given text."""
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
+    with torch.no_grad():
+        outputs = model(**inputs)
+    return outputs.last_hidden_state.mean(dim=1).squeeze().numpy()
 
-# 6. LLM setup
-model = AlbertModel.from_pretrained('albert-base-v2')
-llm = HuggingFacePipeline.from_model_id(
-    model_id="albert-base-v2",
-    task="text-generation",
-    model_kwargs={"temperature": 0.7, "max_length": 64},
-)
+def create_document_embeddings(chunks, tokenizer, model):
+    """Create embeddings for all document chunks."""
+    return [get_embedding(chunk, tokenizer, model) for chunk in chunks]
 
-# 7. Chain creation
-qa_chain = RetrievalQA.from_chain_type(
-    llm=llm,
-    chain_type="stuff",
-    retriever=retriever,
-)
+def find_most_relevant_chunk(query, chunks, doc_embeddings, tokenizer, model):
+    """Find the most relevant chunk to the query using cosine similarity."""
+    query_embedding = get_embedding(query, tokenizer, model)
+    similarities = cosine_similarity([query_embedding], doc_embeddings)[0]
+    most_relevant_idx = np.argmax(similarities)
+    return chunks[most_relevant_idx]
 
-# Example usage
-query = "Your question here"
-response = qa_chain.run(query)
-print(response)
+def classify_relevance(query, context, tokenizer, model):
+    """Classify the relevance of the context to the query."""
+    inputs = tokenizer(query, context, return_tensors="pt", truncation=True, max_length=512)
+    with torch.no_grad():
+        outputs = model(**inputs)
+    logits = outputs.logits
+    predicted_class = logits.argmax().item()
+    
+    classes = ["unrelated", "partially related", "fully answers the question"]
+    return classes[predicted_class]
+
+def process_documents(input_path):
+    """Process documents and return necessary components for the chatbot."""
+    cleaned_docs = load_and_clean_docs(input_path)
+    chunks = split_texts(cleaned_docs)
+    tokenizer, embedding_model, classification_model = setup_albert_models()
+    doc_embeddings = create_document_embeddings(chunks, tokenizer, embedding_model)
+    return chunks, doc_embeddings, tokenizer, embedding_model, classification_model
+
+def answer_question(query, chunks, doc_embeddings, tokenizer, embedding_model, classification_model):
+    """Answer a question using ALBERT embeddings and classification."""
+    relevant_chunk = find_most_relevant_chunk(query, chunks, doc_embeddings, tokenizer, embedding_model)
+    relevance = classify_relevance(query, relevant_chunk, tokenizer, classification_model)
+    return relevant_chunk, relevance
