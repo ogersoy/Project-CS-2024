@@ -13,7 +13,11 @@ app = Flask(__name__)
 chatbot = ALBERTChatbot()
 
 # Set the input directory
-input_directory = '/mnt/C/Users/Mahta/projectcs/TSpec-LLM/test'
+input_directory = os.path.join('C:', 'Users', 'Mahta', 'projectcs', 'TSpec-LLM', 'test')
+
+# Convert Windows path to WSL path if necessary
+if os.name == 'posix' and input_directory.startswith('C:'):
+    input_directory = '/mnt/c' + input_directory[2:].replace('\\', '/')
 
 # Load documents
 try:
