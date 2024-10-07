@@ -13,19 +13,21 @@ app = Flask(__name__)
 chatbot = ALBERTChatbot()
 
 # Set the input directory
-#input_directory = os.path.join('C:', 'Users', 'Administrator', 'Desktop','cleaned_data', 'Rel-8','21_series')
-input_directory = r'cleaned_data\Rel-8\21_series'
+input_directory = r'cleaned_data'
 
 # Convert Windows path to WSL path if necessary
 if os.name == 'posix' and input_directory.startswith('C:'):
     input_directory = '/mnt/c' + input_directory[2:].replace('\\', '/')
 
-# Load documents
+# Load all documents
 try:
     if not os.path.exists(input_directory):
         raise FileNotFoundError(f"Directory not found: '{input_directory}'")
-    
-    md_files = [f for f in os.listdir(input_directory) if f.endswith('.md')]
+
+    md_files = []
+    for root, _, files in os.walk(input_directory):
+        md_files.extend([os.path.join(root, f) for f in files if f.endswith('.md')])
+
     if not md_files:
         raise FileNotFoundError(f"No markdown files found in '{input_directory}'")
     
