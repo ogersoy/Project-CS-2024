@@ -15,9 +15,9 @@ chatbot = ALBERTChatbot()
 # Set the input directory
 input_directory = r'cleaned_data'
 
-# Convert Windows path to WSL path if necessary
-if os.name == 'posix' and input_directory.startswith('C:'):
-    input_directory = '/mnt/c' + input_directory[2:].replace('\\', '/')
+# # Convert Windows path to WSL path if necessary
+# if os.name == 'posix' and input_directory.startswith('C:'):
+#     input_directory = '/mnt/c' + input_directory[2:].replace('\\', '/')
 
 # Load all documents
 try:
