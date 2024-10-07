@@ -1,0 +1,5639 @@
+# Foreword
+This Technical Specification has been produced by the 3^rd^ Generation
+Partnership Project (3GPP).
+The contents of the present document are subject to continuing work within the
+TSG and may change following formal TSG approval. Should the TSG modify the
+contents of the present document, it will be re-released by the TSG with an
+identifying change of release date and an increase in version number as
+follows:
+Version x.y.z
+where:
+x the first digit:
+1 presented to TSG for information;
+2 presented to TSG for approval;
+3 or greater indicates TSG approved document under change control.
+y the second digit is incremented for all changes of substance, i.e. technical
+enhancements, corrections, updates, etc.
+z the third digit is incremented when editorial only changes have been
+incorporated in the document.
+# 1 Scope
+This document specifies the functional model, procedures and information flows
+needed for the mission critical video (MCVideo) service. Support for both
+MCVideo group streaming and MCVideo private streaming operating in on-network
+and off-network modes of operation is specified.
+The corresponding service requirements are defined in 3GPP TS 22.280 [2], and
+3GPP TS 22.281 [3].
+The present document is applicable primarily to mission critical video service
+using E-UTRAN access based on the common functional architecture for mission
+critical services defined in 3GPP TS 23.280 [6] and the EPC architecture
+defined in 3GPP TS 23.401 [8].
+The MCVideo service can be used for public safety applications and also for
+general commercial applications e.g. utility companies and railways.
+# 2 References
+The following documents contain provisions which, through reference in this
+text, constitute provisions of the present document.
+\- References are either specific (identified by date of publication, edition
+number, version number, etc.) or non‑specific.
+\- For a specific reference, subsequent revisions do not apply.
+\- For a non-specific reference, the latest version applies. In the case of a
+reference to a 3GPP document (including a GSM document), a non-specific
+reference implicitly refers to the latest version of that document _in the
+same Release as the present document_.
+[1] 3GPP TR 21.905: \"Vocabulary for 3GPP Specifications\".
+[2] 3GPP TS 22.280: \"Mission Critical Common Requirements (MCCoRe); Stage
+1\".
+[3] 3GPP TS 22.281: \"Mission Critical Video services\".
+[4] 3GPP TS 23.002: \"Network Architecture\".
+[5] 3GPP TS 23.228: \"IP Multimedia Subsystem (IMS); Stage 2\".
+[6] 3GPP TS 23.280: \"Common functional architecture to support mission
+critical services; Stage 2\".
+[7] 3GPP TS 23.303: \"Proximity-based services (ProSe); Stage 2\".
+[8] 3GPP TS 23.401: \"General Packet Radio Service (GPRS) enhancements for
+Evolved Universal Terrestrial Radio Access Network (E-UTRAN) access\".
+[9] 3GPP TS 23.468: \"Group Communication System Enablers for LTE (GCSE_LTE);
+Stage 2\".
+[10] Void
+> [11] 3GPP TS 23.203: \"Policy and charging control architecture\".
+[12] 3GPP TS 36.331: \"Evolved Universal Terrestrial Radio Access (E-UTRA);
+Radio Resource Control (RRC); Protocol specification\".
+[13] 3GPP TS 29.468: \"Group Communication System Enablers for LTE (GCSE_LTE);
+MB2 reference point; Stage 3\".
+[14] 3GPP TS 33.180: \"Security of the mission critical service\".
+# 3 Definitions, symbols and abbreviations
+## 3.1 Definitions
+For the purposes of the present document, the terms and definitions given in
+3GPP TR 21.905 [1] and the following apply. A term defined in the present
+document takes precedence over the definition of the same term, if any, in
+3GPP TR 21.905 [1].
+**MCVideo client:** An instance of an MC service client that provides the
+client application function for the MCVideo service.
+**MCVideo group:** An MC service group configured for MCVideo service.
+**MCVideo group affiliation:** An MC service group affiliation for MCVideo.
+**MCVideo group de-affiliation:** An MC service group de-affiliation for
+MCVideo.
+**MCVideo group home system** : The mission critical system where the MCVideo
+group is defined.
+**MCVideo group host server** : The MCVideo server within a mission critical
+system which provides centralised support for MCVideo services of an MCVideo
+group defined in a MCVideo group home system.
+**MCVideo ID:** An instance of an MC service ID within the MCVideo service.
+**MCVideo server:** An instance of an MC service server that provides the
+server application function for the MCVideo service.
+**MCVideo service:** A video communication service supporting applications for
+mission critical organizations and mission critical applications for other
+businesses and organizations (e.g., utilities, railways) with strong security,
+high availability, reliability and priority handling.
+**MCVideo system:** The collection of applications, services, and enabling
+capabilities required to provide Mission Critical video for a Mission Critical
+Organization.
+**MCVideo UE:** An MC service UE that can be used to participate in MCVideo
+services.
+**MCVideo user:** An MC service user who is authorized for MCVideo services
+via an MCVideo UE.
+**Transmission control:** Video transmitting control mechanism in an MCVideo
+service that determines which participants have the authority to transmit
+video, and determines the onward downlink video transmission during an video
+call.
+For the purposes of the present document, the following terms and definitions
+given in 3GPP TS 22.280 [2] apply:
+**Mission Critical**
+**Mission Critical Applications**
+**Mission Critical Service**
+**Mission Critical Organization**
+**Mission Critical System**
+For the purposes of the present document, the following terms and definitions
+given in 3GPP TS 22.281 [3] apply:
+**Real Time**
+**Real Time Video**
+For the purposes of the present document, the following terms and definitions
+given in 3GPP TS 23.280 [6] apply:
+**MC service client**
+**MC service group**
+**MC service group affiliation**
+**MC service group de-affiliation**
+**MC service group home system**
+**MC service group host**
+**MC service ID**
+**MC service server**
+## 3.2 Symbols
+For the purposes of the present document, the following symbols given in 3GPP
+TS 22.280 [2] apply:
+**Nc2**
+## 3.3 Abbreviations
+For the purposes of the present document, the abbreviations given in 3GPP TR
+21.905 [1] and the following apply. An abbreviation defined in the present
+document takes precedence over the definition of the same abbreviation, if
+any, in 3GPP TR 21.905 [1].
+E-UTRAN Evolved Universal Terrestrial Radio Access Network
+EPC Evolved Packet Core
+GCS AS Group Communication Service Application Server
+GCSE_LTE Group Communication Service Enabler over LTE
+HTTP Hyper Text Transfer Protocol
+IMS IP Multimedia Subsystem
+MC Mission Critical
+MCVideo Mission Critical Video
+MCVideo group ID MCVideo group identity
+MCVideo ID MCVideo user identity
+ProSe Proximity-based Services
+SIP Session Initiated Protocol
+# 4 Introduction
+The MCVideo service supports video media communication between several users
+(i.e. group call), where each user has the ability to gain access to the
+permission to stream video in an arbitrated manner. The MCVideo service also
+supports private calls between two users.
+The MCVideo architecture is based on the functional architecture for mission
+critical communication services defined in 3GPP TS 23.280 [6].
+# 5 Architectural requirements
+## 5.1 Media routing requirements
+The video media flow for a private call shall be routed according to one of
+the following two options:
+a) Option 1:
+1) Through the primary MCVideo system if both users in the call belong to the
+same organisation; or
+2) Through the primary MCVideo system of each users, if the users in the call
+do not belong to the same organisation.
+b) Option 2: The video media flow may be routed locally, under the control of
+the primary MCVideo system, through an entity allowing the duplication of the
+media flow to the primary MCVideo system of each user.
+The video media flow for a group call shall be routed to the group home
+MCVideo system.
+## 5.2 MCVideo group affiliation and MCVideo group de-affiliation
+MCVideo group affiliation shall be as specified in clause 5.2.5 of 3GPP TS
+23.280 [6]. In addition, the following requirements shall be fulfilled by the
+MCVideo service for MCVideo users affiliated to MCVideo groups:
+\- MCVideo users receive notifications for MCVideo group call setup and
+invitations for their affiliated MCVideo group(s).
+\- MCVideo users select an affiliated MCVideo group to initiate a new group
+MCVideo call or transmit media in an existing MCVideo group call.
+\- MCVideo users receive media and events from their affiliated MCVideo
+group(s).
+## 5.3 Device inventory requirements
+The MCVideo service shall provide device inventory capabilities for MCVideo
+UEs. The device inventory capabilities shall include:
+\- device information registration;
+\- device information storage; and
+\- device information query.
+## 5.4 Device discovery requirements (off-network)
+The MCVideo service shall provide device discovery for devices as requested by
+the MCVideo user according to the MC service provider policy for off-network
+operations.
+## 5.5 Bearer management
+### 5.5.1 General
+The MCVideo UE shall use the APNs as defined in subclause 5.2.7.0 of 3GPP TS
+23.280 [6]. The MCVideo UE shall use the MC services APN as defined in
+subclause 5.2.7.0 of 3GPP TS 23.280 [6] for the SIP-1 reference point.
+### 5.5.2 EPS bearer considerations
+The EPS bearer considerations specified in subclause 5.2.7.2 of 3GPP TS 23.280
+[6] shall apply.
+### 5.5.3 EPS unicast bearer considerations for MCVideo
+For an MCVideo call session request, resources shall be requested utilising
+interaction with dynamic PCC. The MCVideo system shall request resources over
+Rx to a PCRF. It is recommended that the dedicated bearer(s) for video media
+and control of the video media (i.e. MCVideo‑4 and MCVideo‑7) utilise the QCI
+values depending on the MCVideo mode of the MCVideo call/session, as per table
+5.5.3-1. For transmission and reception control signalling, the QCI value of
+69 is recommended as specified in 3GPP TS 23.203 [11]. The request of
+resources over Rx shall include an application identifier for MCVideo in order
+for the PCRF to evaluate the correct QCI.
+Table 5.5.3-1: QCI values to use for EPS unicast bearers for each MCVideo mode
+* * *
+MCVideo mode QCI value utilised\ (as specified in 3GPP TS 23.203 [11])
+Urgent real-time mode 67
+Non-urgent real-time mode 67
+Non real-time mode 4
+* * *
+The MCVideo audio media and video media may transmit over separate EPS
+bearers, in which case the priority for each bearer is determined by the
+operator policy. Depending on operator policy, the MCVideo system may be able
+to request modification of the priority (ARP) of an existing bearer without
+the need to initiate a new dedicated GBR bearer.
+NOTE: Operator policy takes into account regional/national requirements.
+When MCVideo audio media and video media are multiplexed into one EPS bearer,
+then different QCI and/or ARP values are not possible for video and audio
+media.
+### 5.5.4 MBMS bearer management
+The MBMS bearer management for MC services is specified in subclause 5.2.7.1
+of 3GPP TS 23.280 [6].
+# 5A Involved business relationships
+The description of the involved business relationships for the MCVideo service
+is contained in clause 6 of 3GPP TS 23.280 [6].
+# 6 MCVideo Functional model
+## 6.1 Functional model description
+### 6.1.1 On-network functional model
+Figure 6.1.1-1 shows the functional model for the application plane of MCVideo
+service for on-network operations.
+Figure 6.1.1-1: Functional model for application plane of MCVideo service
+In the model shown in figure 6.1.1-1, the following apply:
+\- The MCVideo server is an instantiation of a MC service server in accordance
+with 3GPP TS 23.280 [6].
+\- The MCVideo server is an instantiation of a GCS AS in accordance with 3GPP
+TS 23.468 [9].
+\- MCVideo-9 carries signalling over multicast bearer between the transmission
+control server of the MCVideo server and the transmission control participant
+of the MCVideo UE.
+\- MCVideo-4 carries signalling over unicast bearer between the transmission
+control server of the MCVideo server and the transmission control participant
+of the MCVideo UE.
+### 6.1.2 Off-network functional model
+Figure 6.1.2-1 shows the functional model for the application plane of MCVideo
+service for off-network operations.
+Figure 6.1.2-1: Functional model for application plane of off-network MCVideo
+service
+## 6.2 Functional entities description
+### 6.2.1 General
+Each subclause is a description of a functional entity and does not imply a
+physical entity.
+### 6.2.2 MCVideo service application plane
+#### 6.2.2.1 General
+Entities within the application plane of MCVideo service provide application
+control, media transmission control and distribution functions.
+#### 6.2.2.2 Common services core
+The description of the common services core entities are contained in common
+functional architecture for MC services over LTE in 3GPP TS 23.280 [6].
+#### 6.2.2.3 MCVideo application service
+##### 6.2.2.3.1 MCVideo client
+The MCVideo client functional entity acts as the user agent for all MCVideo
+application transactions.
+The MCVideo client is responsible for remote device control. This functional
+entity is located in the UE for both on-network and off-network operations.
+##### 6.2.2.3.2 MCVideo server
+The MCVideo server functional entity provides centralised support for MCVideo
+services.
+All the MCVideo clients supporting users belonging to a single group are
+required to use the same MCVideo server for that group. An MCVideo client
+supporting a user involved in multiple groups can have relationships with
+multiple MCVideo servers.
+The MCVideo server is an instantiation of a MC service server in accordance
+with 3GPP TS 23.280 [6].
+The MCVideo server functional entity represents a specific instantiation of
+the GCS AS described in 3GPP TS 23.468 [9] to control multicast and unicast
+operations for group communications.
+The MCVideo server functional entity is supported by the SIP AS, HTTP client
+and HTTP server functional entities of the signalling control plane.
+This MCVideo server provides support for centralised media transmission
+control for on-network and distributed media transmission control for off-
+network operation.
+The MCVideo server is responsible for managing and providing the device
+information that can participate in MCVideo communications. The device
+information is further associated to MCVideo users to manage remote device
+control authorization. The device information is provisioned to the MCVideo
+server by the MCVideo service provider, mission critical organization and the
+MCVideo user.
+##### 6.2.2.3.3 Media distribution function
+The media distribution function is responsible for the distribution of media
+to MCVideo clients. By means of information provided by the MCVideo server
+(e.g. IP addresses, transport layer ports), it will provide the following
+functionality:
+\- provide for the reception of uplink MCVideo UE media transmission by means
+of the MCVideo-7 reference point;
+\- storing the received media stream as MCVideo content files;
+\- replicate the media as needed for distribution to those participants using
+unicast transport;
+\- distribute downlink media to MCVideo UEs by IP unicast transmission to
+those participants utilizing unicast transport by means of the MCVideo-7
+reference point;
+\- distribute downlink media to MCVideo UEs using multicast downlink transport
+of media for the call by means of the MCVideo-8 reference point; and
+\- provide a media mixing function where multiple media streams are combined
+into a single media stream for transmission to the MCVideo UE.
+NOTE 1: If media mixing function occurs within the media distribution
+function, it operates independently of the media mixer in the UE.
+NOTE 2: A media mixing function within the media distribution function is not
+possible where the media is end to end encrypted.
+##### 6.2.2.3.4 Media mixer
+This functional entity exists on the UE and provides support for sending and
+receiving one or multiple media streams. It also provides support for
+combining multiple media streams into one media stream through the enforcement
+of media policy information. It supports the storing of a media stream as
+MCVideo content files.
+##### 6.2.2.3.5 MCVideo user database
+This functional entity contains information of the MCVideo user profile
+associated with an MCVideo ID that is held by the MCVideo service provider at
+the application plane. The MCVideo user profile is determined by the mission
+critical organization, the MCVideo service provider, and potentially the
+MCVideo user.
+The MCVideo ID is a MC service ID as described in clause 8 of 3GPP TS 23.280
+[6]. The MCVideo user profile is a MC service user profile as described in
+clause 10.1.4 of 3GPP TS 23.280 [6].
+The MCVideo user profile can be co-located with other MC service user profiles
+and stored in a common MC service user database.
+##### 6.2.2.3.6 Transmission control server
+This functional entity provides support for centralised transmission control
+for on-network and distributed transmission control for off-network operation.
+It may schedule transmission requests according to uplink criteria from
+different transmission control participants, send an notification to all
+transmission control participants to allow them to receive the video according
+to downlink criteria if the transmission request is granted, and provide
+queuing in cases of contention. Transmission control applies to all MCVideo
+communications including group call and private call. For on-network
+operation, this functional entity is located with the MCVideo server. For off-
+network operation, this functional entity is located in the UE.
+##### 6.2.2.3.7 Transmission control participant
+The transmission control participant functional entity is responsible for
+handling outgoing transmission requests and the incoming video stream
+invitations and notifications. This functional entity is located in the UE for
+both on-network and off-network operations.
+##### 6.2.2.3.8 MC gateway server
+The MC gateway server provides support for MCVideo interconnection services
+with a partner MCVideo system in a different trust domain whilst providing
+topology hiding. It acts as a proxy for one or more MCVideo servers in the
+partner MCVideo system without needing to expose the MCVideo servers in the
+primary MCVideo system outside the trusted domain of the primary MCVideo
+system. It may be a role of the MCVideo server described in subclause
+6.2.2.3.2 of the present document.
+The MC gateway server is responsible for relaying call control and floor
+control signalling messages, and media between MCVideo servers within the
+MCVideo system and the interconnected MCVideo system.
+Editor\'s note: It is FFS whether the gateway MC server can act as a
+signalling proxy as defined in 3GPP TS 33.180 [14]
+## 6.3 Reference points
+### 6.3.1 Reference point MCVideo-1 (between the MCVideo client and the
+MCVideo server)
+The MCVideo-1 reference point, which exists between the MCVideo client and the
+MCVideo server, is used for MCVideo application signalling for establishing a
+session in support of MCVideo service.
+### 6.3.2 Reference point MCVideo-2 (between the MCVideo server and the
+MCVideo user database)
+The MCVideo-2 reference point, which exists between the MCVideo server and the
+MCVideo user database, is used by the MCVideo server to obtain information
+about a specific user.
+### 6.3.3 Reference point MCVideo-3 (between the MCVideo server and the
+MCVideo server and between the MCVideo server and the MC gateway server)
+The MCVideo-3 reference point exists between the MCVideo server and another
+MCVideo server and between the MCVideo server and the MC gateway server, and
+is used for MCVideo application signalling.
+### 6.3.4 Reference point MCVideo-4 (between the transmission control
+participant and the transmission control server)
+The MCVideo-4 reference point, which exists between the transmission control
+participant and the transmission control server, is used for MCVideo
+transmission control signalling over unicast. The MCVideo-4 reference point
+uses the SGi reference point defined in 3GPP TS 23.002 [4].
+### 6.3.4A Reference point MCVideo-5 (unicast between the media distribution
+function and the EPS)
+The MCVideo-5 reference point, which exists between the media distribution
+function and the EPS, is used, subject to the conditions below, by the media
+distribution function of the MCVideo server to obtain unicast bearers with
+appropriate QoS from the EPS. It utilises the Rx interface of the EPS
+according to 3GPP TS 23.203 [11].
+MCVideo-5 is not used when the MCVideo service provider and the PLMN operator
+do not have an operational agreement for QoS control to be provided directly
+from the MCVideo service provider domain.
+MCVideo-5 may be used when the MCVideo service provider and the PLMN operator
+have an operational agreement where QoS control is provided directly from the
+MCVideo service provider domain.
+NOTE: Any coordination between the P-CSCF use of Rx and the MCVideo server use
+of Rx (via MCVideo-5) from the MCVideo service provider domain is not
+specified in this release of this specification.
+### 6.3.4B Reference point MCVideo-6 (between the MCVideo server and the EPS)
+The MCVideo-6 reference point, which exists between the MCVideo server and the
+EPS, is used to request the allocation and activation of multicast transport
+resources for MCVideo application usage. The MCVideo-6 reference point uses
+the MB2-C interface as defined in 3GPP TS 29.468 [13].
+### 6.3.5 Reference point MCVideo-7 (between the media distribution function
+and the media mixer)
+The MCVideo-7 reference point, which exists between the media distribution
+function and the media mixer, is used to exchange unicast media between the
+media distribution function of the MCVideo server and the media mixer of the
+MCVideo client. The MCVideo-7 reference point uses the SGi reference point
+defined in 3GPP TS 23.002 [4].
+### 6.3.6 Reference point MCVideo-8 (between the media distribution function
+and the media mixer)
+The MCVideo-8 reference point, which exists between the media distribution
+function and the media mixer, is used by the media distribution function of
+the MCVideo server to send multicast media to the media mixer of the MCVideo
+client. The MCVideo-8 reference point uses the MB2-U interface defined in 3GPP
+TS 23.468 [9].
+### 6.3.7 Reference point MCVideo-9 (between the transmission control
+participant and the transmission control server)
+The MCVideo-9 reference point, which exists between the transmission control
+participant and the transmission control server, is used MCVideo transmission
+control signalling over multicast. The MCVideo-9 reference point uses the
+MB2-U interface defined in 3GPP TS 23.468 [9].
+### 6.3.8 Reference point MCVideo-10 (between the MC gateway server and the MC
+gateway server in a different MCVideo system)
+The MCVideo-10 reference point, which exists between the MC gateway server and
+the MC gateway server in an interconnected MCVideo system for MCVideo
+application signalling for establishing MCVideo sessions, shall use the SIP-3
+reference point for transport and routing of signalling. Floor control
+signalling and media are also transferred using the MCVideo‑10 reference point
+between interconnected MCVideo systems.
+# 6A Identities
+The MCVideo service specific identities (e.g. MCVideo ID, MCVideo group ID)
+are described in clause 8 of 3GPP TS 23.280 [6].
+# 6B Application of functional model to deployments
+The application of the functional model to deployments, and description of
+various deployment scenarios for the MCVideo service, can be found in clause 9
+of 3GPP TS 23.280 [6].
+# 7 Procedures and information flows
+## 7.1 Group call
+### 7.1.1 General
+Group calls are enabled in both on-network and off-network.
+### 7.1.2 On-network group call
+#### 7.1.2.1 General
+This subclause contains procedures for group call across a single and multiple
+MCVideo servers, and associated functions such as emergency call, broadcast
+call and others.
+Two variations of group call model are described in subclause 7.1.2.3, the
+pre-arranged group call and the chat group call. Each of the subsequent group
+call types in subclause 7.1.2.4 onwards are applicable to either call model.
+#### 7.1.2.2 Information flows for group call in on-network
+##### 7.1.2.2.1 Group call request (MCVideo client -- MCVideo server)
+Table 7.1.2.2.1-1 describes the information flow group call request from the
+MCVideo client to the MCVideo server.
+Table 7.1.2.2.1-1: Group call request (MCVideo client -- MCVideo server)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party Functional alias O The functional alias of the calling party
+MCVideo group ID M The MCVideo group ID of the group on which the call is
+requested SDP offer M Media parameters of MCVideo clients Implicit transmit
+media request O When originating client requests the permission to transmit
+media, this element shall be included Broadcast indicator O Indicates that the
+group call request is for a broadcast group call Requested priority O
+Application priority level requested for this call
+* * *
+##### 7.1.2.2.2 Group call request (MCVideo server -- MCVideo client)
+Table 7.1.2.2.2-1 describes the information flow group call request from the
+MCVideo server to the MCVideo client.
+Table 7.1.2.2.2-1: Group call request (MCVideo server -- MCVideo client)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party Functional alias O The functional alias of the calling party
+MCVideo group ID M The MCVideo group ID of the group on which the call is
+initiated SDP offer M Media parameters of MCVideo server Broadcast indicator O
+Indicates that the group call request is for a broadcast group call
+* * *
+##### 7.1.2.2.3 Group call response (MCVideo server -- MCVideo client)
+Table 7.1.2.2.3-1 describes the information flow group call response from the
+MCVideo server to the MCVideo client.
+Table 7.1.2.2.3-1: Group call response (MCVideo server -- MCVideo client)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party MCVideo group ID M The MCVideo group ID of the group on which
+the call is requested SDP answer M Media parameters selected Result M Result
+of the group call request (success or failure)
+* * *
+##### 7.1.2.2.4 Group call response (MCVideo client -- MCVideo server)
+Table 7.1.2.2.4-1 describes the information flow group call response from the
+MCVideo client to the MCVideo server.
+Table 7.1.2.2.4-1: Group call response (MCVideo client -- MCVideo server)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+target MCVideo group member MCVideo group ID M The MCVideo group ID of the
+group on which the call is initiated SDP answer M Media parameters selected
+Result M Result of the group call request (success or failure)
+* * *
+##### 7.1.2.2.5 Group call release request (MCVideo server -- MCVideo client)
+Table 7.1.2.2.5-1 describes the information flow group call release request
+from the MCVideo server to the MCVideo client.
+Table 7.1.2.2.5-1: Group call release request (MCVideo server -- MCVideo
+client)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+MCVideo group member MCVideo group ID M The MCVideo group ID of the group on
+which the call is released
+* * *
+##### 7.1.2.2.6 Group call release request (MCVideo client -- MCVideo server)
+Table 7.1.2.2.6-1 describes the information flow group call release request
+from the MCVideo client to the MCVideo server.
+Table 7.1.2.2.6-1: Group call release request (MCVideo client -- MCVideo
+server)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+MCVideo group member MCVideo group ID M The MCVideo group ID of the group on
+which the call is released
+* * *
+##### 7.1.2.2.7 Group call release response (MCVideo client -- MCVideo server)
+Table 7.1.2.2.7-1 describes the information flow group call release response
+from the MCVideo client to the MCVideo server.
+Table 7.1.2.2.7-1: Group call release response (MCVideo client -- MCVideo
+server)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+MCVideo group member MCVideo group ID M The MCVideo group ID of the group on
+which the call is released
+* * *
+##### 7.1.2.2.8 Group call rejoin request (MCVideo client -- MCVideo server)
+Table 7.1.2.2.8-1 describes the information flow group call rejoin request
+from the MCVideo client to the MCVideo server.
+Table 7.1.2.2.8-1: Group call rejoin request (MCVideo client -- MCVideo
+server))
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the re-
+joining MCVideo group member Functional alias O The functional alias of the
+re-joining MCVideo group member MCVideo group ID M The MCVideo group ID of the
+group on which the call is on-going SDP offer M Media parameters of MCVideo
+client Requested priority O Application priority level requested for this call
+* * *
+##### 7.1.2.2.9 Group call rejoin response (MCVideo server -- MCVideo client)
+Table 7.1.2.2.9-1 describes the information flow group call rejoin response
+from the MCVideo server to the MCVideo client.
+Table 7.1.2.2.9-1: Group call rejoin response (MCVideo server -- MCVideo
+client)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+MCVideo group member rejoining the group call MCVideo group ID M The MCVideo
+group ID of the group on which the call is on-going SDP answer M Media
+parameters selected
+* * *
+##### 7.1.2.2.10 Group join request (MCVideo client -- MCVideo server)
+Table 7.1.2.2.10-1 describes the information flow group join request from the
+MCVideo client to the MCVideo server.
+Table 7.1.2.2.10-1: Group join request (MCVideo client -- MCVideo server)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+MCVideo group member joining the group communications for the group MCVideo
+group ID M The MCVideo group ID of the group to which the group communication
+is requested SDP offer M Media parameters of MCVideo client Implicit transmit
+media request O An indication that the user is also requesting the permission
+to transmit video Requested priority O Application priority level requested
+for this call
+* * *
+##### 7.1.2.2.11 Group join response (MCVideo server -- MCVideo client)
+Table 7.1.2.2.11-1 describes the information flow group join response from the
+MCVideo server to the MCVideo client.
+Table 7.1.2.2.11-1: Group join response (MCVideo server -- MCVideo client)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+MCVideo group member joining the group communications for the group MCVideo
+group ID M The MCVideo group ID of the group to which the group communication
+is requested SDP answer M Media parameters selected
+* * *
+##### 7.1.2.2.12 Group call leave request (MCVideo server -- MCVideo client)
+Table 7.1.2.2.12-1 describes the information flow group call leave request
+from the MCVideo server to the MCVideo client.
+Table 7.1.2.2.12-1: Group call leave request (MCVideo server -- MCVideo
+client)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+MCVideo group member which has been de-affiliated MCVideo group ID M The
+MCVideo group ID of the group on which the call is on-going
+* * *
+##### 7.1.2.2.12a Group call leave request (MCVideo client -- MCVideo server)
+Table 7.1.2.2.12a-1 describes the information flow group call leave request
+from the MCVideo client to the MCVideo server.
+Table 7.1.2.2.12a-1: Group call leave request (MCVideo client -- MCVideo
+server)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+MCVideo group member leaving the group call MCVideo group ID M The MCVideo
+group ID of the group on which the call is on-going
+* * *
+##### 7.1.2.2.13 Group call leave response (MCVideo client -- MCVideo server)
+Table 7.1.2.2.13-1 describes the information flow group call leave response
+from the MCVideo client to the MCVideo server.
+Table 7.1.2.2.13-1: Group call leave response (MCVideo client -- MCVideo
+server)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+MCVideo group member which has been de-affiliated MCVideo group ID M The
+MCVideo group ID of the group on which the call is on-going
+* * *
+##### 7.1.2.2.13a Group call leave response (MCVideo server -- MCVideo client)
+Table 7.1.2.2.13a-1 describes the information flow group call leave response
+from the MCVideo server to the MCVideo client.
+Table 7.1.2.2.13a-1: Group call leave response (MCVideo server -- MCVideo
+client)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+MCVideo group member leaving the group call MCVideo group ID M The MCVideo
+group ID of the group on which the call is on-going
+* * *
+##### 7.1.2.2.14 MCVideo emergency alert request
+Table 7.1.2.2.14-1 describes the information flow MCVideo emergency alert
+request from the MCVideo client to the MCVideo server, for the procedures
+defined in 3GPP TS 23.280 [6].
+Table 7.1.2.2.14-1: MCVideo emergency alert request (MCVideo client -- MCVideo
+server)
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+alerting party Functional alias O The functional alias of the alerting party
+MCVideo group ID M The MCVideo group ID with which the alert is associated
+Location O The alerting MCVideo client\'s location
+* * *
+Table 7.1.2.2.14-2 describes the information flow MCVideo emergency alert
+request from the MCVideo server to the MCVideo client, for the procedures
+defined in 3GPP TS 23.280 [6].
+Table 7.1.2.2.14-2: MCVideo emergency alert request (MCVideo server -- MCVideo
+client)
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+alerting party Functional alias O The functional alias of the alerting party
+MCVideo group ID M The MCVideo group ID with which the alert is associated
+Organization name M The alerting MCVideo user\'s mission critical organization
+name Location O The alerting MCVideo client\'s location
+* * *
+##### 7.1.2.2.15 MCVideo emergency alert response
+Table 7.1.2.2.15-1 describes the information flow MCVideo emergency alert
+response from the MCVideo client to the MCVideo server and from the MCVideo
+server to the MCVideo client, for the procedures defined in 3GPP TS 23.280
+[6].
+Table 7.1.2.2.15-1: MCVideo emergency alert response
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+alerting party MCVideo group ID M The MCVideo group ID with which the alert is
+associated
+* * *
+##### 7.1.2.2.16 MCVideo emergency alert cancel request
+Table 7.1.2.2.16-1 describes the information flow MCVideo emergency alert
+cancel request from the MCVideo client to the MCVideo server and from the
+MCVideo server to the MCVideo client, for the procedures defined in 3GPP TS
+23.280 [6].
+Table 7.1.2.2.16-1: MCVideo emergency alert cancel request
++-----------------------------+--------+-----------------------------+ | Information Element | Status | Description | +-----------------------------+--------+-----------------------------+ | MCVideo ID | M | The identity of the | | | | cancelling party | +-----------------------------+--------+-----------------------------+ | MCVideo group ID | M | The MCVideo group ID with | | | | which the alert is | | | | associated | +-----------------------------+--------+-----------------------------+ | Client emergency alert | O | Requests cancellation of | | cancel inform | | the emergency alert of the | | | | cancelling party | | (see NOTE) | | | +-----------------------------+--------+-----------------------------+ | Group in-progress emergency | O | Requests cancellation of | | state cancel request | | the in-progress emergency | | | | state of the group | | (see NOTE) | | | +-----------------------------+--------+-----------------------------+ | NOTE: At least one of these | | | | information elements shall | | | | be present | | | +-----------------------------+--------+-----------------------------+
+##### 7.1.2.2.17 MCVideo emergency alert cancel response
+Table 7.1.2.2.17-1 describes the information flow MCVideo emergency alert
+cancel response from the MCVideo client to the MCVideo server and from the
+MCVideo server to the MCVideo client, for the procedures defined in 3GPP TS
+23.280 [6].
+Table 7.1.2.2.17-1: MCVideo emergency alert cancel response
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+cancelling party MCVideo group ID M The MCVideo group ID with which the alert
+is associated
+* * *
+##### 7.1.2.2.18 MCVideo emergency group call request
+Table 7.1.2.2.18-1 describes the information flow emergency group call request
+from the MCVideo client to the MCVideo server and from the MCVideo server to
+the MCVideo client.
+Table 7.1.2.2.18-1: MCVideo emergency group call request
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+calling party Functional alias O The functional alias of the calling party
+MCVideo group ID M The MCVideo group ID on which the call is to be conducted
+Emergency indicator M Indicates that the group call request is an MCVideo
+emergency call Alert indicator M Indicates whether an emergency alert is to be
+sent Implicit transmit media request (see NOTE) O Indicates that the
+originating client requests the permission to transmit media. NOTE: This
+element shall be included only when the originating client requests the the
+permission to transmit media.
+* * *
+##### 7.1.2.2.19 MCVideo emergency group call response
+Table 7.1.2.2.19-1 describes the information flow emergency group call
+response from the MCVideo client to the MCVideo server and from the MCVideo
+server to the MCVideo client.
+Table 7.1.2.2.19-1: MCVideo emergency group call response
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+calling party MCVideo group ID M The MCVideo group ID on which the call is to
+be conducted Result M Result of the MCVideo emergency group call request
+(success or failure)
+* * *
+##### 7.1.2.2.20 MCVideo in-progress emergency group state cancel request
+Table 7.1.2.2.20-1 describes the information flow MCVideo in-progress
+emergency group state cancel request from the MCVideo client to the MCVideo
+server.
+NOTE: In Rel-14 and Rel-13 versions of this specification the name of this
+information flow is \"MCVideo emergency group call cancel request\".
+Table 7.1.2.2.20-1: MCVideo in-progress emergency group state cancel request
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+cancelling party MCVideo group ID M The MCVideo group ID on which the MCVideo
+in-progress emergency state is to be cancelled. Alert indicator O Indicates
+whether the emergency alert of the cancelling party is to be cancelled
+* * *
+##### 7.1.2.2.21 MCVideo in-progress emergency group state cancel response
+Table 7.1.2.2.21-1 describes the information flow MCVideo in-progress
+emergency group state cancel response from the MCVideo server to the MCVideo
+client.
+NOTE: In Rel-14 and Rel-13 versions of this specification the name of this
+information flow is \"MCVideo emergency group call cancel response\".
+Table 7.1.2.2.21-1: MCVideo in-progress emergency group state cancel response
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+cancelling party MCVideo group ID M The MCVideo group ID on which the MCVideo
+in-progress emergency state is to be cancelled.
+* * *
+##### 7.1.2.2.22 MCVideo imminent peril group call request
+Table 7.1.2.2.22-1 describes the information flow MCVideo imminent peril group
+call request from the MCVideo client to the MCVideo server and from the
+MCVideo server to the MCVideo client.
+Table 7.1.2.2.22-1: MCVideo imminent peril group call request
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+calling party Functional alias O The functional alias of the calling party
+MCVideo group ID M The MCVideo group ID on which the call is to be conducted
+Imminent peril indicator M Indicates that the group call request is an
+imminent peril call
+* * *
+##### 7.1.2.2.23 MCVideo imminent peril group call response
+Table 7.1.2.2.23-1 describes the information flow MCVideo imminent peril group
+call response from the MCVideo client to the MCVideo server and from the
+MCVideo server to the MCVideo client.
+Table 7.1.2.2.23-1: MCVideo imminent peril group call response
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+calling party MCVideo group ID M The MCVideo group ID on which the call is to
+be conducted Result M Result of the MCVideo imminent peril group call request
+(success or failure)
+* * *
+##### 7.1.2.2.24 MCVideo imminent peril group call cancel request
+Table 7.1.2.2.24-1 describes the information flow MCVideo imminent peril group
+call cancel request from the MCVideo client to the MCVideo server and from the
+MCVideo server to the MCVideo client.
+Table 7.1.2.2.24-1: MCVideo imminent peril group call cancel request
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+cancelling party MCVideo group ID M The MCVideo group ID on which the imminent
+peril is to be cancelled
+* * *
+##### 7.1.2.2.25 MCVideo imminent peril group call cancel response
+Table 7.1.2.2.25-1 describes the information flow MCVideo imminent peril group
+call cancel response from the MCVideo client to the MCVideo server and from
+the MCVideo server to the MCVideo client.
+Table 7.1.2.2.25-1: MCVideo imminent peril group call cancel response
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+cancelling party MCVideo group ID M The MCVideo group ID on which the imminent
+peril is to be cancelled
+* * *
+#### 7.1.2.3 Group call within one MC system
+##### 7.1.2.3.1 Group call models
+###### 7.1.2.3.1.1 Pre-arranged group call
+##### 7.1.2.3.1.1.1 General {#general-5 .H6}
+A pre-arranged group call is initiated by one of the affiliated group members.
+The initiation of a pre-arranged group call results in all other affiliated
+group members being invited. Media plane resources are reserved (on-demand) or
+a pre-established session is associated during the group call setup procedure
+and released (if on-demand session) or de-associated (if pre-established
+session) when the call is released. SIP signalling is used to setup and
+release pre-arranged group calls.
+##### 7.1.2.3.1.1.2 Pre-arranged group call setup {#pre-arranged-group-call-
+setup .H6}
+The procedure enables the scenario where an MCVideo client is initiating an
+MCVideo group call with unicast signalling for communicating with the
+affiliated members of that group.
+Procedures in figure 7.1.2.3.1.1.2-1 are the signalling control plane
+procedures for the MCVideo client initiating establishment of an MCVideo group
+call with a pre-arranged group i.e., MCVideo users on client 1, client 2 and
+client 3 belong to the same group which is defined in the group management
+server.
+Pre-conditions:
+1\. A pre-arranged group is an MCVideo group that is pre-defined with MCVideo
+group ID and member list in the group management server. All members of the
+group belong to the same MC system.
+2\. It is assumed that MCVideo users on MCVideo client 1, MCVideo client 2 and
+MCVideo client 3 are already registered for receiving MCVideo service and
+affiliated.
+3\. Optionally, the MCVideo client 1 may have an activated functional alias to
+be used.
+4\. The MCVideo server may have subscribed to the MCVideo functional alias
+controlling server within the MC system for functional alias activation/de-
+activation updates.
+Figure 7.1.2.3.1.1.2-1: Pre-arranged group call setup
+1\. User at MCVideo client 1 would like to initiate an MCVideo group call with
+a selected group (identified by MCVideo group ID). The MCVideo user at MCVideo
+client 1 may include a functional alias used within the MCVideo group call.
+NOTE 1: The selected functional alias is not changed during the group call,
+i.e. a MCVideo client uses the same functional alias until the group call is
+released or the MCVideo client has left the group call.
+2\. MCVideo client 1 sends a group call request towards the MCVideo server via
+the SIP core, which hosts the group selected by the user and identified by
+MCVideo group ID. The group call request also contains the MCVideo group ID
+and an SDP offer containing the MCVideo client media parameters. If the MC
+service user of MCVideo client 1 has selected a functional alias, then the
+group call request contains that functional alias. If there is a transmit
+media request, then the group call request contains an indication for the
+implicit transmit media request.
+3\. MCVideo server checks whether the user of MCVideo client 1 is authorized
+to initiate a group call for the selected group. If a functional alias is
+present, the MCVideo server checks whether it is allowed to be used and if it
+has been activated for the user. If authorized and the group call is ongoing
+for that MCVideo group ID, the MCVideo server adds the requesting MCVideo
+client 1 to the existing MCVideo group call and notifies the MCVideo client 1
+that the MCVideo group call is already in progress. Otherwise, MCVideo server
+resolves the MCVideo group ID to determine the members of that group and their
+affiliation status, based on the information from the group management server.
+NOTE 2: MCVideo server can have already retrieved the user/group configuration
+data and locally cached. If the user/group configuration data is not locally
+cached on the MCVideo server then MCVideo server requests the user/group
+configuration data from the MCVideo user database/group management server.
+4\. MCVideo server includes information that it communicates using MCVideo
+service, offers the same media parameters or a subset of the media parameters
+contained in the initial received request and sends the corresponding group
+call request via the SIP core towards the MCVideo clients of each of those
+affiliated group members. MCVideo users are notified about the incoming group
+call and, if present, the functional alias of the initiating MC service user
+is displayed. The MCVideo server indicates whether acknowledgement is required
+for the call.
+5\. The receiving MCVideo clients accept the group call request, and a group
+call response is sent to the group host MCVideo server. This response may
+contain an acknowledgement. The conditions for sending acknowledgement may be
+based on configuration.
+6\. MCVideo server sends the group call response including the selected media
+parameters to the MCVideo client 1 through the signalling path to inform about
+successful call establishment.
+NOTE 3: Step 6 can occur at any time following step 4b, and prior to step 7
+depending on the conditions to proceed with the call.
+7\. If the initiating MCVideo user requires the acknowledgement from
+affiliated MCVideo group members, and the required MCVideo group members do
+not acknowledge the call setup within a configured time (the \"acknowledged
+call setup timeout\"), then the MCVideo server may proceed with or abandon the
+call and then notify the initiating MCVideo user that the acknowledgements did
+not include all required members according to group policy. This notification
+may be sent to the initiating MCVideo user by the MCVideo server more than
+once during the call when MCVideo users join or leave the MCVideo group call.
+8\. MCVideo client 1, client 2 and client 3 have successfully established
+media plane and transmission control for communication.
+##### 7.1.2.3.1.1.3 Release pre-arranged group call {#release-pre-arranged-
+group-call .H6}
+The procedure enables the scenario where an MCVideo server initiates the
+termination of an ongoing MCVideo group call for all the participants of that
+group call, since at least one of the termination conditions are met e.g.,
+last participant leaving, second last participant leaving, initiator leaving,
+or minimum number of affiliated MCVideo group members are not present.
+Procedures in figure 7.1.2.3.1.1.3-1 are the signalling control plane
+procedures for the MCVideo server initiating termination of an ongoing MCVideo
+group call.
+Figure 7.1.2.3.1.1.3-1: Release pre-arranged group call
+1\. It is assumed that MCVideo users on MCVideo client 1, client 2 and client
+3 are already part of the ongoing group call (e.g., as a result of pre-
+arranged group call setup).
+2\. MCVideo server would like to release the MCVideo group call which is
+ongoing e.g., last participant leaving, initiator leaving, or minimum number
+of affiliated group members are not present.
+3\. MCVideo server identifies the participants of the ongoing group call and
+generates group call release request to release ongoing session.
+4\. MCVideo server sends a group call release request via SIP core towards
+each participant of the ongoing group call.
+5\. MCVideo users are notified about the release of the group call.
+6\. MCVideo client(s) receiving group call release request, acknowledge
+towards the MCVideo server by sending a group call release response.
+7\. MCVideo client 1, client 2 and client 3 have successfully released the
+media transmission control and media plane resources associated with the group
+call that is terminated.
+##### 7.1.2.3.1.1.4 Late entry pre-arranged group call {#late-entry-pre-
+arranged-group-call .H6}
+Procedures in figure 7.1.2.3.1.1.4-1 are the signalling control plane
+procedures for the MCVideo server requesting a newly affiliated member or a
+member coming back from out of coverage to join an ongoing MCVideo group call.
+Pre-conditions:
+1\. MCVideo group is previously defined on the group management server with
+MCVideo users affiliated to that group. All members of the group belong to the
+same MC system.
+2\. It is assumed that MCVideo users on MCVideo client 2 to MCVideo client n
+are on an ongoing call.
+3\. Optionally, the MCVideo client 1 may have activated functional alias to be
+used.
+4\. The MCVideo server may have subscribed to the MCVideo functional alias
+controlling server within the MC system for functional alias activation/de-
+activation updates.
+Figure 7.1.2.3.1.1.4-1: Late entry pre-arranged group call
+1\. MCVideo server determines that MCVideo client 1 which is newly affiliated
+or coming back from out of coverage has to be invited to join an ongoing group
+call (late entry).
+2\. MCVideo server generates group call request including the information such
+as MCVideo service identifier (possible for the SIP core to route the request
+to the MCVideo server), MC service group ID of the group invited to join,
+offer one or more media types and sends towards the MCVideo client 1 via SIP
+core.
+3\. MCVideo user at MCVideo client 1 is notified about the incoming group
+call.
+4\. Upon MCVideo user at MCVideo client 1 accepting the incoming group call
+request, MCVideo client 1 sends the group call response including the selected
+media types to the MCVideo server through the signalling path. If the incoming
+group call request is rejected by the MCVideo client 1, the MCVideo server
+should not resend the group call request
+5\. MCVideo client 1 is successfully added to the ongoing group call and
+MCVideo users at MCVideo client 1 to MCVideo client n may be notified about
+the MCVIDEO client 1 joining the group call.
+6\. A notification with the information of media transmissions in the group
+call is sent to MCVideo client1.
+Editor\'s Note: Checking of functional alias of MCVideo client 1 by the
+MCVideo server is FFS.
+##### 7.1.2.3.1.1.5 Rejoining call {#rejoining-call .H6}
+Procedures in figure 7.1.2.3.1.1.5-1 are the signalling control plane
+procedures for the MCVideo client to rejoin an ongoing MCVideo group call
+(e.g. coming back from out of coverage).
+Pre-condition:
+1 It is assumed that MCVideo users on MCVideo client 2 to MCVideo client n are
+on an ongoing call.
+2\. Optionally, the MCVideo client 1 may have activated functional alias to be
+used.
+3\. The MCVideo server may have subscribed to the MCVideo functional alias
+controlling server within the MC system for functional alias activation/de-
+activation updates.
+Figure 7.1.2.3.1.1.5-1: Rejoin call
+1\. MCVideo client 1 has necessary information for rejoining an ongoing group
+call, then the MCVideo client 1 initiates group call rejoin request including
+the ongoing group call information. The MCVideo user at MCVideo client 1 may
+include a functional alias used within the MCVideo rejoin request.
+2\. MCVideo server checks whether the MCVideo client 1 can rejoin the ongoing
+call (e.g. based upon affiliation status) and checks the functional alias, if
+present.
+3\. MCVideo client 1 is informed that the group call rejoin is successful by
+sending a group call rejoin response.
+4\. MCVideo client 1 is successfully added to the ongoing group call and
+MCVideo users at MCVideo client 1 to MCVideo client n may be notified about
+the MCVideo client 1 joining the group call and the functional alias of
+MCVideo client 1 may be displayed.
+5\. A notification with the information of media transmissions in the group
+call is sent to MCVideo client 1.
+###### 7.1.2.3.1.2 Chat group call
+##### 7.1.2.3.1.2.1 General {#general-6 .H6}
+In a chat group (restricted) call model, the MCVideo user individually joins a
+group call without being explicitly invited by the MCVideo server. The
+establishment of a chat group (restricted) call does not result in other group
+members being invited.
+Figure 7.1.2.3.1.2.2-1 describes the basic procedure for the MCVideo client
+initiating an MCVideo group call which uses the chat group (restricted) call
+model. The chat group (restricted) call model can be used to realize the video
+conferencing service where only users that have been configured as
+participants for the video conferencing group are allowed to join the group
+communications for the given group.
+Chat group join mechanism:
+\- Each MCVideo client sends a group join request when the MCVideo user wants
+to participate in the group communication for the group. (This message does
+not impact the MCVideo user\'s membership in the group; the MCVideo server
+will verify that the MCVideo user is an authorized member of the group.)
+\- The group join request may include a transmit media request. It is assumed
+that the group join request will be delivered from MCVideo client to MCVideo
+server using SIP.
+\- The group join request is used to indicate to the MCVideo server that the
+MCVideo user associated with the given MCVideo client wishes to participate
+(begin to receive notifications for media transmissions) from the group.
+\- The group join request shall cause the MCVideo server to generate an
+implicit affiliation for the MCVideo user to the group, if the user is not
+already affiliated to the group.
+\- The group join request contains the information needed to negotiate media
+parameters (on demand) or to associate a pre-established session between
+MCVideo server and MCVideo client for the group call. The group join request
+can take the form of a SIP invite.
+\- A selected functional alias is not changed by a MCVideo client during the
+whole participation within a chat group call, i.e. a MCVideo client uses the
+same functional alias selected when joining the chat group call until the chat
+group call is released or the MCVideo client leaves the chat group call.
+Subsequent participation in a group call when the group is using the chat
+model:
+\- Once an MCVideo client successfully joins a group call which is using the
+chat model, the MCVideo client connects to the media plane for the media
+transmission if the media transmission is currently ongoing.
+\- If the MCVideo group call is not currently ongoing (i.e.: when MCVideo
+clients on the group call are not sending or receiving media, and the time out
+between transmission control exchanges has expired) then the newly joined
+MCVideo client will only have pre-established its media parameters for the
+call.
+\- If the newly joined MCVideo user wishes to transmit media to the other
+joined users of the group using the chat model, then the MCVideo client shall
+use a normal transmission control procedure for transmitting the media.
+\- Subsequent group call media transmissions are controlled using transmission
+control signalling.
+\- The MCVideo server may tear down the media plane between successive group
+calls using the chat model, or the MCVideo server may allow the media plane to
+remain up between successive group calls using the chat model depending on
+resources.
+Leaving and releasing a chat group:
+\- When a user wants to leave a chat group call, the client shall send a group
+call leave request to the server and release the media plane.
+\- The server can release a chat group call by sending a group call release to
+all joined clients. A server initiated release also releases the media plane
+for all joined clients.
+##### 7.1.2.3.1.2.2 Chat group call setup {#chat-group-call-setup .H6}
+MCVideo client 1, client 2, and client 3 are served by the home MCVideo
+service provider in figure 7.1.2.3.1.2.2-1.
+Pre-conditions:
+1\. MCVideo user 2 and MCVideo user 3 have previously joined (affiliated) to
+the group call. MCVideo client 1, client 2, and client 3 are registered and
+all users (MCVideo user 1, user 2, and user 3) have been authenticated and
+authorized to use the MCVideo service.
+2\. MCVideo client 1, MCVideo client 2 and MCVideo client 3 may have activated
+functional alias(es) configured to be used during the group call
+communication. No call is currently in progress for the group.
+3\. The MCVideo server may have subscribed to the MCVideo functional alias
+controlling server within the MC system for functional alias activation/de-
+activation updates.
+Figure 7.1.2.3.1.2.2-1: MCVideo chat group call
+1\. MCVideo user 1 indicates to join the group communication for the group.
+This may include a transmit media request.
+1a. MCVideo client 1 sends a group join request with the MCVideo group ID of
+the desired group. It contains the MCVideo user\'s MCVideo ID and the MCVideo
+client media parameters. The MCVideo user at MCVideo client 1 may include a
+functional alias used within the MCVideo group join request. If there is a
+request for media transmission, then the group join request contains an
+indication of an implicit transmit media request.
+1b. The MCVideo server receives the group join request. MCVideo server
+generates an implicit affiliation (if the MCVideo user is not already
+affiliated to the group) and verifies that MCVideo user 1 is authorized to
+affiliate to the group by following the affiliation procedure for MCVideo. If
+a functional alias is present, the MCVideo server checks whether it is allowed
+to be used and if it has been activated for the user.
+1c. The MCVideo server replies with a group join response indicating the
+acceptance of the group join request and also returns the MCVideo server
+selected media parameters for the group call in the group join response.
+2\. If MCVideo user 1 requests to transmit media by sending transmit media
+request to MCVideo server, the MCVideo server establishes the media plane (if
+not already established) for the call.
+3\. Transmission control will continue to be used by the transmission control
+participants associated with MCVideo client 1, MCVideo client 2 and MCVideo
+client 3 for the duration of the call. .If present, the functional alias of
+MCVideo client 1, MCVideo client 2 and MCVideo client 3 are displayed where
+appropriate.
+##### 7.1.2.3.1.2.3 Release chat group call {#release-chat-group-call .H6}
+The procedure describes the case where the MCVideo server releases an ongoing
+MCVideo group call for all the participants of that group call, since at least
+one of the conditions for release are met e.g. due to chat duration expiry,
+last participant leaving or initiator leaving.
+NOTE 1: The procedure for an MCVideo user leaving the group call is a
+different procedure.
+Procedures in figure 7.1.2.3.1.2.3-1 are the procedures for the MCVideo server
+initiating the release of an ongoing MCVideo group call.
+The following precondition applies:
+\- A group call is ongoing between MCVideo clients 1, 2 and 3
+Figure 7.1.2.3.1.2.3-1: Release chat group call
+1\. MCVideo server would like to release the MCVideo group call which is
+ongoing e.g., due to chat duration expiry, last participant leaving, or
+initiator leaving.
+2\. MCVideo server identifies the participants of the ongoing group call and
+generates group call release request to release the ongoing session.
+3\. MCVideo server sends a group call release request towards each participant
+of the ongoing group call.
+NOTE 2: The group call release request can also be sent over SIP signalling on
+the signalling plane.
+4\. MCVideo users are notified about the release of the group call.
+5\. Optionally the MCVideo client(s) receiving group call release request, may
+send a group call release response to the MCVideo server.
+NOTE 3: The MCVideo client can send group call release response when the group
+call release request is sent using a unicast bearer.
+6\. MCVideo client 1, client 2 and client 3 release the transmission control
+and media plane resources associated with the group call that is released.
+Successful release of the group call does not affect the status of affiliation
+of any of the clients.
+##### 7.1.2.3.1.2.4 void {#void .H6}
+##### 7.1.2.3.1.2.5 Late entry chat group call, newly joined group member
+{#late-entry-chat-group-call-newly-joined-group-member .H6}
+Procedures in figure 7.1.2.3.1.2.5-1 are those for a group member entering an
+ongoing MCVideo group call, i.e. performing a late entry.
+Pre-conditions:
+1\. MCVideo user 2 and MCVideo user 3 have previously joined to the group.
+MCVideo client 1, client 2, and client 3 are registered and all users (MCVideo
+user 1, user 2, and user 3) have been authenticated and authorized to use the
+MCVideo service.
+2\. MCVideo user 1 indicates to join the group communication for the group.
+3\. MCVideo users using MCVideo client 1 to MCVideo client n may have
+activated functional alias(es) configured to be used during the group call
+communication.
+4 The MCVideo server may have subscribed to the MCVideo functional alias
+controlling server within the MC system for functional alias activation/de-
+activation updates.
+Figure 7.1.2.3.1.2.5-1: Late entry of a newly joined group member
+1\. MCVideo client 1 sends a group join request with the MCVideo group ID of
+the desired group. It contains the MCVideo user\'s MCVideo ID and the MCVideo
+client media parameters. The MCVideo user at MCVideo client 1 may include a
+functional alias used within the MCVideo group join request. If there is a
+request to transmit, then the group join request contains an indication of an
+implicit transmit media request.
+2\. The MCVideo server receives the group join request. MCVideo server
+generates an implicit affiliation (if the MCVideo user is not already
+affiliated to the group) and verifies that MCVideo user 1 is authorized to
+affiliate to the group. If a functional alias is present, the MCVideo server
+checks whether it is allowed to be used and if it has been activated for the
+user.
+3\. The MCVideo server replies with a group join response indicating the
+acceptance of the group join request.
+4\. Media plane between MCVideo client 1 and MCVideo server is established
+using media plane control signalling.
+> 5\. MCVideo users at MCVideo client 2 and MCVideo client 3 may be notified
+> about the MCVideo client 1 joining the group call, and the functional alias
+> of MCVideo client 1 may be displayed.
+6\. The MCVideo server may send (6a) Media transmission notification to
+MCVideo client 1, indicating the current transmitter. Alternatively the
+MCVideo server may send (6b) Transmit media granted, (6b) Transmit media
+rejected or (6d) Queue position info.
+7\. Transmission control will continue to be used by the transmission control
+participants associated with MCVideo client 1, MCVideo client 2 and MCVideo
+client 3. If present, the functional alias of MCVideo client 1, MCVideo client
+2 and MCVideo client 3 are displayed where appropriate.
+##### 7.1.2.3.1.2.6 Late entry chat group call, MCVideo client coming back
+from out of coverage {#late-entry-chat-group-call-mcvideo-client-coming-back-
+from-out-of-coverage .H6}
+Procedures in figure 7.1.2.3.1.2.6-1 are those for an MCVideo client coming
+back from out of coverage during an ongoing MCVideo group call.
+Pre-conditions:
+1\. MCVideo users using MCVideo client 1, MCVideo client 2 and MCVideo client
+3 are in an ongoing group call when MCVideo client1 goes out of radio
+coverage.
+2\. MCVideo client1 returns from out of coverage while the group call is still
+ongoing.
+3\. MCVideo users using MCVideo client 1 to MCVideo client n may have
+activated functional alias(es) configured to be used during the group call
+communication.
+4\. The MCVideo server may have subscribed to the MCVideo functional alias
+controlling server within the MC system for functional alias activation/de-
+activation updates.
+Figure 7.1.2.3.1.2.6-1: Late entry of an MCVideo client returning from out of
+coverage
+1\. MCVideo client 1 or MCVideo server detects that MCVideo client 1 has
+returned from out of coverage.
+NOTE 1: How the MCVideo client or MCVideo server detects that the client has
+returned from out of coverage is out of scope of the present document.
+2\. Media plane between MCVideo client 1 and MCVideo server is re-established
+using media plane control signalling.
+NOTE 2: Depending on how long MCVideo client 1 was out of coverage, this step
+can include signalling from MCVideo client 1 to rejoin the chat group.
+3\. The MCVideo server may send (3a) Media transmission notification to
+MCVideo client 1, indicating the current transmitter. Alternatively the
+MCVideo server may send (3b) Transmit media granted, (3c) Transmit media
+rejected or (3d) Queue position info.
+4\. MCVideo users at MCVideo client 2 and MCVideo client 3 may be notified
+about the MCVideo client 1 returning to the group call, and the functional
+alias of MCVideo client 1 may be displayed.
+5\. Transmission control will continue to be used by the transmission control
+participants associated with MCVideo client 1, MCVideo client 2 and MCVideo
+client 3. If present, the functional alias of MCVideo client 1, MCVideo client
+2 and MCVideo client 3 are displayed where appropriate.
+##### 7.1.2.3.2 Exiting group call due to de-affiliation
+Procedures in figure 7.1.2.3.2-1 are the signalling control plane procedures
+for the MCVideo server requesting a newly de-affiliated member to leave an
+ongoing MCVideo group call.
+Pre-conditions:
+1\. MCVideo group is previously defined on the group management server with
+MCVideo users affiliated to that group. All members of the group belong to the
+same MC system.
+2\. MCVideo users on MCVideo client 1 to MCVideo client n are on an ongoing
+call.
+3\. MCVideo client 1 has been de-affiliated from the MCVideo group.
+Figure 7.1.2.3.2-1: Exiting MCVideo group call due to de-affiliation
+1\. MCVideo client 1 which has been de-affiliated is instructed to leave the
+ongoing group call.
+2\. MCVideo server sends a group call leave request to MCVideo client 1.
+3\. MCVideo user at MCVideo client 1 is notified about leaving the group call.
+4\. MCVideo client 1 sends the group call leave response and leaves the group
+call.
+5\. MCVideo client 1 is now removed from the ongoing group call and MCVideo
+users at MCVideo client 2 to MCVideo client n may be notified that MCVideo
+client 1 has left the group call.
+##### 7.1.2.3.3 MCVideo user leaving a group call
+Procedures in figure 7.1.2.3.3-1 are the signalling control plane procedures
+for the MCVideo user leaving an ongoing MCVideo group call.
+Pre-conditions:
+1\. MCVideo group is previously defined on the group management server with
+MCVideo users affiliated to that group. All members of the group belong to the
+same MC system.
+2\. MCVideo users on MCVideo client 1 to MCVideo client n are on an ongoing
+call.
+3\. MCVideo user 1 indicates to leave the group call
+Figure 7.1.2.3.3-1: MCVideo user leaving a group call
+1\. MCVideo client 1 sends a group call leave request to the MCVideo server.
+2\. MCVideo server sends a group call leave response to MCVideo client 1.
+3\. Release of transmission control and media plane resources associated with
+the group call for MCVideo client 1.
+NOTE 1: MCVideo server checks if group call termination conditions are met,
+e.g. last participant leaving, second last participant leaving, initiator
+leaving, minimum number of affiliated MCVideo group members are not present .
+If at least one of the group call termination conditions is met, the MCVideo
+server releases the group call for all participants (see subclauses
+7.1.2.3.1.1.3 Release pre-arranged group call and 7.1.2.3.1.2.3 Release chat
+group call).
+4\. MCVideo users at MCVideo client 2 to MCVideo client n may be notified that
+the MCVideo user of client 1 has left the group call.
+NOTE 2: The MCVideo server does not perform late entry for MCVideo users that
+have left the group call.
+#### 7.1.2.4 Broadcast group call
+##### 7.1.2.4.1 General
+A broadcast group call is a special group call where the initiating MCVideo
+user expects no response from the other MCVideo users, i.e. no response from
+the recipients is required to start media transmission and the call ends when
+the media transmission is complete.
+##### 7.1.2.4.2 Common broadcast group call procedure
+Only the call originator can transmit media during the broadcast group call
+and the broadcast group call is released when the transmission is complete.
+Figure 7.1.2.4.2-1 illustrates the common procedure both for group-broadcast
+group call and user-broadcast group call.
+Pre-condition:
+1\. MCVideo client 1 and MCVideo client 2 are members of a group-broadcast
+group/user-broadcast group.
+Figure 7.1.2.4.2-1: Broadcast group call
+1\. MCVideo user at MCVideo client 1 initiates the broadcast group call setup
+procedure with the indication of broadcast group call. The signalling
+procedure is identical to the group call setup as described in subclause
+7.1.2.3.1.1 with the inclusion of the parameter for broadcast group call
+indicator.
+2\. MCVideo client 1 starts to transmit media.
+NOTE 1: Only the call originating MCVideo user is allowed to transmit media on
+broadcast group call.
+NOTE 2: A broadcast group call transmitted on a user-broadcast group has
+priority over group calls involving users within the user hierarchy. A
+broadcast group call transmitted on a group-broadcast group has priority over
+group calls on its subordinate groups.
+3\. If the media transmission from call originating MCVideo user is complete,
+the broadcast group call is released.
+#### 7.1.2.5 Emergency and imminent peril procedures
+##### 7.1.2.5.1 MCVideo emergency group call
+###### 7.1.2.5.1.1 MCVideo emergency group call commencement
+The procedure describes the case where an MCVideo client is initiating an
+MCVideo emergency group call with the affiliated MCVideo group members of that
+MCVideo group. An MCVideo client in the MCVideo emergency state gains elevated
+access privilege for all of the MCVideo user\'s mission critical applications.
+Procedures in figure 7.1.2.5.1.1-1 are the signalling control plane procedures
+for the MCVideo client initiating establishment of an MCVideo emergency group
+call with an MCVideo group i.e., MCVideo users on MCVideo client 1, MCVideo
+client 2 and MCVideo client 3 belong to the same MCVideo group which is
+defined on group management server.
+NOTE 1: For simplicity, a single MCVideo server is shown in place of a user
+home MCVideo server and a group hosting MCVideo server.
+Pre-conditions:
+1\. The MCVideo group is previously defined on the group management server
+with MCVideo client 2 and MCVideo client 3 affiliated to that MCVideo group.
+2\. All members of the MCVideo group belong to the same MC system.
+3\. The initiating MCVideo client 1 has been provisioned with an MCVideo group
+that has been designated via provisioning as the MCVideo emergency group.
+4 MCVideo client 1, MCVideo client 2 and MCVideo client 3 may have an
+activated functional alias to be used during the emergency group
+communication.
+5\. The MCVideo server may have subscribed to the MCVideo functional alias
+controlling server within the MC system for functional alias activation/de-
+activation updates.
+NOTE 2: Alternatively, the client could have been provisioned for emergency
+behaviour on the selected group.
+Figure 7.1.2.5.1.1-1: MCVideo emergency group call
+1\. The user at the MCVideo client 1 initiates an MCVideo emergency group
+call. MCVideo client 1 sets its MCVideo emergency state. The MCVideo emergency
+state is retained until explicitly cancelled.
+2\. MCVideo client 1 sends an MCVideo emergency group call request towards the
+MCVideo server. The MCVideo user at MCVideo client 1 may include a functional
+alias used within the MCVideo emergency group call request. The request
+contains an indication of the MCVideo emergency. The MCVideo server records
+the identity of the MCVideo user that initiated the MCVideo emergency group
+call until the MCVideo emergency is cancelled. Once an MCVideo emergency call
+has been initiated, the MCVideo group is considered to be in an in-progress
+emergency state until cancelled. If configured to send an MCVideo emergency
+alert when initiating an MCVideo emergency group call, the request also
+contains an indication that an MCVideo emergency alert is to be initiated. The
+request may contain an indication of an implicit transmit media request.
+3\. The MCVideo server implicitly affiliates MCVideo client 1 to the emergency
+group if the client is not already affiliated.
+4\. MCVideo server checks whether the provided functional alias is allowed to
+be used and has been activated for the MCVideo user, and whether the MCVideo
+user of MCVideo client 1 is authorized for initiation of MCVideo emergency
+calls on the indicated MCVideo group, and if authorized, it resolves the
+MCVideo group ID to determine the members of that MCVideo group and their
+affiliation status, based on the information from group management server.
+5\. The MCVideo server configures the priority of the underlying bearers for
+all participants in the MCVideo group.
+NOTE 3: Successive calls during the MCVideo group\'s in-progress emergency
+state will all receive the adjusted bearer priority.
+6\. MCVideo server sends the MCVideo emergency group call request towards the
+MCVideo clients of each of those affiliated MCVideo group members. The request
+contains an indication of the in-progress emergency. The request contains an
+indication of an MCVideo emergency alert if the request from the originator
+indicated MCVideo emergency alert.
+7\. MCVideo users are notified of the incoming MCVideo group call, and, if
+available, the functional alias of the initiating user is displayed.
+8\. The receiving MCVideo clients send the MCVideo emergency group call
+response to the MCVideo server to acknowledge the MCVideo emergency group call
+request. For a multicast call, these acknowledgements are not sent.
+9\. The MCVideo server sends the MCVideo emergency group call response to the
+MCVideo user 1 to inform the successful MCVideo emergency call establishment.
+NOTE 4: Step 9 can occur at any time following step 5, and prior to step 10
+depending on the conditions to proceed with the call.
+MCVideo client 1, MCVideo client 2 and MCVideo client 3 have successfully
+established media plane for communication. MCVideo transmission control
+participant 1, transmission control participant 2 and transmission control
+participant 3 exchange transmission control information e.g., MCVideo client 1
+receives the transmit media granted information over the established media
+plane, while the other MCVideo client\'s receive media available notification
+with forced reception information. MCVideo client 1 indicates to the MCVideo
+user that the permission is granted to transmit media, while the other MCVideo
+clients in the MCVideo emergency group call will be receiving that media.
+MCVideo client 1 can override other clients in the call except those that are
+also in the MCVideo emergency state.
+###### 7.1.2.5.1.2 MCVideo group call upgraded to an MCVideo emergency group
+call
+The procedure describes the case where an authorized MCVideo user is upgrading
+an MCVideo group call to an MCVideo emergency group call while the MCVideo
+group call is already in progress.
+Procedures in figure 7.1.2.5.1.2-1 are the signalling control plane procedures
+for the MCVideo client upgrading an MCVideo group call on an MCVideo group to
+an MCVideo emergency group call.
+NOTE 1: For simplicity, a single MCVideo server is shown in place of a user
+home MCVideo server and a group hosting MCVideo server.
+Pre-conditions:
+1\. The MCVideo group is previously defined on the group management server
+with MCVideo client 2 and MCVideo client 3 affiliated to that MCVideo group.
+2\. All members of the MCVideo group belong to the same MC system.
+3\. An MCVideo group call is already in progress.
+4\. The initiating MCVideo client 1 has been configured to send an MCVideo
+emergency alert when upgrading an MCVideo emergency group call.
+Figure 7.1.2.5.1.2-1: MCVideo group call upgraded to an MCVideo emergency
+group call
+1\. The MCVideo user at MCVideo client 1 initiates a group emergency. MCVideo
+client 1 sets its MCVideo emergency state. The MCVideo emergency state is
+retained until explicitly cancelled.
+2\. MCVideo client 1 requests the MCVideo server to upgrade the MCVideo group
+to an in-progress emergency state by sending an MCVideo emergency group call
+request. If configured to send an MCVideo alert when initiating an MCVideo
+emergency upgrade, the request also contains an indication that an MCVideo
+alert is to be initiated. The request may contain an indication of an implicit
+transmit media request.
+3\. The MCVideo server adjusts the priority of the underlying bearer for all
+participants in the MCVideo group.
+4\. MCVideo server sends the MCVideo emergency group call request towards the
+MCVideo clients of each of those affiliated MCVideo group members. The request
+contains an indication of an MCVideo emergency alert if the request from the
+originator indicated MCVideo emergency alert.
+5\. MCVideo users are notified of the in-progress emergency state of the
+MCVideo group.
+6\. The receiving MCVideo clients send the MCVideo emergency group call
+response to the MCVideo server to acknowledge the MCVideo group emergency
+request. For a multicast call, these acknowledgements are not sent.
+7\. The MCVideo server sends the MCVideo emergency group call response to the
+MCVideo user 1 to confirm the upgrade request. If the MCVideo emergency
+request contained an implicit transmit media request, the OK message contains
+the result of the implicit transmit media request.
+NOTE 2: Step 7 can occur at any time following step 3, and prior to step 8
+depending on the conditions to proceed with the call.
+MCVideo client 1, MCVideo client 2 and MCVideo client 3 continue with the
+MCVideo group call, which has been transformed into an MCVideo emergency group
+call. MCVideo client 1 can override other clients in the call except those
+that are also in the MCVideo emergency state.
+###### 7.1.2.5.1.3 MCVideo in-progress emergency group state cancel
+NOTE 1: In Rel-14 and Rel-13 versions of this specification the title of this
+subclause is \"MCVideo emergency group call cancel\".
+The procedure describes the case where an MCVideo client cancels an MCVideo
+group\'s in-progress emergency.
+Procedures in figure 7.1.2.5.1.3-1 are the signalling control plane procedures
+for the MCVideo client cancelling an in-progress emergency of a group.
+NOTE 2: For simplicity, a single MCVideo server is shown in place of a user
+home MCVideo server and a group hosting MCVideo server.
+NOTE 3: The end of the MCVideo emergency group call does not cancel the
+MCVideo group\'s in-progress emergency state. It is explicitly cancelled by an
+authorized user using this procedure.
+Pre-conditions:
+1\. The MCVideo group is previously defined on the group management server
+with MCVideo client 2 and MCVideo client 3 affiliated to that MCVideo group.
+2\. All members of the MCVideo group belong to the same MC system.
+3\. MCVideo group members have been notified about the in-progress emergency.
+4\. The MCVideo group is in the in-progress emergency state and has
+prioritized bearer support.
+5\. MCVideo client 1 previously initiated the in-progress emergency for the
+group.
+Figure 7.1.2.5.1.3-1: MCVideo in-progress emergency group state cancel
+1\. The user at the MCVideo client 1 initiates an MCVideo in-progress
+emergency group state cancel.
+NOTE 4: An MCVideo user authorized to cancel in-progress emergencies on the
+MCVideo group can also be authorised to cancel the MCVideo emergency alert in
+addition to the initiator. However, only the initiator can cancel the
+initiator\'s local MCVideo emergency state.
+2\. MCVideo client 1 sends an MCVideo in-progress emergency group state cancel
+request to the MCVideo server.
+NOTE 5: When MCVideo emergency alerts are in effect together with an MCVideo
+in-progress emergency group state on the same MCVideo group, the MCVideo
+emergency alert can, under some circumstances be cancelled at the same time.
+In that case, the MCVideo in-progress emergency group state request carries an
+indication that the alert is also being cancelled.
+3\. MCVideo server resolves the MCVideo group ID to determine the members of
+that MCVideo group and their affiliation status, based upon the information
+from group management server.
+4\. The MCVideo server adjusts the priority of the underlying bearer; priority
+treatment is no longer required. The MCVideo server cancels/resets the
+emergency in-progress state of the MCVideo group.
+5\. The MCVideo server sends an MCVideo in-progress emergency group state
+cancel request to the MCVideo group members.
+6\. MCVideo group members are notified of the MCVideo in-progress emergency
+group state cancel.
+7\. The receiving MCVideo clients send the MCVideo in-progress emergency group
+state cancel response to the MCVideo server to acknowledge the MCVideo in-
+progress emergency group state cancel. For a multicast call scenario, these
+acknowledgements are not sent.
+8\. The MCVideo server sends the MCVideo in-progress emergency group state
+cancel response to the MCVideo user 1 to confirm the MCVideo in-progress
+emergency group state cancel. If the MCVideo in-progress emergency group state
+cancel request (in step 2) contained the \"Alert indicator\" IE, the MCVideo
+client 1 resets its local emergency status.
+NOTE 6: Step 8 can occur at any time following step 4, depending on the
+conditions to proceed with the call.
+##### 7.1.2.5.2 MCVideo imminent peril group call
+###### 7.1.2.5.2.1 MCVideo imminent peril group call commencement
+The procedure focuses on the case where an authorized MCVideo user is
+initiating an imminent peril group call for communicating with the affiliated
+MCVideo members of that MCVideo group. This procedure will gain elevated
+access privilege for the MCVideo client if it is not already in that state.
+The access privilege for other applications will not necessarily be affected.
+Procedures in figure 7.1.2.5.2.1-1 are the signalling control plane procedures
+for the MCVideo client initiating establishment of an imminent peril group
+call with an MCVideo group i.e., MCVideo users on MCVideo client 1, MCVideo
+client 2 and MCVideo client 3 belong to the same MCVideo group which is
+defined on MCVideo group management server.
+Pre-conditions:
+1\. The MCVideo group is previously defined on the group management server
+with MCVideo client 2 and MCVideo client 3 affiliated to that MCVideo group.
+2\. All members of the MCVideo group belong to the same MC system.
+3\. The initiating MCVideo client 1 has been provisioned with an MCVideo group
+that has been designated in the provisioning to be used for imminent peril
+communications.
+4\. MCVideo client 1, MCVideo client 2 and MCVideo client 3 may have an
+activated functional alias to be used during the emergency group
+communication.
+5\. The MCVideo server may have subscribed to the MCVideo functional alias
+controlling server within the MC system for functional alias activation/de-
+activation updates.
+NOTE 1: Alternatively, the client could have been provisioned for imminent
+peril behaviour on the selected group.
+Figure 7.1.2.5.2.1-1: MCVideo imminent peril group call
+1\. The user at the MCVideo client 1 initiates an imminent peril group call.
+2\. MCVideo client 1 sends an MCVideo imminent peril group call request
+towards the MCVideo server. The MCVideo user at MCVideo client 1 may include a
+functional alias used within the MCVideo imminent peril group call request.
+The request contains an indication of the in-progress imminent peril. The
+MCVideo server records the identity of the MCVideo user that initiated the
+imminent peril group call until the in-progress imminent peril state is
+cancelled. Once an imminent peril group call has been initiated, the MCVideo
+group is considered to be in an in-progress imminent peril state until
+cancelled. The request may contain an indication of an implicit transmit media
+request.
+3\. The MCVideo server implicitly affiliates MCVideo client 1 to the imminent
+peril group if the client is not already affiliated.
+4\. MCVideo server checks whether the provided functional alias is allowed to
+be used and has been activated for the MCVideo user, and whether the MCVideo
+user of MCVideo client 1 is authorized for initiation of imminent peril group
+calls on the indicated MCVideo group, and if authorized, it resolves the
+MCVideo group ID to determine the members of that MCVideo group and their
+affiliation status, based on the information from group management server.
+5\. The MCVideo server configures the priority of the underlying bearers for
+all participants in the MCVideo group.
+NOTE 2: Successive calls during the in-progress imminent peril state will all
+receive the adjusted bearer priority.
+6\. MCVideo server sends the imminent peril group call request towards the
+MCVideo clients of each of those affiliated MCVideo group members. The request
+contains an indication of the in-progress imminent peril.
+7\. MCVideo users are notified of the incoming imminent peril call, and, if
+available, the functional alias of the initiating user is displayed.
+8\. The receiving MCVideo clients send the MCVideo imminent peril group call
+response to the MCVideo server to acknowledge the imminent peril call request.
+For a multicast call, these acknowledgements are not set.
+9\. The MCVideo server sends the MCVideo imminent peril group call response to
+the MCVideo user 1 to inform the successful imminent peril call establishment.
+If the MCVideo imminent peril request contained an implicit transmit media
+request, the OK message contains the result of the implicit transmit media
+request.
+NOTE 3: Step 9 can occur at any time following step 5, and prior to step 10
+depending on the conditions to proceed with the imminent peril call.
+MCVideo client 1, MCVideo client 2 and MCVideo client 3 have successfully
+established media plane for communication. MCVideo transmission control
+participant 1, transmission control participant 2 and transmission control
+participant 3 exchange transmission control information e.g., MCVideo client 1
+receives the transmit media granted information over the established media
+plane, while the other MCVideo clients receive media available notification
+with forced reception mode information. MCVideo client 1 indicates to the
+MCVideo user that the permission is granted to transmit media, while the other
+MCVideo clients in the imminent peril call will be receiving that media.
+###### 7.1.2.5.2.2 Imminent peril group call upgrade
+The procedure focuses on the case where an authorized MCVideo user is
+upgrading an MCVideo group call to an imminent peril group call while the
+MCVideo group call is already in progress.
+Procedures in figure 7.1.2.5.2.2-1 are the signalling control plane procedures
+for the MCVideo client upgrading an MCVideo group call on an MCVideo group to
+an imminent peril group call.
+Pre-conditions:
+1\. The MCVideo group is previously defined on the group management server
+with MCVideo client 1, MCVideo client 2 and MCVideo client 3 affiliated to
+that MCVideo group.
+2\. All members of the MCVideo group belong to the same MC system.
+3\. An MCVideo group call is already in progress.
+Figure 7.1.2.5.2.2-1: MCVideo group call upgrade to an imminent peril group
+call
+1\. The MCVideo user at MCVideo client 1 initiates an imminent peril call.
+2\. MCVideo client 1 requests the MCVideo server to upgrade the MCVideo group
+to an in-progress imminent peril state by sending an MCVideo imminent peril
+group call request. The request may contain an indication of an implicit
+transmit media request.
+3\. The MCVideo server adjusts the priority of the underlying bearer for all
+participants in the MCVideo group.
+4\. MCVideo server sends the MCVideo imminent peril group call request towards
+the MCVideo clients of each of those affiliated MCVideo group members.
+5\. MCVideo users are notified of the in-progress imminent peril state of the
+MCVideo group.
+6\. The receiving MCVideo clients send the MCVideo imminent peril group call
+response to the MCVideo server to acknowledge the MCVideo imminent peril group
+call request. For a multicast call, these acknowledgements are not set.
+7\. The MCVideo server sends the MCVideo imminent peril group call response to
+the MCVideo user 1 to confirm the upgrade request. If the MCVideo imminent
+peril group call request contained an implicit transmit media request, the OK
+message contains the result of the implicit transmit media request.
+NOTE: Step 7 can occur at any time following step 4, and prior to step 8
+depending on the conditions to proceed with the call.
+MCVideo client 1, MCVideo client 2 and MCVideo client 3 continue with the
+MCVideo group call, which has been transformed into an imminent peril group
+call.
+###### 7.1.2.5.2.3 MCVideo imminent peril group call cancel
+The procedure focuses on the case where an authorized MCVideo user cancels an
+MCVideo group\'s in-progress imminent peril state.
+Procedures in figure 7.1.2.5.2.3-1 are the signalling control plane procedures
+for the MCVideo client cancelling an MCVideo group\'s in-progress imminent
+peril state.
+NOTE 1: The end of the imminent peril call does not cancel the MCVideo
+group\'s in-progress imminent peril state. It is explicitly cancelled by an
+authorized user.
+Pre-conditions:
+1\. The MCVideo group is previously defined on the group management server
+with MCVideo client 1, MCVideo client 2 and MCVideo client 3 affiliated to
+that MCVideo group.
+2\. All members of the MCVideo group belong to the same MC system.
+3\. The MCVideo group is an in-progress imminent peril state and has
+prioritized bearer support.
+4\. MCVideo group members have been notified about the MCVideo group\'s in-
+progress imminent peril state.
+5\. MCVideo client 1 previously initiated the in-progress imminent peril.
+Figure 7.1.2.5.2.3-1: MCVideo imminent peril group call cancel
+1\. The user at the MCVideo client 1 initiates an imminent peril cancel.
+2\. MCVideo client 1 sends an MCVideo imminent peril group call cancel request
+to the MCVideo server.
+3\. The MCVideo server adjusts the priority of the underlying bearer; priority
+treatment is no longer required. The MCVideo server cancels/resets the in-
+progress imminent peril state.
+4\. MCVideo server resolves the MCVideo group ID to determine the members of
+that MCVideo group and their affiliation status, based upon the information
+from group management server.
+5\. The MCVideo server sends an MCVideo imminent peril group call cancel
+request to the MCVideo group members.
+6\. MCVideo group members are notified of the in-progress imminent peril
+cancel.
+7\. The receiving MCVideo group members send the MCVideo imminent peril group
+call cancel response to the MCVideo server to acknowledge the in-progress
+MCVideo imminent peril group call cancel request. For a multicast scenario,
+these acknowledgements are not set.
+8\. The MCVideo server sends the MCVideo imminent peril group call cancel
+response to the MCVideo user 1 to confirm the MCVideo imminent peril group
+call cancel request.
+NOTE 2: Step 8 can occur at any time following step 4, depending on the
+conditions to proceed with the call.
+#### 7.1.2.6 MCVideo emergency alert
+##### 7.1.2.6.1 General
+The MCVideo server and MCVideo client use emergency alert initiation and
+emergency alert cancel procedures defined in 3GPP TS 23.280 [6] using
+MCVideo-1 reference point, with the following clarifications:
+\- The MC service ID is the MCVideo ID; and
+\- The MC service group ID is the MCVideo group ID.
+### 7.1.3 Off-network group communications
+#### 7.1.3.1 General
+This subclause contains procedures for group communications directly between
+multiple MCVideo clients without involving the network to provide associated
+functions.
+The group communication setup is described in subclause 7.1.3.3 and two
+variations of joining an existing communication group communication are
+described, the passive variant in subclause 7.1.3.4 and the active variant in
+subclause 7.1.3.5.
+NOTE: When the MCVideo client receives a message that is not addressed to
+either its MCVideo ID or to any MCVideo group of which the MCVideo client is
+an affiliated group member, the MCVideo client ignores the message.
+#### 7.1.3.2 Information flows for off-network group communications
+##### 7.1.3.2.1 Group communication announcement
+Table 7.1.3.2.1-1 describes the information flow for the group communication
+announcement sent from the MCVideo client to other MCVideo clients.
+Table 7.1.3.2.1-1: Group communication announcement
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+MCVideo user sending the announcement MCVideo group ID M The MCVideo group ID
+towards which the announcement was sent Media codec M The media
+characteristics like codec, resolution, frame rate and video mode to be used
+for the communication Multi-cast port M Multicast port number for media
+Transmission control port number M Port number for transmission control
+protocol Announcement period M Period of the group communication announcement
+Encryption parameters O Encryption parameters to be used for the
+communication, if the communication is to be encrypted Confirm mode indication
+O Indicates whether the receiving MCVideo user needs to confirm participation
+Emergency indication O Indicates that the MCVideo group communication is an
+MCVideo emergency communication Imminent peril indication O Indicates that the
+MCVideo group communication is an MCVideo imminent peril communication
+Broadcast communication indication O Indicates that the MCVideo communication
+is a broadcast communication Video push indication O Indicates that the
+MCVideo communication is for video push Video pull indication O Indicates that
+the MCVideo communication is for video pull
+* * *
+##### 7.1.3.2.2 Group communication answer response
+Table 7.1.3.2.2-1 describes the information flow for the group communication
+answer response sent from the MCVideo client to other MCVideo clients.
+Table 7.1.3.2.2-1: Group communication answer response
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+MCVideo user sending the response MCVideo group ID M The identity of the
+MCVideo group on which the call is requested
+* * *
+##### 7.1.3.2.3 MCVideo upgrade to emergency group communication
+Table 7.1.3.2.3-1 describes the information flow for the MCVideo upgrade to
+emergency sent from the MCVideo client to other MCVideo clients.
+Table 7.1.3.2.3-1: MCVideo upgrade to emergency group communication
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+MCVideo user upgrading the communication MCVideo group ID M The MCVideo group
+ID towards which the upgrade was sent
+* * *
+##### 7.1.3.2.4 MCVideo emergency group communication cancel
+Table 7.1.3.2.4-1 describes the information flow for the MCVideo emergency
+group communication cancel sent from the MCVideo client to other MCVideo
+clients.
+Table 7.1.3.2.4-1: MCVideo emergency group communication cancel
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+MCVideo user cancelling the upgrade MCVideo group ID M The MCVideo group ID
+towards which the cancel was sent
+* * *
+##### 7.1.3.2.5 MCVideo upgrade to imminent peril group communication
+Table 7.1.3.2.5-1 describes the information flow for the MCVideo upgrade to
+imminent peril sent from the MCVideo client to other MCVideo clients.
+Table 7.1.3.2.5-1: MCVideo upgrade to imminent peril group communication
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+MCVideo user upgrading the communication MCVideo group ID M The MCVideo group
+ID towards which the upgrade was sent
+* * *
+##### 7.1.3.2.6 MCVideo imminent peril group communication cancel
+Table 7.1.3.2.6-1 describes the information flow for MCVideo imminent peril
+group communication cancel sent from the MCVideo client to other MCVideo
+clients.
+Table 7.1.3.2.6-1: MCVideo imminent peril group communication cancel
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+MCVideo user cancelling the upgrade MCVideo group ID M The MCVideo group ID
+towards which the cancel was sent
+* * *
+##### 7.1.3.2.7 MCVideo emergency alert announcement
+Table 7.1.3.2.7-1 describes the information flow for the MCVideo emergency
+alert announcement sent from the MCVideo client to the other MCVideo clients,
+for the procedures defined in 3GPP TS 23.280 [6].
+Table 7.1.3.2.7-1: MCVideo emergency alert announcement
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+MCVideo user sending emergency alert MCVideo group ID M The MCVideo group ID
+towards which the alert was sent Organization name M The alerting user\'s
+mission critical organization name Location O The alerting client\'s location,
+if known
+* * *
+##### 7.1.3.2.8 MCVideo emergency alert cancel announcement
+Table 7.1.3.2.8-1describes the information flow for the MCVideo emergency
+alert cancel sent from the MCVideo client to other MCVideo clients, for the
+procedures defined in 3GPP TS 23.280 [6].
+Table 7.1.3.2.8-1: MCVideo emergency alert cancel announcement
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+MCVideo user cancelling emergency alert MCVideo group ID M The MCVideo group
+ID towards which the cancel was sent
+* * *
+#### 7.1.3.3 Group communication setup
+##### 7.1.3.3.1 General
+A group communication setup is initiated by one member of a pre-configured
+MCVideo group and ends up with an established MCVideo group between multiple
+MCVideo clients ready for video sharing.
+##### 7.1.3.3.2 Procedure
+Figure 7.1.3.3.2-1 describes procedures to establish a MCVideo group
+communication with other MCVideo clients.
+Once the MCVideo group communication is established the MCVideo clients send
+Group communication announcement periodically.
+Pre-conditions:
+1\. Information for ProSe direct communications corresponding to the MCVideo
+group and its mapping to ProSe Layer-2 Group ID are pre-configured in MCVideo
+client 1 to client N.
+2\. MCVideo client 1 to MCVideo client N are members of the same MCVideo
+group.
+3\. MCVideo user 1 has initiated MCVideo group communication.
+Figure 7.1.3.3.2-1: MCVideo group communication setup
+1\. MCVideo client 1 sends a Group communication announcement message to the
+MCVideo group.
+2\. Upon receiving the Group communication announcement message, all MCVideo
+clients that are not part of an ongoing group communication for the MCVideo
+group indicated in the Group communication announcement message set parameters
+for the media plane as described in the Group communication announcement
+message.
+3\. The MCVideo clients send a group communication answer response to the
+MCVideo group confirming the participation in the MCVideo group communication.
+On receiving a group communication answer response message from at least one
+MCVideo client, other MCVideo clients need not send a group communication
+answer response message. If the Group communication announcement message
+included a confirm mode indication, then the MCVideo clients should send a
+group communication answer response message.
+NOTE 1: MCVideo client 1 should wait for at least one group communication
+answer response message before transmitting video to the MCVideo group.
+4\. MCVideo client 1 checks the participants of the MCVideo group
+communication through the received group communication answer response
+messages.
+NOTE 2: Due to the movement of the participants (in and out of the radio
+coverage) during the off-network group communication, the Group communication
+announcement message, including parameters for media delivery, is periodically
+sent.
+NOTE 3: Group communication announcement may include user ID, group ID, media
+type codec, control port for transmission video, video resolution and video
+frame rate, video mode, last chage time of video mode etc.
+5\. MCVideo client 1, MCVideo client 2 and MCVideo client 3 have successfully
+established the media plane and transmission control for communication.
+#### 7.1.3.4 Passive join to group communication
+##### 7.1.3.4.1 General
+There is ongoing group communication between multiple MCVideo clients. Another
+MCVideo client, after becoming aware of that group communication and after it
+has received periodically sent communication parameters, joins the group with
+or without sending an indication to other group members.
+##### 7.1.3.4.2 Procedure
+Figure 7.1.3.4.2-1 describes procedures to join a MCVideo group communication
+passively.
+The MCVideo client X passively waits for a Group communication announcement
+message. Upon receiving a periodic Group communication announcement message,
+MCVideo client X establishes media plane and joins the MCVideo group
+communication.
+Pre-conditions:
+1\. Information for ProSe direct communications corresponding to the MCVideo
+group and its mapping to ProSe Layer-2 Group ID are pre-configured in MCVideo
+client 1 to client N and client X.
+2\. MCVideo client 1 to MCVideo client N and MCVideo client X are members of
+the same MCVideo group.
+3\. MCVideo client 1 to MCVideo client N are part of an ongoing MCVideo group
+communication.
+Figure 7.1.3.4.2-1: Passive join to MCVideo group communication
+1\. Another MCVideo client X enters in the communication range after the
+MCVideo group communication establishment. The MCVideo client X does not do
+anything and passively waits for a periodic Group communication announcement
+message.
+2\. An MCVideo client which is part of the ongoing MCVideo group communication
+eventually sends a periodic Group communication announcement message.
+3\. Upon receiving the periodic Group communication announcement message
+MCVideo client X sets the parameters for media plane as described in the Group
+communication announcement message.
+4\. If the Group communication announcement message included a confirm mode
+indication, MCVideo client X may sends a group communication answer response
+towards MCVideo group to inform all MCVideo group members of its participation
+the MCVideo group communication.
+5\. MCVideo group communication continues with the MCVideo client X.
+#### 7.1.3.5 Active join to group communication
+##### 7.1.3.5.1 General
+There is ongoing group communication between multiple MCVideo clients. Another
+MCVideo client, after becoming aware of that group communication, sends a
+request to get the required communication parameters and after feedback joins
+the group with or without sending an indication to other group members.
+##### 7.1.3.5.2 Procedure
+Figure 7.1.3.5.2-1 describes procedures to join a MCVideo group communication
+actively.
+The MCVideo client X sends a Group communication announcement message towards
+the MCVideo group.
+Upon receiving a Group communication announcement message with new
+communication parameters, such as communication identifier, a MCVideo client
+participating in the on-going group communication for the MCVideo group sends
+a Group communication announcement message.
+The Group communication announcement message contains parameters for the on-
+going MCVideo group communication. MCVideo client X upon receiving such a
+Group communication announcement message establishes the media plane as
+described in the message and joins the MCVideo group communication.
+Pre-conditions:
+1\. Information for ProSe direct communications corresponding to the MCVideo
+group and its mapping to ProSe Layer-2 Group ID are pre-configured in MCVideo
+client 1 to client N and client X.
+2\. MCVideo client 1 to MCVideo client N and MCVideo client X are members of
+the same MCVideo group.
+3\. MCVideo client 1 to MCVideo client N are part of an ongoing MCVideo group
+communication.
+Figure 7.1.3.5.2-1: Active join to MCVideo group communication
+1\. Another MCVideo client X enters in the communication range after the
+MCVideo group communication establishment. The MCVideo client X sends a Group
+communication announcement message to start a newMCVideo group communication.
+2\. Upon receiving a Group communication announcement message with new
+communication parameters, such as communication identifier, another MCVideo
+client, which is part of the ongoing MCVideo group communication sends a Group
+communication announcement message.
+3\. Upon receiving the Group communication announcement message MCVideo client
+X sets parameters for the media plane as described in the Group communication
+announcement message.
+4\. If the Group communication announcement message included a confirm mode
+indication, MCVideo client X may send a group communication answer response
+towards MCVideo group to inform all MCVideo group members of its participation
+the MCVideo group communication.
+5\. MCVideo group communication continues with the MCVideo client X.
+#### 7.1.3.6 Broadcast group communication
+Figure 7.1.3.6-1 describes procedures for broadcast group communication.
+Broadcast group communication over group-broadcast group and over user-
+broadcast group are handled without distinction in off-network.
+Figure 7.1.3.6-1: Broadcast group communication
+1\. MCVideo client 1 initiates group communication setup as described in
+subclause 7.1.3.3. The group communication announcement message includes the
+indication of broadcast group communication.
+2\. MCVideo client 1 initiating broadcast group communication starts to
+transmit video.
+NOTE: Other clients of the group member are not allowed to transmit media in
+broadcast group communication.
+3\. The broadcast group communication is released as described in subclause
+7.1.3.7.
+#### 7.1.3.7 Group communication release due to inactivity
+If the on-going MCVideo group communication is inactive for a specific
+duration, the participating MCVideo clients release the MCVideo group
+communication. Inactivity is defined as absence of any transmission to or from
+other communication participants.
+NOTE: Inactivity time can be set according to the policy of MC service
+provider.
+#### 7.1.3.8 Emergency and imminent peril procedures
+##### 7.1.3.8.1 Emergency group communication
+The off-network emergency group communication is a special case of off-network
+(non-emergency) group communication as defined in subclause 7.1.3.2, subclause
+7.1.3.3, subclause 7.1.3.4, subclause 7.1.3.5, subclause 7.1.3.6 and subclause
+7.1.3.7. The following are modifications to the aforementioned subclauses to
+support MCVideo emergency group communications:
+\- As a pre-condition, the client initiating the emergency communication has
+previously been provisioned with an MCVideo group designated as the MCVideo
+emergency group. The MCVideo client initiates MCVideo emergency group
+communications on this group. Alternatively, the MCVideo client could have
+been provisioned for emergency behaviour on the selected MCVideo group.
+\- The group communication announcement contains an indication that the
+MCVideo group communication is to be an MCVideo emergency communication
+regardless of whether or not the MCVideo client is in communication. Group
+communication participants learn of the MCVideo group\'s in-progress emergency
+state from the indication.
+\- Every communication initiated by the MCVideo client will be an emergency
+communication while the MCVideo client is in MCVideo emergency state.
+\- The MCVideo client enters the MCVideo emergency state when initiating an
+MCVideo emergency communication or emergency alert. Only the MCVideo user of
+the MCVideo client can clear the client\'s local MCVideo emergency state.
+\- The MCVideo group in-progress emergency state is cancelled when the
+communication ends.
+\- The MCVideo user who initiated the emergency communication, or upgraded the
+group communication to emergency group communication, or an authorized user,
+may cancel the in-progress emergency state with an MCVideo emergency group
+communication cancel message. The message is sent to the MCVideo group.
+\- When the MCVideo group is no longer in the in-progress emergency state,
+every client returns the value of ProSe Per Packet Priority to its default
+value.
+\- An in-progress MCVideo group communication is upgraded to an emergency
+group communication when the periodic group communication announcement
+contains the emergency indicator.
+\- The value of ProSe Per Packet Priority is upgraded according to emergency
+state of MCVideo group communication.
+\- An MCVideo group communication upgraded to emergency group communication
+does not affect the state of other MCVideo communication(s) in the client.
+\- The MCVideo group remains in the in-progress emergency state until the
+emergency group communication ends or the in-progress emergency state is
+cancelled.
+##### 7.1.3.8.2 MCVideo imminent peril
+The off-network imminent peril group communication is a special case of off-
+network (non-imminent peril) group communication as defined in subclause
+7.1.3.2, subclause 7.1.3.3, subclause 7.1.3.4, subclause 7.1.3.5, subclause
+7.1.3.6 and subclause 7.1.3.7. The following are modifications to the
+aforementioned subclauses to support MCVideo imminent peril communications:
+\- As a pre-condition, the user initiating the imminent peril communication
+has previously been provisioned with an MCVideo group to be used as the
+MCVideo imminent peril group. The MCVideo client initiates MCVideo imminent
+peril group communications on this group. Alternatively, the MCVideo client
+could have been provisioned for imminent peril behaviour on the selected
+MCVideo group.
+\- The group communication announcement contains an indication that the
+MCVideo group communication is to be an MCVideo imminent peril communication.
+Group communication participants learn of the MCVideo group\'s in-progress
+imminent peril condition from the indication.
+\- The MCVideo group in-progress imminent peril state is considered cancelled
+when the communication ends.
+\- The MCVideo user who initiated the in-progress imminent peril communication
+or upgraded the group communication to imminent peril group communication, or
+an authorized user may cancel the in-progress imminent peril state with an
+MCVideo imminent peril group communication cancel message. The message is sent
+to the communication participants.
+\- When the MCVideo group is no longer in the in-progress imminent peril
+state, every MCVideo client returns the value of ProSe Per Packet Priority to
+its default value.
+\- An in-progress MCVideo group communication is upgraded to an imminent peril
+group communication when the periodic group communication announcement
+contains the imminent peril indicator.
+\- The value of ProSe Per Packet Priority is upgraded according to imminent
+peril state of MCVideo group communication.
+\- The MCVideo group remains in the in-progress imminent peril state until the
+imminent peril group communication ends or the in-progress imminent peril
+state is cancelled.
+#### 7.1.3.9 MCVideo emergency alert
+##### 7.1.3.9.1 General
+The MCVideo client use emergency alert initiation and emergency alert cancel
+procedures defined in 3GPP TS 23.280 [6], with the following clarifications:
+\- The MC service ID is the MCVideo ID; and
+\- The MC service group ID is the MCVideo group ID.
+## 7.2 Private call
+### 7.2.1 General
+Private calls are enabled in both on-network and off-network.
+Private calls can be setup in two different commencement modes, automatic
+commencement mode and manual commencement mode.
+### 7.2.2 Private call on-network
+#### 7.2.2.1 General
+The private call setup in automatic commencement mode is described in
+subclause 7.2.2.3.1, manual commencement mode in subclause 7.2.2.3.2 and
+private call release (client or server initiated) in subclause 7.2.2.3.3.
+#### 7.2.2.2 Information flows for private call in on-network
+##### 7.2.2.2.1 MCVideo private call request (MCVideo client -- MCVideo
+server)
+Table 7.2.2.2.1-1 describes the information flow MCVideo private call request
+from the MCVideo client to the MCVideo server.
+Table 7.2.2.2.1-1: MCVideo private call request (MCVideo client -- MCVideo
+server)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party Functional alias O The functional alias of the calling party
+MCVideo ID M The MCVideo ID of the called party Transmit media request
+indication M This element indicates whether transmission control will be used
+for the private call. SDP offer M Media parameters of MCVideo client.
+Requested commencement mode O An indication that is included if the user is
+requesting a particular commencement mode Implicit transmit media request O An
+indication that the user is also requesting the permission to transmit video
+Push indication O Indicates that the private call request is for a one-to-one
+push call Pull indication O Indicates that the private call request is for a
+one-to-one pull call Requested priority O Application priority level requested
+for this call
+* * *
+##### 7.2.2.2.2 MCVideo private call request (MCVideo server -- MCVideo
+client)
+Table 7.2.2.2.2-1 describes the information flow MCVideo private call request
+from the MCVideo server to the MCVideo client.
+Table 7.2.2.2.2-1: MCVideo private call request (MCVideo server -- MCVideo
+client)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party Functional alias O The functional alias of the calling party
+MCVideo ID M The MCVideo ID of the called party Transmit media request
+indication M This element indicates whether transmission control will be used
+for the private call. SDP offer M Media parameters of MCVideo client.
+Requested commencement mode O An indication that is included if the user is
+requesting a particular commencement mode Implicit transmit media request O An
+indication that the user is also requesting the permission to transmit video
+* * *
+##### 7.2.2.2.3 MCVideo private call response (MCVideo client -- MCVideo
+server)
+Table 7.2.2.2.3-1 describes the information flow MCVideo private call response
+from the MCVideo client to the MCVideo server.
+Table 7.2.2.2.3-1: MCVideo private call response (MCVideo client -- MCVideo
+server)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party MCVideo ID O The MCVideo ID of the called party SDP answer M
+Media parameters selected Requested commencement mode O An indication of the
+commencement mode to be used.
+* * *
+##### 7.2.2.2.4 MCVideo private call response (MCVideo server -- MCVideo
+client)
+Table 7.2.2.2.4-1 describes the information flow MCVideo private call response
+from the MCVideo server to the MCVideo client.
+Table 7.2.2.2.4-1: MCVideo private call response (MCVideo server -- MCVideo
+client)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party MCVideo ID O The MCVideo ID of the called party Acceptance
+confirmation O An indication whether the user has positively accepted the
+call. SDP answer M Media parameters selected
+* * *
+##### 7.2.2.2.5 MCVideo call end request
+Table 7.2.2.2.5-1 describes the information flow MCVideo call end request from
+the MCVideo client to the MCVideo server and from the MCVideo server to the
+MCVideo client.
+Table 7.2.2.2.5-1: MCVideo call end request
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party MCVideo ID M The MCVideo ID of the called party
+* * *
+##### 7.2.2.2.6 MCVideo emergency private call request (MCVideo client to
+MCVideo server)
+Table 7.2.2.2.6-1 describes the information flow MCVideo emergency private
+call request from the MCVideo client to the MCVideo server.
+Table 7.2.2.2.6-1: MCVideo emergency private call request (MCVideo client to
+MCVideo server)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party Functional alias O The functional alias of the calling party
+MCVideo ID M The MCVideo ID of the called party Emergency indicator M
+Indicates that the private call request is an MCVideo emergency call Alert
+indicator M Indicates whether an emergency alert is to be sent Requested
+commencement mode O An indication of the commencement mode to be used.
+Implicit transmit media request O An indication that the user is also
+requesting to transmit media SDP offer M Media parameters of MCVideo client.
+* * *
+##### 7.2.2.2.7 MCVideo emergency private call request (MCVideo server to
+MCVideo client)
+Table 7.2.2.2.7-1 describes the information flow MCVideo emergency private
+call request from the MCVideo server to the MCVideo client.
+Table 7.2.2.2.7-1: MCVideo emergency private call request (MCVideo server to
+MCVideo client)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party Functional alias O The functional alias of the calling party
+MCVideo ID M The MCVideo ID of the called party Emergency indicator M
+Indicates that the private call request is an MCVideo emergency call Alert
+indicator M Indicates whether an emergency alert is to be sent Requested
+commencement mode O An indication of the commencement mode to be used.
+Implicit transmit media request O An indication that the user is also
+requesting to transmit media. SDP offer M Media parameters of MCVideo client.
+* * *
+##### 7.2.2.2.8 Emergency MCVideo private call response (MCVideo client --
+MCVideo server)
+Table 7.2.2.2.8-1 describes the information flow emergency MCVideo private
+call response from the MCVideo client to the MCVideo server.
+Table 7.2.2.2.8-1: Emergency MCVideo private call response (MCVideo client --
+MCVideo server)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party MCVideo ID O The MCVideo ID of the called party SDP answer M
+Media parameters selected Requested commencement mode O An indication of the
+commencement mode to be used.
+* * *
+##### 7.2.2.2.9 Emergency MCVideo private call response (MCVideo server --
+MCVideo client)
+Table 7.2.2.2.9-1 describes the information flow Emergency MCVideo private
+call response from the MCVideo server to the MCVideo client.
+Table 7.2.2.2.9-1: Emergency MCVideo private call response (MCVideo server --
+MCVideo client)
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party MCVideo ID O The MCVideo ID of the called party Acceptance
+confirmation O An indication whether the user has positively accepted the
+call. SDP answer M Media parameters selected
+* * *
+#### 7.2.2.3 Private call within one MC system
+##### 7.2.2.3.1 Private call setup in automatic commencement mode
+The procedure describes the scenario where an MCVideo user is initiating an
+MCVideo private call for communicating with another MCVideo user, with or
+without transmission control enabled, in an automatic commencement mode.
+Procedures in figure 7.2.2.3.1-1 are the basic signalling control plane
+procedures for the MCVideo client initiating establishment of MCVideo private
+call with the chosen MCVideo user.
+Pre-conditions:
+1\. MCVideo users on MCVideo client 1 and MCVideo client 2 are already
+registered for receiving MCVideo service.
+2\. The calling MCVideo user has selected automatic commencement mode for the
+call; or
+3\. The called MCVideo client is set to automatic commencement mode.
+4\. Optionally, the MCVideo client 1 may have a functional alias activated to
+be used.
+5\. The MCVideo server may have subscribed to the MCVideo functional alias
+controlling server within the MC system for functional alias activation/de-
+activation updates.
+Figure 7.2.2.3.1-1: Private call setup in automatic commencement mode--
+MCVideo users in the same MC system
+1\. User at MCVideo client 1 would like to initiate an MCVideo private call
+for the chosen MCVideo user. The MCVideo user at MCVideo client 1 may include
+a functional alias used within the MCVideo private call.
+2\. MCVideo client 1 sends an MCVideo private call request towards the MCVideo
+server (via SIP core) using a service identifier as defined in 3GPP TS 23.228
+[5] for MCVideo, for establishing a private call with the chosen MCVideo user.
+The MCVideo private call request contains the MCVideo ID of invited user, an
+SDP offer containing one or more media types. The MCVideo client 1 may include
+a Requested commencement mode that indicates that the call is to be
+established in automatic commencement mode if automatic commencement mode is
+requested by the initiating user.
+3\. MCVideo server checks whether the MCVideo user at MCVideo client 1 is
+authorized to initiate the private call, and that MCVideo user at MCVideo
+client 2 is authorized to receive the private call. MCVideo server verifies
+whether the provided functional alias, if present, can be used and has been
+activated for the user. If the MCVideo private call request requested
+automatic commencement mode then the MCVideo server also checks whether the
+MCVideo user at MCVideo client 1 is authorized to initiate a private call in
+automatic commencement mode.
+4\. MCVideo server may provide a progress indication to MCVideo client 1 to
+indicate progress in the call setup process.
+NOTE: Step 4 can occur at any time following step 3, and prior to step 8.
+5\. If authorized, MCVideo server includes information that it communicates
+using MCVideo service, offers the same media types or a subset of the media
+types contained in the initial received request, includes the requested
+automatic commencement mode indication based on a requested automatic
+commencement mode by the calling user or based upon the setting of the called
+MCVideo client and sends the corresponding MCVideo private call request
+towards the MCVideo client 2, including the MC service ID and, if available
+the functional alias of the calling MCVideo user 1. If the called MCVideo user
+has registered to the MCVideo service with multiple MCVideo UEs and has
+designated the MCVideo UE for receiving the private calls, then the incoming
+MCVideo private call request is delivered only to the designated MCVideo UE.
+6\. The receiving MCVideo client 2 notifies the user about the incoming
+private call. If the functional alias of the calling user is included it is
+displayed.
+7\. The receiving MCVideo client 2 accepts the private call automatically, and
+an MCVideo private call response is sent to the MCVideo server (via SIP core).
+8\. Upon receiving the MCVideo private call response from MCVideo client 2
+accepting the private call request, the MCVideo server informs the MCVideo
+client 1 about successful call establishment.
+9\. MCVideo client 1 and MCVideo client 2 have successfully established media
+plane and transmission control for communication and both users can transmit
+media.
+##### 7.2.2.3.2 Private call setup in manual commencement mode
+###### 7.2.2.3.2.1 Description
+Figure 7.2.2.3.2.2-1 describes the basic procedure for the MCVideo client
+initiating an MCVideo private call that uses manual commencement mode. The
+flow may use a transmit media request in the MCVideo private call request
+indicating that the originator will be granted permission to transmit when the
+call starts and eliminates the need for a separate initial transmit media
+request message during media plane establishment. Alternatively the call
+initiation may be sent without the transmit media request, which allows the
+called party to transmit media request first.
+###### 7.2.2.3.2.2 Procedure
+Both clients are served by the primary MC service provider in figure
+7.2.2.3.2.2-1.
+Pre-conditions:
+1\. MCVideo client 1 and MCVideo client 2 are both registered and their
+respective users, MCVideo user 1 and MCVideo user 2, are authenticated and
+authorized to use the MCVideo service.
+2\. The calling MCVideo user has selected manual commencement mode or has not
+specified a commencement mode for the call; and
+3\. The called MCVideo client is set to manual commencement mode.
+4\. Optionally, the MCVideo client 1 may have a functional alias activated to
+be used.
+5\. The MCVideo server may have subscribed to the MCVideo functional alias
+controlling server within the MC system for functional alias activation/de-
+activation updates.
+Figure 7.2.2.3.2.2-1: MCVideo private call in manual commencement mode--
+MCVideo users in the same MC system
+1\. MCVideo user at MCVideo client 1 would like to initiate an MCVideo private
+call for the selected MCVideo user. The MCVideo user at MCVideo client 1 may
+include a functional alias used within the MCVideo private call.
+2\. MCVideo client 1 sends an MCVideo private call request addressed to the MC
+service ID of MCVideo user 2 using an MCVideo service identifier as defined in
+3GPP TS 23.228 [5] (possible for the SIP core to route the request to the
+MCVideo server). The MCVideo private call request contains the MC service ID
+of invited user and an SDP offer containing one or more media types. The
+MCVideo client 1 may include a requested commencement mode that indicates that
+the call is to be established in manual commencement mode if manual
+commencement mode is requested by the initiating user.
+3\. The MCVideo server confirms that both MCVideo users are authorized for the
+private call. MCVideo server verifies whether the provided functional alias,
+if present, can be used and has been activated for the user. The MCVideo
+server checks the commencement mode setting of the called MCVideo client and
+also checks whether the MCVideo user at MCVideo client 1 is authorized to
+initiate a call in manual commencement mode.
+4\. The MCVideo server includes information that it communicates using MCVideo
+service, offers the same media types or a subset of the media types contained
+in the initial received request and sends an MCVideo private call request for
+the call to MCVideo client 2, including the MC service ID, and, if available
+the functional alias of the calling MCVideo user 1. If the called MCVideo user
+has registered to the MCVideo service with multiple MCVideo UEs and has
+designated the MCVideo UE for receiving the private calls, then the incoming
+MCVideo private call request is delivered only to the designated MCVideo UE.
+5\. MCVideo server may provide a progress indication to MCVideo client 1 to
+indicate progress in the call setup process.
+NOTE: Step 5 can occur at any time following step 3, and prior to step 6b.
+6a. The MCVideo user is alerted. MCVideo client 2 sends an MCVideo ringing to
+the MCVideo server.
+6b. The MCVideo server sends an MCVideo ringing to MCVideo client 1,
+indicating that MCVideo client 2 is being alerted. If the functional alias of
+the calling user is included it is displayed.
+7\. MCVideo user 2 is notified and has accepted the call using manual
+commencement mode (i.e., has taken some action to accept via the user
+interface).
+8\. The MCVideo client 2 sends an MCVideo private call response to the MCVideo
+server. If MCVideo user 2 has not accepted the incoming call, the MCVideo
+client 2 sends a call failure response to the MCVideo server without adding
+reason for call failure.
+9\. The MCVideo server sends an MCVideo private call response to MCVideo
+client 1 indicating that MCVideo user 2 has accepted the call, including the
+accepted media parameters.
+10\. The media plane and transmission control for communication is
+established.
+##### 7.2.2.3.3 Private call release
+###### 7.2.2.3.3.1 Client initiated
+The procedure describes the scenario where an MCVideo client is requesting to
+release an ongoing MCVideo private call (with or without transmission control)
+and the call established in either of the two commencement modes (manual or
+automatic).
+Procedures in figure 7.2.2.3.3.1-1 are the basic signalling control plane
+procedures for the MCVideo client initiating the release of an ongoing MCVideo
+private call.
+Pre-condition:
+1\. It is assumed that MCVideo users on MCVideo client 1 and MCVideo client 2
+are already registered for receiving MCVideo service and are involved in
+private call as described in subclause 7.2.2.3.1 and subclause 7.2.2.3.2.
+Figure 7.2.2.3.3.1-1: Private call release -- client initiated
+1\. User at MCVideo client 1 would like to release an ongoing MCVideo private
+call with MCVideo client 2.
+2\. MCVideo client 1 sends an MCVideo call end request towards the MCVideo
+server (via SIP core), for tearing down the private call with the other
+client.
+3\. MCVideo server sends the corresponding MCVideo call end request towards
+the MCVideo client specified in the original MCVideo call end request.
+4\. MCVideo user is notified about the release of the private call.
+5\. The receiving MCVideo client 2 acknowledges the MCVideo call end request
+with a MCVideo call end response.
+6\. After receiving the MCVideo call end response from MCVideo client 2, the
+MCVideo server generates an MCVideo call end response for the MCVideo client
+1\'s MCVideo call end request.
+7\. MCVideo clients release all the media plane resources used for the private
+call. Further, if the private call was established with transmission control,
+transmission control resources are released.
+###### 7.2.2.3.3.2 Server initiated
+The procedure describes the scenario where an MCVideo server is terminating an
+ongoing MCVideo private call and the call established in either of the two
+commencement modes (manual or automatic), upon conditions to terminate call
+e.g., MCVideo administrator configured maximum duration for MCVideo private
+calls has expired or timed out due to MCVideo private call without
+transmission/reception.
+Procedures in figure 7.2.2.3.3.2-1 are the basic signalling control plane
+procedures for the MCVideo server initiating termination of an ongoing MCVideo
+private call.
+Pre-condition:
+1\. It is assumed that MCVideo users on MCVideo client 1 and MCVideo client 2
+are already registered for receiving MCVideo service and are involved in
+private call established either in manual or automatic commencement mode.
+Figure 7.2.2.3.3.2-1: End private call -- server initiated
+1\. Upon conditions to terminate call e.g., MCVideo administrator configured
+maximum duration for MCVideo private calls has expired or timed out due to
+MCVideo private call without transmission/reception, the MCVideo server
+decides to initiate termination of an ongoing MCVideo private call between
+MCVideo client 1 and MCVideo client 2.
+2\. MCVideo server sends an MCVideo call end request towards the MCVideo
+clients 1 and 2 (via SIP core), for tearing down the private call between
+them.
+3\. MCVideo users at client 1 and client 2 are notified about the termination
+of the private call.
+4\. The MCVideo call end request receiving MCVideo clients 1 and 2 acknowledge
+the request with MCVideo call end response.
+5\. MCVideo clients release all the media plane resources used for the private
+call. Further, if the private call was established with transmission control,
+transmission control resources are released.
+#### 7.2.2.4 MCVideo emergency private call
+##### 7.2.2.4.1 MCVideo emergency private call commencement
+This procedure describes the case where an authorized MCVideo user is
+initiating an MCVideo emergency private call with unicast signalling for
+communicating with another MCVideo user. An MCVideo client in the MCVideo
+emergency state gains elevated access privilege for all of the MCVideo user\'s
+mission critical applications.
+Procedures in figure 7.2.2.4.1-1 are the signalling control plane procedures
+for the MCVideo client initiating establishment of an MCVideo emergency
+private call.
+Pre-conditions:
+1\. Both members of the MCVideo private call belong to the same MCVideo
+system.
+2\. The initiating MCVideo client 1 has been configured to send an MCVideo
+emergency alert prior to initiating an MCVideo emergency private call.
+3\. Optionally, the MCVideo client 1 may have a functional alias activated to
+be used.
+4\. The MCVideo server may have subscribed to the MCVideo functional alias
+controlling server within the MC system for functional alias activation/de-
+activation updates.
+Figure 7.2.2.4.1-1 MCVideo emergency private call
+1\. The user at the MCVideo client 1 initiates an MCVideo emergency private
+call. MCVideo client 1 sets its MCVideo emergency state. The MCVideo emergency
+state is retained until explicitly cancelled.
+2\. MCVideo client 1 sends an MCVideo emergency private call request towards
+the MCVideo server. The request contains an indication of the MCVideo
+emergency. The MCVideo user at MCVideo client 1 may include a functional alias
+used within the MCVideo emergency private call. The MCVideo server verifies
+whether the provided functional alias can be used. The MCVideo server records
+the identity of the MCVideo user that initiated the MCVideo emergency private
+call until the MCVideo emergency is cancelled. If the MCVideo client is
+configured to send an MCVideo emergency alert when initiating an MCVideo
+emergency private call, the request also contains an indication that an
+MCVideo emergency alert is to be initiated.
+3\. MCVideo server sends the MCVideo emergency private call request towards
+the target MCVideo client. The request contains an indication of the in-
+progress emergency. The request contains an indication of an MCVideo emergency
+alert if the request from the originator indicated MCVideo emergency alert. If
+available the request contains the functional alias of the calling MCVideo
+user 1.
+4\. The MCVideo user on MCVideo client 2 is notified of the incoming MCVideo
+emergency private call. If the functional alias of the calling user is
+included it is displayed.
+5\. The receiving MCVideo client acknowledges the MCVideo emergency private
+call request to the MCVideo server via a MCVideo emergency private call
+response.
+6\. The MCVideo server adjusts the priority of the underlying bearer.
+7\. The MCVideo server informs MCVideo client 1 about the successful MCVideo
+emergency private call establishment via a MCVideo emergency private call
+response.
+8\. MCVideo client 1 and MCVideo client 2 establish the media plane and
+transmission control for video communication.
+NOTE 1: The priority for the MCVideo emergency private call is retained until
+cancelled according to system policy (e.g. call end) or cancelled by an
+authorized MCVideo user.
+NOTE 2: The initiating MCVideo user\'s MCVideo emergency state is retained by
+the system until cancelled as in subclause 7.1.2.6. The initiating MCVideo
+user\'s MCVideo emergency state is also retained locally by the MCVideo client
+until explicitly cancelled by the MCVideo user.
+##### 7.2.2.4.2 MCVideo private call emergency upgrade
+This procedure describes the case where an authorized MCVideo user is
+upgrading a private call to an MCVideo emergency private call while the
+private call is already in progress.
+Procedures in figure 7.2.2.4.2-1 are the signalling procedures for the MCVideo
+client upgrading a private call to an MCVideo emergency private call.
+Pre-conditions:
+1\. Both members of the private call belong to the same MCVideo system.
+2\. A private call is already in progress.
+Figure 7.2.2.4.2-1: MCVideo private call upgrade
+1\. The MCVideo user at MCVideo client 1 initiates an emergency. MCVideo
+client 1 sets its MCVideo emergency state. The MCVideo emergency state is
+retained until explicitly cancelled.
+2\. MCVideo client 1 requests the MCVideo server to upgrade the private call
+to in-progress emergency by sending an MCVideo emergency private call request.
+If configured to send an MCVideo alert when initiating an MCVideo emergency
+upgrade, the request also contains an indication that an MCVideo alert is to
+be initiated. The request may contain an indication of an implicit transmit
+media request.
+3\. MCVideo server sends the MCVideo emergency request towards the MCVideo
+client of the other participant.
+4\. The MCVideo user is notified of the in-progress emergency of the MCVideo
+emergency private call.
+5\. The receiving MCVideo client acknowledges the MCVideo emergency request to
+the MCVideo server.
+6\. The MCVideo server adjusts the priority of the underlying bearer for both
+participants in the private call. The priority is retained until the call
+ends.
+7\. The MCVideo server confirms the upgrade request to MCVideo client 1. If
+the MCVideo emergency request contained an implicit transmit media request,
+the MCVideo emergency private call response message contains the result of the
+implicit transmit media request.
+8\. MCVideo client 1 and MCVideo client 2 continue with the private call,
+which has been transformed into an MCVideo emergency private call.
+### 7.2.3 Off-network private communications
+#### 7.2.3.1 General
+The private call setup in automatic commencement mode is described in
+subclause 7.2.3.4, manual commencement mode in subclause 7.2.3.5 and private
+call release in subclause 7.2.3.6.
+#### 7.2.3.2 Information flows for off-network private communications
+##### 7.2.3.2.1 Private communication request
+Table 7.2.3.2.1-1 describes the information flow for the private communication
+request sent from one MCVideo client to another MCVideo client.
+Table 7.2.3.2.1-1: Private communication request
+* * *
+Information element Status Description MCVideo ID M The identity of the
+MCVideo user requesting the communication MCVideo ID M The identity of the
+MCVideo user with whom communication was requested SDP offer M SDP with media
+information offered by the caller Video push indication O Indicates that the
+MCVideo private communication is for video push Video pull indication O
+Indicates that the MCVideo private communication is for video pull
+* * *
+NOTE 1: For video push, \'the identity of the MCVideo user requesting the
+communication\' refers to the user who will be the source of the video, and
+\'the identity of the MCVideo user with whom the communication was requested\'
+refers to the user who will receive the video.
+NOTE 2: For video pull, \'the identity of the MCVideo user requesting the
+communication\' refers to the user who wants to receive the video, and \'the
+identity of the MCVideo user with whom the communication was requested\'
+refers to the user who will be the source of the video.
+##### 7.2.3.2.2 Private communication answer response
+Table 7.2.3.2.2-1 describes the information flow for the response of private
+communication request sent from one MCVideo client to another MCVideo client.
+Table 7.2.3.2.2-1: Private communication answer response
+* * *
+Information element Status Description MCVideo ID M The identity of the
+MCVideo user requesting the communication MCVideo ID M The identity of the
+MCVideo user with whom communication was requested SDP answer M SDP with media
+information accepted by the callee
+* * *
+NOTE 1: For video push, \'the identity of the MCVideo user requesting the
+communication\' refers to the user who will be the source of the video, and
+\'the identity of the MCVideo user with whom the communication was requested\'
+refers to the user who will receive the video.
+NOTE 2: For video pull, \'the identity of the MCVideo user requesting the
+communication\' refers to the user who wants to receive the video, and \'the
+identity of the MCVideo user with whom the communication was requested\'
+refers to the user who will be the source of the video.
+##### 7.2.3.2.3 Private communication release request
+Table 7.2.3.2.3-1 describes the information flow for the private communication
+release request sent from one MCVideo client to another MCVideo client.
+Table 7.2.3.2.3-1: Private communication release request
+* * *
+Information element Status Description MCVideo ID M The identity of the
+MCVideo user requesting the communication MCVideo ID M The identity of the
+MCVideo user with whom communication was requested MCVideo private
+communication release reason O Reason for the private communication release.
+* * *
+NOTE 1: For video push, \'the identity of the MCVideo user requesting the
+communication\' refers to the user who will be the source of the video, and
+\'the identity of the MCVideo user with whom the communication was requested\'
+refers to the user who will receive the video.
+NOTE 2: For video pull, \'the identity of the MCVideo user requesting the
+communication\' refers to the user who wants to receive the video, and \'the
+identity of the MCVideo user with whom the communication was requested\'
+refers to the user who will be the source of the video.
+##### 7.2.3.2.4 Private communication release response
+Table 7.2.3.2.4-1 describes the information flow for the private communication
+release response sent from one MCVideo client to another MCVideo client.
+Table 7.2.3.2.4-1: Private communication release response
+* * *
+Information element Status Description MCVideo ID M The identity of the
+MCVideo user requesting the communication MCVideo ID M The identity of the
+MCVideo user with whom communication was requested
+* * *
+NOTE 1: For video push, \'the identity of the MCVideo user requesting the
+communication\' refers to the user who will be the source of the video, and
+\'the identity of the MCVideo user with whom the communication was requested\'
+refers to the user who will receive the video.
+NOTE 2: For video pull, \'the identity of the MCVideo user requesting the
+communication\' refers to the user who wants to receive the video, and \'the
+identity of the MCVideo user with whom the communication was requested\'
+refers to the user who will be the source of the video.
+#### 7.2.3.3 Use of ProSe for off-network private communications
+To enable an MCVideo user, using a ProSe-enabled UE, to communicate with
+another MCVideo user, using ProSe-enabled UE, the MCVideo client retrieves the
+ProSe discovery group ID and user info ID of the target MCVideo user from the
+\"List of user(s) who can be communicated privately\" in the MCVideo user
+profile and requests the IP address of the MCVideo UE associated with the
+target MCVideo user, from the ProSe layer.
+The MCVideo client enables the ProSe layer to determine the IP address for the
+target MCVideo UE by providing the ProSe discovery group ID and user info ID
+(as defined in specification 3GPP TS 23.303 [7]) of the target MCVideo user.
+This may trigger the ProSe layer procedure (e.g. discovery). The user info ID
+of the target MCVideo user is used by the ProSe layer as the target info (as
+defined in specification 3GPP TS 23.303 [7]). The ProSe layer can then provide
+the IP address related to the target MCVideo user\'s MCVideo ID to the MCVideo
+client.
+#### 7.2.3.4 Automatic commencement private communication
+##### 7.2.3.4.1 General
+A private call request is sent by a MCVideo client directly to another MCVideo
+client, which checks the request, establishes the MCVideo session without
+further user interaction and notifies its user that the MCVideo session has
+been established.
+##### 7.2.3.4.2 Procedure
+Figure 7.2.3.4.2-1 describes procedures to establish an off-network automatic
+commencement private communication between MCVideo user A MCVideo user B.
+Pre-conditions:
+1\. MCVideo user A has initiated automatic commencement private communication
+with MCVideo user B.
+2\. MCVideo user B has indicated MCVideo client B as the designated MCVideo
+client for MCVideo private communications.
+3\. MCVideo client A and MCVideo client B are members of the same ProSe
+Discovery group and are ProSe 1:1 direct communication capable.
+4\. MCVideo client A has discovered MCVideo client B in proximity, associated
+with MCVideo user B, using ProSe Discovery procedures.
+Editor\'s Note: How MCVideo client A determines that MCVideo client B is the
+designated MCVideo client of MCVideo user B for private communications is FFS.
+Figure 7.2.3.4.2-1: Off-network automatic commencement private communication
+1\. The MCVideo client A sends the Private communication request towards
+MCVideo client associated with MCVideo user B. The Private communication
+request contains an indication for automatic commencement and the SDP offer.
+2\. On receiving a Private communication request with an indication for
+automatic commencement, the MCVideo client checks if it is the designated
+MCVideo client for off-network MCVideo private communications.
+3a. The designated MCVideo client B automatically accepts the Private
+communication request, and sends a Private communication answer response,
+indicating the successful receipt of communication request to the MCVideo
+client A. The Private communication answer response contains the SDP answer.
+3b. The designated MCVideo client B notifies the MCVideo user B about the
+incoming Private communication request.
+NOTE 1: Step 3a and step 3b can occur in any order.
+4\. The MCVideo client A and the MCVideo client B establish the media plane
+for Private Communication.
+NOTE 2: If a MCVideo client fails to establish the communication, the MCVideo
+client should send a Private communication failed response indicating the
+failure reason to the appropriate MCVideo client.
+5\. MCVideo media is transmitted from the MCVideo client A to the MCVideo
+client B and is presented to the MCVideo user B.
+NOTE 3: If a Private communication failed response is received by a MCVideo
+client, before or after establishing the media session, if already
+established, the session is terminated and the MCVideo user is notified about
+the failure and its reason, if any.
+#### 7.2.3.5 Manual commencement private communication
+##### 7.2.3.5.1 General
+A private call request is sent by a MCVideo client directly to another MCVideo
+client, which checks the request, establishes the MCVideo session without
+further user interaction and notifies its user about the incoming MCVideo
+session request. The MCVideo user may accept, reject or ignore the MCVideo
+session request.
+##### 7.2.3.5.2 Procedure -- Communication accepted
+Figure 7.2.3.5.2-1 describes procedures to establish an off-network manual
+commencement private communication between MCVideo user A MCVideo user B,
+which is accepted by the MCVideo user B.
+Pre-conditions:
+1\. MCVideo user A has initiated manual commencement private communication
+with MCVideo user B.
+2\. MCVideo user B has indicated MCVideo client B as the designated MCVideo
+client for MCVideo private communications, if the MCVideo user B has signed on
+to the MCVideo service with multiple MCVideo clients.
+3\. MCVideo client A and MCVideo client B are members of the same ProSe
+Discovery group and are ProSe 1:1 direct communication capable.
+4\. MCVideo client A has discovered MCVideo clients B in proximity, associated
+with MCVideo user B, using ProSe Discovery procedures.
+Editor\'s Note: How MCVideo client A determines that MCVideo client B is the
+designated MCVideo client of MCVideo user B for private communications is FFS.
+Figure 7.2.3.5.2-1: Off-network manual commencement private communication --
+Accepted
+1\. The MCVideo client A sends the Private communication request towards
+MCVideo client associated with MCVideo user B. The Private communication
+request contains an indication for manual commencement and the SDP offer.
+2\. On receiving a Private communication request, the MCVideo client checks if
+it is the designated MCVideo client for off-network MCVideo private
+communications.
+3a. The designated MCVideo client B presents the incoming Private
+communication request to the MCVideo user B.
+3b. The MCVideo client B sends back a Private communication ringing response
+to the MCVideo client A.
+NOTE 1: Step 3a and step 3b can occur in any order.
+4\. The MCVideo client A notifies the ringing status to the MCVideo user A.
+5\. The MCVideo user B accepts the Private communication request.
+6\. The MCVideo client B sends the Private communication answer response to
+the MCVideo client A. The Private communication response contains the SDP
+answer.
+7\. The MCVideo client A and the MCVideo client B establish the media plane
+for Private communication.
+NOTE 2: If a MCVideo client fails to establish the communication, the MCVideo
+client should send a Private communication failed response indicating the
+failure reason to the appropriate MCVideo client.
+8\. MCVideo media is transmitted from the MCVideo client A to the MCVideo
+client B and is presented to the MCVideo user B.
+NOTE 3: If a Private communication failed response is received by a MCVideo
+client, before or after establishing the media session, if already
+established, the session is terminated and the MCVideo user is notified about
+the failure and its reason, if any.
+##### 7.2.3.5.3 Procedure -- Communication rejected/ignored
+Figure 7.2.3.5.3-1 describes procedures to initiate an off-network manual
+commencement private communication between MCVideo user A MCVideo user B,
+which is rejected or ignored by the MCVideo user B.
+Pre-conditions:
+1\. MCVideo user A has initiated manual commencement private communication
+with MCVideo user B.
+2\. MCVideo user B has indicated MCVideo client B as the designated MCVideo
+client for MCVideo Private Communications, if the MCVideo user B has signed on
+to the MCVideo service with multiple MCVideo clients.
+3\. MCVideo client A and MCVideo client B are members of the same ProSe
+Discovery group and are ProSe 1:1 direct communication capable.
+4\. MCVideo client A has discovered MCVideo clients B in proximity, associated
+with MCVideo user B, using ProSe Discovery procedures.
+Editor\'s Note: How MCVideo client A determines that MCVideo client B is the
+designated MCVideo client of MCVideo user B for private communications is FFS.
+Figure 7.2.3.5.3-1: Off-network manual commencement private communication --
+Rejected or Ignored
+1\. The MCVideo client A sends the private communication request towards
+MCVideo client associated with MCVideo user B. The private communication
+request contains an indication for manual commencement and the SDP offer.
+2\. On receiving a Private communication request, the MCVideo client checks if
+it is the designated MCVideo client for off-network MCVideo private
+communications.
+3a. The designated MCVideo client B presents the incoming Private
+communication request to the MCVideo user B.
+3b. The MCVideo client B sends back a Private communication ringing response
+to the MCVideo client A.
+NOTE 1: Step 3a and step 3b can occur in any order.
+4\. The MCVideo client A notifies the ringing status to the MCVideo user A.
+5\. The MCVideo user B rejects (or ignores) the Private communication request.
+NOTE 2: The MCVideo client B determines that the MCVideo user B has ignored
+the Private communication request, if the MCVideo user B does not respond
+within a configured time limit.
+6\. The MCVideo client B sends a Private communication reject response to the
+MCVideo client A. The Private communication reject response may indicate that
+the MCVideo user B has ignored the Private communication request.
+7\. The MCVideo client A notifies the MCVideo user A that the Private
+communication request was rejected (or ignored).
+#### 7.2.3.6 Private communication release
+##### 7.2.3.6.1 General
+Either of the MCVideo users involved in a private communication may release
+the unidirectional media plane or the whole private communication at any time.
+##### 7.2.3.6.2 Procedure
+Figure 7.2.3.6.2-1 describes procedures to release an ongoing MCVideo Private
+communication (either automatic commencement private communication or manual
+commencement private communication).
+Either of the MCVideo users, the initiator or the receiver of the Private
+communication can request to release the Private communication.
+The Private communication release request can be to release an individual
+(unidirectional) media plane or to terminate the Private communication. Based
+on the request the requested media plane or both the media planes are
+terminated in step 3.
+Pre-conditions:
+1\. MCVideo client A and MCVideo client B are engaged in a Private
+communication.
+2\. MCVideo user A at MCVideo client A initiates release of the Private
+communication.
+Figure 7.2.3.6.2-1: Off-network Private communication release
+1, The MCVideo client A sends the Private communication release request to the
+MCVideo client B.
+2a. The MCVideo client B sends a Private communication release response
+indicating successful receipt of the request to the MCVideo client A.
+2b. The MCVideo client B notifies the MCVideo user B about the Private
+communication release request.
+NOTE: Step 2a and step 2b can occur in any order.
+3\. MCVideo client A and MCVideo client B release the requested media plane.
+If both the media planes are released, the Private communication is
+terminated.
+## 7.3 Video pull
+### 7.3.1 General
+MCVideo pull is enabled in both on-network and off-network mode.
+For on-network MCVideo pull is supported between MCVideo clients, or between a
+MCVideo client and a MCVideo server.
+For off-network MCVideo pull is supported between MCVideo clients only.
+### 7.3.2 On-network video pull
+#### 7.3.2.1 General
+A MCVideo user triggers its MCVideo client to pull a video either from another
+MCVideo client or from a MCVideo server.
+#### 7.3.2.2 Information flows for on-network video pull
+The following information flows for private call specified in subclause
+7.2.2.2 is used for on-network video pull:
+\- MCVideo private call request (MCVideo client -- MCVideo server)
+\- MCVideo private call request (MCVideo server -- MCVideo client)
+\- MCVideo private call response (MCVideo client -- MCVideo server)
+\- MCVideo private call response (MCVideo server -- MCVideo client)
+\- MCVideo call end request
+##### 7.3.2.2.1 MCVideo pull from server request
+Table 7.3.2.2.1-1 describes the information flow MCVideo pull from server
+request from the MCVideo client to the MCVideo server.
+Table 7.3.2.2.1-1: MCVideo pull from server request
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party File URL M URL of the video file to be streamed SDP offer M
+Media parameters of MCVideo client Requested priority O Application priority
+level requested for this call
+* * *
+##### 7.3.2.2.2 MCVideo pull from server response
+Table 7.3.2.2.2-1 describes the information flow MCVideo pull from server
+response from the MCVideo server to the MCVideo client.
+Table 7.3.2.2.2-1: MCVideo pull from server response
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party SDP answer M Media parameters selected
+* * *
+##### 7.3.2.2.3 MCVideo pull from server complete request
+Table 7.3.2.2.3-1 describes the information flow MCVideo pull from server
+complete request from the MCVideo client to the MCVideo server or from the
+MCVideo server to the MCVideo client..
+Table 7.3.2.2.3-1: MCVideo pull from server complete request
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party Cause M End of communication cause
+* * *
+##### 7.3.2.2.4 MCVideo pull from server complete response
+Table 7.3.2.2.4-1 describes the information flow MCVideo pull from server
+complete response from the MCVideo client to the MCVideo server or from the
+MCVideo server to the MCVideo client..
+Table 7.3.2.2.4-1: MCVideo pull from server complete response
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party
+* * *
+#### 7.3.2.3 One-to-one video pull
+##### 7.3.2.3.1 General
+One-to-one video pull is a private call that only allows the called party to
+transmit video to the calling party, and the private call ends when the video
+transmission is completed.
+##### 7.3.2.3.2 One-to-one video pull -- call setup
+The procedure describes the case where an MCVideo user is initiating an
+MCVideo private call to pull video from called MCVideo user in an automatic or
+manual commencement mode. Only the called party is allowed to transmit video.
+Procedures in figure 7.3.2.3.2-1 are the basic signalling control plane
+procedures for the MCVideo client initiating establishment of MCVideo private
+call with the chosen MCVideo user for video pull.
+Pre-conditions:
+1\. Optionally, MCVideo client 1 may have a functional alias activated to be
+used.
+2\. The MCVideo server may have subscribed to the MCVideo functional alias
+controlling server within the MC system for functional alias activation/de-
+activation updates.
+Figure 7.3.2.3.2-1: One-to-one video pull
+1\. MCVideo user on MCVideo client 1 initiates video pull from MCVideo client
+2, by sending a private call request to the MCVideo server using a service
+identifier as defined in 3GPP TS 23.228 [5] for MCVideo, for establishing a
+private call with the chosen MCVideo user for video pull. The MCVideo private
+call request contains MCVideo ID of invited user, an SDP offer containing one
+or more media types and the video pull indication to indicate that invited
+user is requested to transmit video to the requester. The MCVideo user at
+MCVideo client 1 may include a functional alias used within the MCVideo
+private call request.
+2\. MCVideo server checks whether the MCVideo user at MCVideo client 1 is
+authorized to initiate the private call for video pull, and that MCVideo user
+at MCVideo client 2 is authorized to receive the private call for video pull.
+MCVideo server verifies whether the provided functional alias, if present, can
+be used and has been activated for the user.
+3\. MCVideo server may provide a progress indication to MCVideo client 1 to
+indicate progress in the call setup process.
+NOTE 1: Step 3 can occur at any time following step 4, and prior to step 6.
+4\. If authorized, MCVideo server includes information that it communicates
+using MCVideo service, offers the same media types or a subset of the media
+types contained in the initial received request, includes the requested
+automatic commencement mode indication based on a requested commencement mode
+by the calling user or based upon the setting of the called MCVideo client and
+sends the corresponding MCVideo private call request towards the MCVideo
+client 2, including the MCVideo ID, and, if available the functional alias of
+the calling MCVideo user 1\. If the called MCVideo user has registered to the
+MCVideo service with multiple MCVideo UEs and has designated the MCVideo UE
+for receiving the private calls, then the incoming MCVideo private call
+request is delivered only to the designated MCVideo UE.
+5\. The MCVideo client 2 notifies the user about the incoming private call for
+video pull. If a functional alias of the calling user is included it is
+displayed.
+6\. The receiving MCVideo client 2 accepts the private call for video pull,
+and sends an MCVideo private call response to the MCVideo server with an
+implicit transmit media request.
+7\. Upon receiving the MCVideo private call response from MCVideo client 2
+accepting the private call request for video pull, the MCVideo server informs
+the MCVideo client 1 about successful call establishment via a private call
+response message.
+8\. MCVideo client 1 and MCVideo client 2 have successfully established media
+plane and transmission control for media communication.
+NOTE 2: When the video transmission is completed, the private call is
+released.
+##### 7.3.2.3.3 One-to-one video pull -- call release
+The private call release procedure specified in subclause 7.2.2.3.3 is used
+for one-to-one video pull call release.
+  1. #### 7.3.2.4 One-from-server video pull
+    1. ##### 7.3.2.4.1 General
+One-from-server video pull is a private call between the calling party and the
+MCVideo server that allows the calling party to request streaming of a video
+from the server where it is stored in a file. The one-from-server video pull
+ends typically when the end of the video file has been reached or when the
+transmission is stopped by the calling user or by the MCVideo server.
+NOTE: This procedure fulfills the requirements for the stage 1 replay of
+stored video feature.
+##### 7.3.2.4.2 Procedure
+Procedure in figure 7.3.2.4.2-1 is the basic signalling control plane
+procedures for the MCVideo client initiating establishment of MCVideo video
+pull from the MCVideo server.
+Pre-conditions:
+1\. MCVideo user 1 on MCVideo client 1 has been authenticated and authorized
+to use MCVideo service.
+2\. MCVideo client 1 is registered.
+3\. MCVideo client 1 has been received the URL of a video file available on
+the MCVideo server, e.g. within an MCData SDS.
+Figure 7.3.2.4.2-1: One-from-server video pull
+1\. MCVideo user on MCVideo client 1 initiates the pull of a video from the
+server and sends an MCVideo pull from server request to the MCVideo server.
+The request contains the URL of the video file and an SDP offer with media
+description..
+2\. MCVideo server checks whether MCVideo client 1 is authorized to pull the
+requested video from the server.
+3\. MCVideo server accepts the pull from server request and sends an MCVideo
+pull from server response. The response contains the SDP answer.
+NOTE 1: The SDP may contain a media description that allows the receiving
+party to remote control the stream (e.g. rewind, fast forward).
+4\. MCVideo client 1 and MCVideo server have successfully established the
+media plane and transmission control for the video stream.
+5\. Video stream is transmitted from MCVideo server to MCVideo client 1. The
+MCVideo client 1 may be able to remote control the video stream, subject to
+SDP negotiation.
+6\. MCVideo user on MCVideo client 1 stops the video pull from the server and
+sends an MCVideo pull from server complete request.
+7\. MCVideo server acknowledges the end of the communication.
+NOTE 2: Alternatively, based on internal criteria (e.g. maximum duration of
+the video playback, end of the video file), the MCVideo server can end the
+transmission.
+### 7.3.3 Off-network video pull
+#### 7.3.3.1 General
+A MCVideo client pulls a video from another MCVideo client directly, i.e.
+without involving the network.
+#### 7.3.3.2 Information flows for off-network video pull
+The following information flows for private call specified in subclause
+7.2.3.2 are used for off-network video pull:
+\- Private communication request; and
+\- Private communication answer response.
+#### 7.3.3.3 Video pull to self
+##### 7.3.3.3.1 General
+A MCVideo user requests another MCVideo user to deliver a video from its
+MCVideo client.
+##### 7.3.3.3.2 Procedure
+Figure 7.3.3.3.2-1 describes procedures for an off-network MCVideo video pull,
+inititated by MCVideo user A at MCVideo client A with another MCVideo client
+B, to pull a video to MCVideo client A.
+MCVideo client B can be an autonomous MCVideo client or can be a human
+controlled MCVideo client. In either case, following procedure should be
+followed.
+Pre-conditions:
+1\. MCVideo user A has initiated MCVideo video pull with MCVideo user B.
+2\. MCVideo client A and MCVideo client B are members of the same ProSe
+Discovery group and are ProSe 1:1 direct communication capable.
+3\. MCVideo client A has discovered MCVideo client B in proximity, associated
+with MCVideo user B, using ProSe Discovery procedures.
+Figure 7.3.3.3.2-1: Off-network video pull to self
+1\. The MCVideo client A sends a Private communication request towards the
+MCVideo client B. The Private communication request includes a video pull
+request and indicates MCVideo client A as the intended recipient of the video
+pull. Private communication request contains the SDP offer.
+2a. The MCVideo client B notifies the MCVideo user B about the incoming video
+pull request.
+2b. The MCVideo client B automatically accepts the video pull request, and
+sends a Private communication answer response indicating the acceptance of the
+video pull request. The Private communication answer response contains SDP
+answer.
+NOTE 1: Step 2a and step 2b can occur in any order.
+3\. The MCVideo client A notifies MCVideo user A about the incoming Private
+communication answer response as an indication of acceptance of MCVideo video
+pull request.
+4\. The MCVideo client A and the MCVideo client B establish the media plane
+for communication.
+NOTE 2: If a MCVideo client fails to establish the communication, the MCVideo
+client should send a Private communication failed response indicating the
+failure reason to the appropriate MCVideo client.
+5\. Media is transmitted from MCVideo client B to MCVideo client A and
+presented to the MCVideo user A.
+NOTE 3: If a Private communication failed response is received by a MCVideo
+client, before or after establishing the media session, if already
+established, the session is terminated and the MCVideo user is notified about
+the failure and its reason, if any.
+## 7.4 Video push
+### 7.4.1 General
+MCVideo push is enabled in both on-network and off-network mode.
+For on-network MCVideo push is supported between MCVideo clients, or between a
+MCVideo client and a MCVideo server.
+For off-network MCVideo push is supported between MCVideo clients only.
+### 7.4.2 On-network video push
+#### 7.4.2.1 General
+A MCVideo user triggers its MCVideo client to push a video to another MCVideo
+client or a MCVideo server.
+A MCVideo user triggers its MCVideo client to trigger a remote video push,
+i.e. a second MCVideo client pushes a video to a third MCVideo client or to a
+MCVideo group.
+#### 7.4.2.2 Information flows for on-network video push
+The following information flows for private call specified in subclause
+7.2.2.2 is used for on-network video push:
+\- MCVideo private call request (MCVideo client -- MCVideo server)
+\- MCVideo private call request (MCVideo server -- MCVideo client)
+\- MCVideo private call response (MCVideo client -- MCVideo server)
+\- MCVideo private call response (MCVideo server -- MCVideo client)
+\- MCVideo call end request
+##### 7.4.2.2.1 Remote video push request
+Table 7.4.2.2.1-1 describes the information flow remote video push request
+from the MCVideo client to the MCVideo server and from the MCVideo server to
+the MCVideo client.
+Table 7.4.2.2.1-1: Remote video push request
++---------------------------+------------+---------------------------+ | Information Element | Status | Description | +---------------------------+------------+---------------------------+ | MCVideo ID | M | The MCVideo ID of the | | | | call originating party | +---------------------------+------------+---------------------------+ | Functional alias | O | The functional alias of | | | | the originating party | +---------------------------+------------+---------------------------+ | MCVideo ID | M | The MCVideo ID of the | | | | source party who should | | | | transmit media | +---------------------------+------------+---------------------------+ | MCVideo ID | O | The MCVideo ID of the | | | | destination party who | | | (see NOTE) | should receive media | +---------------------------+------------+---------------------------+ | MCVideo group ID | O | The MCVideo group ID of | | | | the destination group | | | (see NOTE) | whose affiliated group | | | | members should receive | | | | media | +---------------------------+------------+---------------------------+ | SDP offer | O | Media parameters of | | | | MCVideo client. | +---------------------------+------------+---------------------------+ | Requested commencement | O | An indication that is | | mode | | included if the user is | | | | requesting a particular | | | | commencement mode | +---------------------------+------------+---------------------------+ | Requested priority | O | Application priority | | | | level requested for this | | | | call | +---------------------------+------------+---------------------------+ | NOTE: MCVideo ID | | | | information element is | | | | present if remote video | | | | push to destination user | | | | is requested. MCVideo | | | | group ID information | | | | element is present if | | | | remote video push to | | | | group is requested. | | | +---------------------------+------------+---------------------------+
+##### 7.4.2.2.2 Remote video push response
+Table 7.4.2.2.2-1 describes the information flow remote video push request
+from the MCVideo server to the MCVideo client and from the MCVideo client to
+the MCVideo server.
+Table 7.4.2.2.2-1: Remote video push response
++---------------------------+------------+---------------------------+ | Information Element | Status | Description | +---------------------------+------------+---------------------------+ | MCVideo ID | M | The MCVideo ID of the | | | | call originating party | +---------------------------+------------+---------------------------+ | MCVideo ID | M | The MCVideo ID of the | | | | source party who should | | | | transmit media | +---------------------------+------------+---------------------------+ | MCVideo ID | O | The MCVideo ID of the | | | | destination party who | | | (see NOTE) | should receive media | +---------------------------+------------+---------------------------+ | MCVideo group ID | O | The MCVideo group ID of | | | | the destination group | | | (see NOTE) | whose affiliated group | | | | members should receive | | | | media | +---------------------------+------------+---------------------------+ | Acceptance confirmation | O | An indication whether the | | | | user or group members | | | | have positively accepted | | | | the call. | +---------------------------+------------+---------------------------+ | SDP answer | M | Media parameters selected | +---------------------------+------------+---------------------------+ | NOTE: MCVideo ID | | | | information element is | | | | present if remote video | | | | push to destination user | | | | is requested. MCVideo | | | | group ID information | | | | element is present if | | | | remote video push to | | | | group is requested. | | | +---------------------------+------------+---------------------------+
+##### 7.4.2.2.3 Remote video push release request
+Table 7.4.2.2.3-1 describes the information flow Remote video push release
+request from the MCVideo client to the MCVideo server and from the MCVideo
+server to the MCVideo client.
+Table 7.4.2.2.3-1: Remote video push release request
++---------------------------+------------+---------------------------+ | Information Element | Status | Description | +---------------------------+------------+---------------------------+ | MCVideo ID | M | The MCVideo ID of the | | | | call originating party | +---------------------------+------------+---------------------------+ | MCVideo ID | M | The MCVideo ID of the | | | | source party who should | | | | transmit media | +---------------------------+------------+---------------------------+ | MCVideo ID | O | The MCVideo ID of the | | | | destination party who | | | (see NOTE) | should receive media | +---------------------------+------------+---------------------------+ | MCVideo group ID | O | The MCVideo group ID of | | | | the destination group | | | (see NOTE) | whose affiliated group | | | | members should receive | | | | media | +---------------------------+------------+---------------------------+ | NOTE: MCVideo ID | | | | information element is | | | | present if remote video | | | | push to destination user | | | | is requested. MCVideo | | | | group ID information | | | | element is present if | | | | remote video push to | | | | group is requested. | | | +---------------------------+------------+---------------------------+
+##### 7.4.2.2.4 MCVideo push to server request
+Table 7.4.2.2.4-1 describes the information flow MCVideo push to server
+request from the MCVideo client to the MCVideo server.
+Table 7.4.2.2.4-1: MCVideo push to server request
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party Time limit O Requested duration of the stream to be recorded SDP
+offer M Media parameters of MCVideo client Requested priority O Application
+priority level requested for this call
+* * *
+##### 7.4.2.2.5 MCVideo push to server response
+Table 7.4.2.2.5-1 describes the information flow MCVideo push to server
+response from the MCVideo server to the MCVideo client.
+Table 7.4.2.2.5-1: MCVideo push to server response
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party Time limit O Accepted or imposed duration limit of the stream to
+be recorded File URL M URL of the file the stream will be recorded to SDP
+answer M Media parameters selected
+* * *
+##### 7.4.2.2.6 MCVideo push to server complete request
+Table 7.4.2.2.6-1 describes the information flow MCVideo push to server
+complete request from the MCVideo client to the MCVideo server or from the
+MCVideo server to the MCVideo client.
+Table 7.4.2.2.6-1: MCVideo push to server complete request
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party Cause M End of communication cause
+* * *
+##### 7.4.2.2.7 MCVideo push to server complete response
+Table 7.4.2.2.7-1 describes the information flow MCVideo push to server
+complete response from the MCVideo client to the MCVideo server or from the
+MCVideo server to the MCVideo client.
+Table 7.4.2.2.7-1: MCVideo push to server complete response
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+calling party
+* * *
+#### 7.4.2.3 One-to-one video push
+##### 7.4.2.3.1 General
+One-to-one video push is a private call that only allows the calling party to
+transmit video to the called party, and the private call ends when the video
+transmission is completed.
+##### 7.4.2.3.2 One-to-one video push -- call setup
+Procedures in figure 7.4.2.3.2-1 are the basic signalling control plane
+procedures for the MCVideo client initiating establishment of MCVideo private
+call with the chosen MCVideo user for video push.
+Pre-conditions:
+1\. This procedure is initiated either manually by the authorized MCVideo
+users at MCVideo client 1, or automatically due to triggers set by authorized
+MCVideo users at MCVideo client 1.
+2\. Optionally, MCVideo client 1 may have a functional alias activated to be
+used.
+3\. The MCVideo server may have subscribed to the MCVideo functional alias
+controlling server within the MC system for functional alias activation/de-
+activation updates.
+Figure 7.4.2.3.2-1: One-to-one video push
+1\. MCVideo client 1 initiates push video to MCVideo client 2, and sends a
+private call request to the MCVideo server using a service identifier as
+defined in 3GPP TS 23.228 [5] for MCVideo, for establishing a private call
+with the chosen MCVideo user for video push. The MCVideo private call request
+contains MCVideo ID of invited user, an SDP offer containing one or more media
+types and the video push indication to indicate that requestor is requesting
+to transmit video to the called party. The MCVideo user at MCVideo client 1
+may include a functional alias used within the MCVideo private call request.
+2\. MCVideo server checks whether the MCVideo user at MCVideo client 1 is
+authorized to initiate the private call for video push, and that MCVideo user
+at MCVideo client 2 is authorized to receive the private call for video push.
+MCVideo server verifies whether the provided functional alias, if present, can
+be used and has been activated for the user.
+3\. MCVideo server may provide a progress indication to MCVideo client 1 to
+indicate progress in the call setup process.
+NOTE 1: Step 3 can occur at any time following step 4, and prior to step 6.
+4\. If authorized, MCVideo server includes information that it communicates
+using MCVideo service, offers the same media types or a subset of the media
+types contained in the initial received request, includes the requested
+automatic commencement mode indication based on a requested commencement mode
+by the calling user or based upon the setting of the called MCVideo client and
+sends the corresponding MCVideo private call request towards the MCVideo
+client 2, including the MCVideo ID and, if available the functional alias of
+the calling MCVideo user 1. If the called MCVideo user has registered to the
+MCVideo service with multiple MCVideo UEs and has designated the MCVideo UE
+for receiving the private calls, then the incoming MCVideo private call
+request is delivered only to the designated MCVideo UE.
+5\. The MCVideo client 2 notifies the user about the incoming private call for
+video push. If the functional alias of the calling user is included it is
+displayed.
+6\. The MCVideo client 2 accepts the private call for video push, and sends an
+MCVideo private call response to the MCVideo server.
+7\. Upon receiving the MCVideo private call response from MCVideo client 2
+accepting the private call request for video push, the MCVideo server informs
+the MCVideo client 1 about successful call establishment via a private call
+response message.
+8\. MCVideo client 1 and MCVideo client 2 have successfully established media
+plane and transmission control for media communication.
+NOTE 2: When the video transmission is completed, the private call is
+released.
+##### 7.4.2.3.3 One-to-one video push -- call release
+The private call release procedure specified in subclause 7.2.2.3.3 is used
+for one-to-one video push call release.
+  1. #### 7.4.2.4 One-to-server video push
+    1. ##### 7.4.2.4.1 General
+One-to-server video push is a private call between the calling party and the
+MCVideo server that allows the calling party to transmit video to the server
+for it to be recorded to a file. The one-to-server video push ends when the
+video transmission is stopped by the calling party or by the MCVideo server.
+NOTE: This procedure fulfils part of the requirements for the stage 1 video
+processing capabilities feature.
+##### 7.4.2.4.2 Procedure
+Procedure in figure 7.4.2.4.2-1 is the basic signalling control plane
+procedures for the MCVideo client initiating establishment of MCVideo video
+push to the MCVideo server.
+Pre-conditions:
+1\. MCVideo user 1 on MCVideo client 1 has been authenticated and authorized
+to use MCVideo service.
+2\. MCVideo client 1 is registered.
+Figure 7.4.2.4.2-1: One-to-server video push
+1\. MCVideo user on MCVideo client 1 initiates the push of a video to the
+server and sends an MCVideo push to server request to the MCVideo server. The
+request contains an SDP offer with media.
+2\. MCVideo server checks whether MCVideo client 1 is authorized to push a
+video to the server.
+3\. MCVideo server accepts the push to server request and sends an MCVideo
+push to server response. The response contains the SDP answer and the URL of
+the file where the video stream will be recorded.
+NOTE 1: Push request and response can include a negotiated maximum duration
+for the transmission.
+4\. MCVideo client 1 and MCVideo server have successfully established the
+media plane and transmission control for the video stream.
+5\. Video stream is transmitted from MCVideo client 1 to MCVideo server. The
+MCVideo server records the stream to the file whose URL has been given in the
+MCVideo push to server response.
+NOTE 2: Notifications of new media availability can be sent by the initiating
+MCVideo user or by the MCVideo server using the URL received in the MCVideo
+push to server response.
+NOTE 3: MCVideo clients which receive the notification can initiate a pull of
+the video stream from the server using the URL provided in the notification,
+at their convenience, using the procedure defined in subclause 7.3.2.4.2.
+6\. MCVideo user on MCVideo client 1, or MCVideo client 1 based on pre-defined
+criteria (e.g. duration), stops the video push to the server and sends an
+MCVideo push to server complete request.
+7\. MCVideo server acknowledges the end of the communication.
+NOTE 4: Alternatively, based on internal criteria (e.g. maximum duration of
+the recorded video), the MCVideo server can end the transmission.
+#### 7.4.2.5 Remotely initiated video push
+##### 7.4.2.5.1 General
+Remotely initiated video push is a private call remotely initiated by a user
+that only allows a source user to transmit video to a destination, and the
+private call ends when the video transmission is completed or released by the
+authorized user who remotely initiated video push call.
+##### 7.4.2.5.2 Remotely initiated video push -- call setup
+The procedure describes the case where an authorized MCVideo user is
+initiating an remotely initiated video push call from source MCVideo user to a
+destination MCVideo user. Only the source user is allowed to transmit video to
+the destination user.
+Procedures in figure 7.4.2.5.2-1 are the basic signalling control plane
+procedures for the MCVideo client remotely initiating establishment of MCVideo
+private call between the source and destination MCVideo users.
+Figure 7.4.2.5.2-1: Remotely initiated video push -- call setup
+1\. MCVideo user on MCVideo client 3 initiates remote video push from MCVideo
+client 1 to MCVideo client 2, by sending a remote video push request to the
+MCVideo server for establishing a one-to-one video push call between MCVideo
+client 1 and MCVideo client 2. The remote video push call request contains
+MCVideo ID of source (MCVideo client 1) and destination (MCVideo client 2)
+users
+2\. MCVideo server checks whether the MCVideo user at MCVideo client 3 is
+authorized to remotely initiate video push call between the source user and
+the destination user. MCVideo server also checks if there is any on-going call
+between the source user and the destination user.
+3\. If MCVideo client 3 is authorized and there is no on-ongoing private call
+between source user and destination user, the MCVideo server sends the remote
+video push request message to MCVideo client 1 including the information of
+MCVideo ID of source and destination users.
+4\. The MCVideo client 1 accepts the remote video push request and establishes
+a one-to-one video push call between MCVideo client 1 and MCVideo client 2 as
+described in the subclause 7.4.2.3.2. The video is transmitted from MCVideo
+client 1 to MCVideo Client 2.
+5\. The MCVideo client 1 sends a remote video push response message to MCVideo
+server indicating success or failure of call establishment between MCVideo
+client 1 and MCVideo client 2.
+6\. Upon receiving the remote video push response from MCVideo client 1, the
+MCVideo server informs the MCVideo client 3 about success or failure of the
+call establishment by sending a remote video push response message.
+NOTE: Steps 5 and 6 can occur before step 4.
+##### 7.4.2.5.3 Remotely initiated video push -- call release by authorized
+user
+The procedure describes the case where an authorized MCVideo user is releasing
+an remotely initiated video push call.
+Procedures in figure 7.4.2.5.3-1 are the basic signalling control plane
+procedures for the MCVideo client releasing the remotely initiated video push
+call between the source and destination users.
+Figure 7.4.2.5.3-1: Remotely initiated video push -- call release by
+authorized user
+1\. MCVideo user on MCVideo client 3 initiates release of remotely initiated
+video push call between MCVideo client 1 and MCVideo client 2, by sending a
+remote video push release request to the MCVideo server for releasing a one-
+to-one video push call between MCVideo client 1 and MCVideo client 2. The
+remote video push release request contains MCVideo ID of source user (MCVideo
+client 1) and destination user (MCVideo client 2).
+2\. MCVideo server checks whether the MCVideo user at MCVideo client 3 is
+authorized to release the remotely initiated video push call between MCVideo
+client 1 and MCVideo client 2, and whether there is any on-going one-to-one
+video push call between MCVideo client 1 and MCVideo client 2.
+3\. MCVideo server sends the remote video push release request to MCVideo
+client 1 for releasing the on-going one-to-one video push call between MCVideo
+client 1 and MCVideo client 2.
+4\. The MCVideo client 1 accepts the remote video push release request and
+performs the release procedure for the one-to-one video push call between
+MCVideo client 1 and MCVideo client 2 as described in the subclause 7.4.2.3.3.
+5\. The MCVideo client 1 sends a remote video push release response to the
+MCVideo server indicating the release of the one-to-one video push call
+between MCVideo client 1 and MCVideo client 2.
+6\. Upon receiving the remote video push release response from MCVideo client
+1, the MCVideo server informs the MCVideo client 3 about the one-to-one video
+push call release by sending a remote video push release response message.
+NOTE: Steps 5 and 6 can occur before step 4.
+#### 7.4.2.6 Remotely initiated video push to group
+##### 7.4.2.6.1 General
+Remotely initiated video push to group is a type of broadcast group call that
+only allows the originating user to remotely request a source user to transmit
+video to the group, and the group call ends when the video transmission is
+completed or the authorized user releases the remotely initiated video push to
+group call.
+##### 7.4.2.6.2 Remotely initiated video push to group -- call setup
+The procedure describes the case where an authorized MCVideo user is
+initiating video push to group call for transmitting video from a source
+MCVideo user to the group. Only the source MCVideo user is allowed to transmit
+video.
+Procedures in figure 7.4.2.6.2-1 are the basic signalling control plane
+procedures for the MCVideo client remotely initiating a video push to group
+call.
+Pre-conditions:
+1\. MCVideo client 1 and MCVideo client 2 are affiliated members of the group
+X.
+2\. The user on MCVideo client 1 is authorized to remotely initiate a video
+push to group call to enable transmitting the video from the user on MCVideo
+client 2.
+Figure 7.4.2.6.2-1: Remotely initiated video push to group -- call setup
+procedure
+1\. MCVideo user on MCVideo client 1 remotely initiates a video push to group
+from MCVideo client 2, by sending a remote video push request to the MCVideo
+server. The remote video push request contains MCVideo ID of the source user
+(user of MCVideo client 2) and the MCVideo group ID of the group X to which
+the video transmission is requested.
+2\. MCVideo server checks whether the MCVideo user at MCVideo client 1 is
+authorized to remotely initiate a video push to group, and also checks whether
+MCVideo client 2 is transmitting video in any on-going MCVideo group call on
+group X. If MCVideo client 2 is already transmitting video to group X then a
+suitable response is provided in step 6 to MCVideo client 1.
+3\. The MCVideo server sends a remote video push request initiated by MCVideo
+client 1 to MCVideo client 2. The remote video push request contains MCVideo
+ID of the source user, the MCVideo group ID of the group X to which the video
+transmission is to be initiated by the source user and an SDP offer containing
+one or more media types.
+4\. MCVideo client 2 initiates a MCVideo broadcast group call on group X. The
+MCVideo client 2 begins to transmit video to the group X.
+5\. The MCVideo client 2 sends a remote video push response message to MCVideo
+server indicating success or failure in remotely initiating the video push to
+group X.
+6\. The MCVideo server sends a remote video push response message to MCVideo
+client 1 indicating success or failure in remotely initiating the video push
+to group X by the MCVideo client 2.
+NOTE: Steps 5 and 6 can occur before step 4.
+##### 7.4.2.6.3 Remotely initiated video push to group -- call release by
+authorized user
+The procedure describes the case where an MCVideo user is remotely releasing a
+video push to group call for ending the video transmission from the source
+MCVideo user.
+Procedures in figure 7.4.2.6.3-1 are the basic signalling control plane
+procedures for the MCVideo client remotely releasing a video push to group
+call.
+Pre-condition:
+\- MCVideo client 1 and MCVideo client 2 are affiliated members of the group X
+and there is an on-going broadcast group call on group X from MCVideo client 2
+remotely initiated by MCVideo client 1 as described in subclause 7.4.2.6.2.
+Figure 7.4.2.6.3-1: Remotely initiated video push to group -- call release by
+authorized user
+1\. MCVideo user on MCVideo client 1 remotely initiates a release of the video
+push to group call from MCVideo client 2, by sending a remote video push
+release request to the MCVideo server. The remote video push release request
+contains MCVideo ID of the source user (user of MCVideo client 2) and the
+MCVideo group ID of the group X to which the video transmission is to be
+released.
+2\. MCVideo server checks whether the MCVideo user at MCVideo client 1 is
+authorized to remotely release a video push to group call, and also checks
+whether MCVideo client 2 is transmitting video in an on-going MCVideo group
+call on group X remotely initiated by MCVideo client 1. If MCVideo client 2 is
+not transmitting video on group X then a suitable response is provided in step
+5 to MCVideo client 1.
+3\. The MCVideo server sends a remote video push release request initiated by
+MCVideo client 1 to MCVideo client 2. The remote video push release request
+contains MCVideo ID of the source user, the MCVideo group ID of the group X to
+which the video transmission is to be released.
+4\. The MCVideo client 2 sends a remote video push release response message to
+MCVideo server indicating the release of video push to group call.
+5\. The MCVideo server sends a remote video push release response message to
+MCVideo client 1 indicating the release of video push to group call.
+6\. MCVideo client 2 stops the video transmission to the group X and releases
+the MCVideo broadcast group call on group X remotely initiated by MCVideo
+client 1.
+NOTE: Step 6 can occur before steps 4 and 5.
+### 7.4.3 Off-network video push
+#### 7.4.3.1 General
+A MCVideo user triggers its MCVideo client to push a video to another MCVideo
+client.
+A MCVideo user triggers its MCVideo client to trigger a remote video push,
+which requests a second MCVideo client to push a video to a third MCVideo
+client or to a MCVideo group.
+Off-network remote video push works without involving the network.
+#### 7.4.3.2 Information flows for off-network video push
+##### 7.4.3.2.1 Remote video push request
+Table 7.4.3.2.1-1 describes the information flow for the remote video push
+request sent from one MCVideo client to other MCVideo client(s).
+Table 7.4.3.2.1-1: Remote video push request
+* * *
+Information element Status Description MCVideo ID M The identity of the
+MCVideo user remotely requesting the video push MCVideo ID M The identity of
+the MCVideo user from whom the video push is requested Video information O
+Information identifying the video MCVideo group ID O The MCVideo group ID to
+which the video is to be transmitted.
+* * *
+##### 7.4.3.2.2 Video push trying response
+Table 7.4.3.2.2-1 describes the information flow for the video push trying
+response sent from one MCVideo client to another MCVideo client.
+Table 7.4.3.2.2-1: Video push trying response
+* * *
+Information element Status Description MCVideo ID M The identity of the
+MCVideo user sending the trying response MCVideo ID M The identity of the
+MCVideo user to whom the trying response is sent MCVideo ID M The identity of
+the MCVideo user to whom the video is attempted
+* * *
+##### 7.4.3.2.3 Notification of video push
+Table 7.4.3.2.3-1 describes the information flow for the notification of video
+push sent from one MCVideo client to another MCVideo client.
+Table 7.4.3.2.3-1: Notification of video push
+* * *
+Information element Status Description MCVideo ID M The identity of the
+MCVideo user sending the notification MCVideo ID M The identity of the MCVideo
+user to whom the notification is sent MCVideo ID M The identity of the MCVideo
+user to whom the video is pushed
+* * *
+#### 7.4.3.3 Video push to another MCVideo user
+##### 7.4.3.3.1 General
+The MCVideo Push is the capability of a MCVideo user to push a video to
+another MCVideo user. A MCVideo user can push a video which is:
+\- being received by the MCVideo user from another a MCVideo client; or
+\- being recorded live on the MCVideo client.
+##### 7.4.3.3.2 Procedure
+Figure 7.4.3.3.2-1 describes procedures for an off-network MCVideo video push,
+inititated by MCVideo client B with another MCVideo client C, to push a video
+received from MCVideo client A to MCVideo client C.
+MCVideo client A or MCVideo client C or both can be autonomous MCVideo clients
+or can be human controlled MCVideo clients. In any such combination, following
+the procedure is followed.
+MCVideo client A and MCVideo client B may belong to the same MCVideo user.
+Pre-conditions:
+1\. MCVideo client A and MCVideo client B are engaged in MCVideo
+communication, where MCVideo client B is receiving media from MCVideo client
+A.
+2\. MCVideo user B has initiated MCVideo video push with MCVideo user C.
+3\. MCVideo client B and MCVideo client C are members of the same ProSe
+Discovery group and are ProSe 1:1 direct communication capable.
+4\. MCVideo client B has discovered MCVideo client C in proximity, associated
+with MCVideo user C, using ProSe Discovery procedures.
+Figure 7.4.3.3.2-1: Off-network Video push to another MCVideo user
+1\. The MCVideo client B sends a Private communication request towards MCVideo
+client C. The Private communication request indicates that the request is for
+video push and contains the SDP offer.
+2a. The MCVideo client C may notify the MCVideo user C about the MCVideo Push
+request (if the MCVideo client C is human controlled)
+2b. The MCVideo client C automatically accepts the Private communication
+request for video push and sends a Private communication answer response to
+MCVideo client B. The Private communication answer response contains SDP
+answer.
+NOTE 1: Step 2a and step 2b can occur in any order.
+3a. If configured, the MCVideo client B notifies MCVideo client A about the
+video being pushed to MCVideo client C by sending a notification message to
+MCVideo client A.
+3b. If configured, the MCVideo client A may notify the MCVideo user A about
+the video being pushed to MCVideo client C.
+4\. The MCVideo client B and MCVideo client C establish the media plane for
+communication.
+5\. Video being received by MCVideo client B from MCVideo client A is
+transmitted from MCVideo client B to MCVideo client C and presented to the
+MCVideo user C.
+NOTE 2: If a MCVideo client fails to establish the communication, the MCVideo
+client should send a Private communication failed response indicating the
+failure reason to the appropriate MCVideo client(s).
+NOTE 3: If a Private communication failed response is received by a MCVideo
+client, before or after establishing the media session, if already
+established, the session is terminated and the MCVideo user is notified about
+the failure and its reason, if any.
+#### 7.4.3.4 Remotely initiated video push
+##### 7.4.3.4.1 General
+The MCVideo push is the capability of a MCVideo user to push a video from a
+second MCVideo user to a third MCVideo user.
+##### 7.4.3.4.2 Procedure
+Figure 7.4.3.4.2-1 describes procedures for a remotely initiated off-network
+MCVideo video push, inititated by MCVideo user A at MCVideo client A with
+another MCVideo client B, to push a video to MCVideo client C.
+MCVideo client B can be an autonomous MCVideo client or can be a human
+controlled MCVideo client. In either case, following procedure is followed.
+Pre-conditions:
+1\. MCVideo user A has remotely initiated MCVideo video push with MCVideo user
+B.
+2\. MCVideo client A and MCVideo client B are members of the same ProSe
+Discovery group and are ProSe 1:1 direct communication capable.
+3\. MCVideo client A has discovered MCVideo client B in proximity, associated
+with MCVideo user B, using ProSe Discovery procedures.
+Figure 7.4.3.4.2-1: Remotely initiated off-network video push
+1\. The MCVideo client A sends a Video push request towards the MCVideo client
+B. The Video push request indicates MCVideo client C as the intended
+recipient.
+2a. The MCVideo client B checks whether there is on-going priviate
+communication with MCVideo client C. If there is on-going private
+communication with MCVideo client C, then step 3, step 4 and step 5 are
+skipped, else MCVideo client B enables ProSe layer to discover MCVideo client
+C as specified in subclause 7.2.3.
+NOTE 1: MCVideo client A may provide the IP address of the MCVideo client C as
+part of the Video push request to the MCVideo B client. If such is the case,
+MCVideo client B does not require discovering MCVideo client C.
+2b. The MCVideo client B notifies the MCVideo user B about the incoming Video
+push request (if MCVideo client B is human controlled).
+2c. The MCVideo client B sends a video push trying response to MCVideo client
+A indicating that it is attempting to establish a connection with MCVideo
+client C,
+NOTE 2: Step 2a, 2b and 2c can occur in any order.
+3\. Once the required details of MCVideo client C are obtained (either by
+discovery or from MCVideo client A) the MCVideo client B accepts the Video
+push request, and sends a Private communication request to MCVideo client C.
+The Private communication request indicates that the request was in response
+to the video push request from the MCVideo client A. The Private communication
+request contains the SDP offer.
+4a. MCVideo client C sends a Private communication answer response to MCVideo
+client B in response to the Private communication request. The Private
+communication answer response contains the SDP answer.
+4b: The MCVideo client C notifies MCVideo user C about the incoming Private
+communication request as an indication of incoming video.
+NOTE 3: Step 4a and step 4b can occur in any order.
+5\. Upon receiving a Private communication answer response from the MCVideo
+client C, the MCVideo client B sends a notification message to the MCVideo
+client A indicating that MCVideo client C has accepted the request.
+6\. MCVideo client A notifies the MCVideo user A about the acceptance of the
+request by MCVideo client C (if the MCVideo client A is human controlled)
+7\. The MCVideo client B and the MCVideo client C establish the media plane
+for communication.
+NOTE 4: If a MCVideo client fails to establish the communication, the MCVideo
+client should send a Private communication failed response indicating the
+failure reason to the appropriate MCVideo client.
+8: Media is transmitted from MCVideo client B to MCVideo client C and
+presented to the MCVideo user C.
+NOTE 5: If a Private communication failed response is received by a MCVideo
+client, before or after establishing the media session, if already
+established, the session is terminated and the MCVideo user is notified about
+the failure and its reason, if any.
+NOTE 6: If the MCVideo client B fails to transmit the video to MCVideo client
+C, it should send a notification to MCVideo client A, indicating the reason.
+#### 7.4.3.5 Remotely initiated video push to a group
+##### 7.4.3.5.1 General
+The MCVideo push is the capability of a MCVideo user to push a video from a
+second MCVideo user to a MCVideo group.
+##### 7.4.3.5.2 Procedure
+Figure 7.4.3.5.2-1 describes procedures for an off-network remote video push
+request, initiated by MCVideo user A at MCVideo client A towards a MCVideo
+client B, to initiate a video push to MCVideo group G.
+MCVideo client B can be an autonomous MCVideo client or can be a human
+controlled MCVideo client. In either case, following procedure should be
+followed.
+Pre-conditions:
+1\. MCVideo client A and MCVideo client B are members of MCVideo group G.
+2\. MCVideo user A has initiated remote video push request with MCVideo user B
+to initiate a video push to MCVideo group G.
+Figure 7.4.3.5.2-1: Remotely initiated video push to a group
+1\. MCVideo client A sends a remote video push request towards the MCVideo
+group. The remote video push request indicates MCVideo client B as the
+intended target of the request and MCVideo group G as the intended recipient.
+2\. Upon receiving the remote video push request as the intended target of the
+request, the MCVideo client B notifies the MCVideo user B of the remote video
+push request, if the MCVideo client B is human controlled. Other MCVideo group
+members notify their respective MCVideo users of the remote video push
+request.
+3\. The MCVideo client B automatically accepts the remote video push request
+and sends a group communication announcement message with video push
+indication towards the MCVideo group, as described in subclause 7.1.3.3. The
+group communication announcement message contains an SDP body and an
+indication that the group communication announcement is for video push.
+## 7.5 Capability information sharing
+### 7.5.1 General
+The MCVideo UE can store its capabilities information at the MCVideo server
+which can be retrieved by authorized users or MCVideo group members during on-
+network operations. The MCVideo UE can share their capabilities periodically
+or on-demand to another MCVideo UE or to MCVideo group members during off-
+network operations.
+### 7.5.2 On-network capability information sharing
+#### 7.5.2.1 General
+The MCVideo UE can store and update its capabilities information at the
+MCVideo server. Authorized MCVideo users or MCVideo group members can retrieve
+the capabilities information from the MCVideo server directly or via
+subscription and notification.
+#### 7.5.2.2 Information flows for on-network capability information sharing
+##### 7.5.2.2.1 Update MCVideo capabilities info request
+Table 7.5.2.2.1-1 describes the information flow update MCVideo capabilities
+info request from the MCVideo client to the MCVideo server.
+Table 7.5.2.2.1-1: Update MCVideo capabilities info request
+* * *
+Information element Status Description MCVideo ID M Identity of the MCVideo
+user who is logged into the MCVideo UE MCVideo capabilities M List of
+capabilities available at the MCVideo UE
+* * *
+NOTE: The device identification associated with MCVideo UE used for providing
+the MCVideo capabilities when the user logs on to multiple MCVideo UEs is
+specified by stage 3.
+##### 7.5.2.2.2 Update MCVideo capabilities info response
+Table 7.5.2.2.2-1 describes the information flow update MCVideo capabilities
+info response from the MCVideo server to the MCVideo client.
+Table 7.5.2.2.2-1: Update MCVideo capabilities info response
+* * *
+Information element Status Description Result M Indicates success or failure
+* * *
+##### 7.5.2.2.3 Get MCVideo capabilities info request
+Table 7.5.2.2.3-1 describes the information flow get MCVideo capabilities info
+request from the MCVideo client to the MCVideo server.
+Table 7.5.2.2.3-1: Get MCVideo capabilities info request
+* * *
+Information element Status Description MCVideo ID M Identity of the requesting
+MCVideo user MCVideo ID list (see NOTE) O List of Identities of the target
+MCVideo users MCVideo group ID list (see NOTE) O List of Identities of the
+target MCVideo groups NOTE: At least one of the information elements shall be
+present.
+* * *
+##### 7.5.2.2.4 Get MCVideo capabilities info response
+Table 7.5.2.2.4-1 describes the information flow get MCVideo capabilities info
+response from the MCVideo server to the MCVideo client.
+Table 7.5.2.2.4-1: Get MCVideo capabilities info response
+* * *
+Information element Status Description Result M Indicates success or failure
+MCVideo ID (see NOTE) M Identity of the MCVideo user whose MCVideo
+capabilities are requested MCVideo capabilities (see NOTE) M List of
+capabilities available at the requested MCVideo user\'s UE NOTE: The MCVideo
+capabilities correspond to the MCVideo ID. MCVideo ID and MCVideo capabilities
+information elements shall not be present if the Result is failure. Mulitple
+pairs of MCVideoID and MCVideo capabilities information elements may be
+appended. Only the affiliated group members in the requested MCVideo group ID
+list are returned.
+* * *
+##### 7.5.2.2.5 Subscribe MCVideo capabilities info request
+Table 7.5.2.2.5-1 describes the information flow subscribe MCVideo
+capabilities info request from the MCVideo client to the MCVideo server.
+Table 7.5.2.2.5-1: Subscribe MCVideo capabilities info request
+* * *
+Information element Status Description MCVideo ID M Identity of the requesting
+MCVideo user MCVideo ID O Identity of the target MCVideo user
+* * *
+##### 7.5.2.2.6 Subscribe MCVideo capabilities info response
+Table 7.5.2.2.6-1 describes the information flow subscribe MCVideo
+capabilities info response from the MCVideo server to the MCVideo client.
+Table 7.5.2.2.6-1: Subscribe MCVideo capabilities info response
+* * *
+Information element Status Description Result M Indicates success or failure
+* * *
+##### 7.5.2.2.7 Notify MCVideo capabilities info request
+Table 7.5.2.2.7-1 describes the information flow notify MCVideo capabilities
+info request from the MCVideo server to the MCVideo client.
+Table 7.5.2.2.7-1: Notify MCVideo capabilities info request
+* * *
+Information element Status Description MCVideo ID M Identity of the MCVideo
+user logged in at the target MCVideo UE MCVideo capabilities M List of
+capabilities available at the target MCVideo user\'s UE
+* * *
+##### 7.5.2.2.8 Notify MCVideo capabilities info response
+Table 7.5.2.2.8-1 describes the information flow notify MCVideo capabilities
+info response from the MCVideo client to the MCVideo server.
+Table 7.5.2.2.8-1: Notify MCVideo capabilities info response
+* * *
+Information element Status Description Result M Indicates success or failure
+* * *
+#### 7.5.2.3 Update MCVideo capabilities information at the MCVideo server
+The procedure for updating the MCVideo capabilities information at the MCVideo
+server is described in figure 7.5.2.3-1.
+Figure 7.5.2.3-1: Update MCVideo capabilities information at the MCVideo
+server
+1\. The MCVideo client sends a update MCVideo capabilities info request
+message to MCVideo server to update the capabilities information available at
+the MCVideo client
+2\. The MCVideo server stores the updated MCVideo capabilities information
+received from the MCVideo client.
+3\. The MCVideo server provides a Update MCVideo capabilities info response
+indicating success or failure.
+#### 7.5.2.4 Retrieve MCVideo capabilities information by the MCVideo client
+The procedure for retrieval of MCVideo capabilities information by the MCVideo
+client is described in figure 7.5.2.4-1.
+Pre-conditions:
+\- The MCVideo server has received MCVideo capabilities information from
+MCVideo clients and has stored this information;
+\- The MCVideo user is authorized to access the MCVideo capabilities
+information from the MCVideo server.
+\- The requesting MCVideo user is within the same MCVideo system as the
+requested MCVideo users and the requested MCVideo groups.
+Figure 7.5.2.4-1: Retrieve MCVideo capabilities information by the MCVideo
+client
+1\. The MCVideo client requests the MCVideo capabilities information by
+specifying some criteria (e.g. parameters, MCVideo ID).
+2\. The MCVideo server checks whether the user of the MCVideo client is
+authorized to retrieve the requested MCVideo capabilities information.
+3\. If authorized, the MCVideo server provides the requested MCVideo
+capabilities information to the MCVideo client.
+Editor\'s note: It is FFS for the case when the requesting MCVideo user is not
+within the same MCVideo system and the requested MCVideo users and the
+requested groups.
+#### 7.5.2.5 Subscription and notification for MCVideo capabilities
+information
+The procedure for subscription for MCVideo capabilities information as
+described in figure 7.5.2.5-1 is used by the MCVideo client to indicate to the
+MCVideo server that it wishes to receive updates of MCVideo capabilities
+information for which it is authorized.
+Pre-conditions:
+\- The MCVideo server has some MCVideo capabilities information stored.
+Figure 7.5.2.5-1: Subscription for MCVideo capabilities information
+1\. The MCVideo client subscribes to the MCVideo capabilities information
+stored at the MCVideo server using the subscribe MCVideo capabilities info
+request.
+2\. The MCVideo server provides a subscribe MCVideo capabilities info response
+to the MCVideo client indicating success or failure of the request.
+The procedure for notification of MCVideo capabilities information as
+described in figure 7.5.2.5-2 is used by the MCVideo server to inform the
+MCVideo client that new or updated MCVideo capabilities information is
+available.
+Pre-conditions:
+\- The MCVideo client has subscribed to the MCVideo capabilities information
+\- The MCVideo server has received and stored new or updated MCVideo
+capabilities information.
+Figure 7.5.2.5-2: Notification of MCVideo capabilities information
+1\. The MCVideo server provides the notification to the MCVideo client, who
+previously subscribed for the MCVideo capabilities information.
+2\. The MCVideo client provides a notify MCVideo capabilities info response to
+the MCVideo server.
+If the MCVideo server has notified the MCVideo client about new or updated
+MCVideo capabilities information through this procedure, the MCVideo client
+may then follow the procedure described in subclause 7.5.2.4 in order to
+retrieve that MCVideo capabilities information.
+### 7.5.3 Off-network capability information sharing
+#### 7.5.3.1 General
+Each MCVideo client within a MCVideo group needs to share its video
+capabilities with other members of the MCVideo group.
+Video capability sharing can be done by sending information periodically as
+described in subclause 7.5.3.3 or on request as described in subclause
+7.5.3.4.
+The receiving MCVideo clients need to store and update the video capability
+information from the sharing MCVideo client.
+#### 7.5.3.2 Information flows for Off-network capability information sharing
+##### 7.5.3.2.1 Capability request
+Table 7.5.3.2.1-1 describes the information flow for the capability request
+sent from the MCVideo client to other MCVideo client(s).
+Table 7.5.3.2.1-1: Capability request
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+MCVideo user requesting the capabilities MCVideo ID O The identity of the
+MCVideo user towards whom the capability request was sent. MCVideo group ID O
+The MCVideo group ID towards which the request was sent Search criteria O A
+criteria filter for the capability request (e.g. category tags, video
+capabilities etc.)
+* * *
+##### 7.5.3.2.2 Capability announcement
+Table 7.5.3.2.2-1 describes the information flow for the capability
+announcement sent from the MCVideo client to other MCVideo client(s).
+Table 7.5.3.2.2-1: Capability announcement
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+MCVideo user announcing the capabilities MCVideo ID O The identity of the
+MCVideo user towards whom the capability announcement was sent. MCVideo group
+ID O The MCVideo group ID towards which the announcement was sent Category
+tags O Category tags associated with a specific MCVideo UE or a video Video
+capabilities O Set of video capabilities (e.g. codecs), camera capabilities
+(e.g. self-activated camera, wide field of view etc.) Location O The location
+of the MCVideo user announcing the capabilities, if known
+* * *
+##### 7.5.3.2.3 Activity status request
+Table 7.5.3.2.3-1 describes the information flow for the activity status
+request sent from the MCVideo client to other MCVideo client(s).
+Table 7.5.3.2.3-1: Activity status request
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+MCVideo user requesting the activity status MCVideo ID O The identity of the
+MCVideo user towards whom the activity status request was sent. MCVideo group
+ID O The MCVideo group ID towards which the activity status request was sent
+* * *
+##### 7.5.3.2.4 Activity status announcement
+Table 7.5.3.2.4-1 describes the information flow for the activity status
+announcement sent from the MCVideo client to other MCVideo client(s).
+Table 7.5.3.2.4-1: Activity status announcement
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+MCVideo user announcing the activity status Activity status M Current status
+of MCVideo UE\'s activities (e.g. receiving video, transmitting video, or
+recording video) Video details O Details of the video like category tags or
+bit rate. MCVideo ID O The identity of the MCVideo user towards whom the
+activity status announcement was sent. MCVideo group ID O The MCVideo group ID
+towards which the activity status announcement was sent
+* * *
+#### 7.5.3.3 Periodic capability announcements
+##### 7.5.3.3.1 General
+The MCVideo client periodically provides its video capability information to
+other members of the MCVideo group.
+##### 7.5.3.3.2 Procedure
+Figure 7.5.3.3.2-1 describes procedures for periodic capability announcements.
+Each MCVideo client periodically sends a Capability announcement messages to
+the MCVideo group. This Capability announcement message is received by all
+other members of MCVideo group members.
+Upon receiving such a Capability announcement message, the MCVideo client
+stores/updates the information about the transmitting MCVideo client.
+Pre-conditions:
+1\. Information for ProSe direct communications corresponding to the MCVideo
+group and its mapping to ProSe Layer-2 Group ID are pre-configured in MCVideo
+client 1.
+2\. MCVideo client 1 to MCVideo client N are members of the same MCVideo
+group.
+Figure 7.5.3.3.2-1: Periodic capability announcements
+1\. MCVideo client 1 periodically sends a Capability announcement message,
+which contains its capability information with other relevant information.
+2\. Other MCVideo clients, upon receiving a Capability announcement message
+from MCVideo client 1, cache its presence and capability information along
+with other relevant information.
+NOTE: Capability announcement may include specific category tags (e.g. certain
+video camera), video capabilities of the client, location, camera angles,
+camera orientation, etc.
+#### 7.5.3.4 Request capabilities from client(s)
+##### 7.5.3.4.1 General
+The MCVideo client requests video capability information from other members of
+the MCVideo group.
+##### 7.5.3.4.2 Request clients with particular capabilities
+Figure 7.5.3.4.2-1 describes procedures for a mechanism to request other
+MCVideo clients having particular characteristics to share their capabilities.
+MCVideo client sends a Capability request message to other MCVideo clients
+with search criteria. The search criteria may include MCVideo user ID or
+MCVideo client ID or a set of capabilities or a particular category of
+capabilities, or a mix of such criterions, etc.
+Upon receiving the Capability request message, the MCVideo client that fulfils
+the search criteria responds to the received Capability request message with a
+Capability announcement message.
+Pre-conditions:
+1\. Information for ProSe direct communications corresponding to the MCVideo
+group and its mapping to ProSe Layer-2 Group ID are pre-configured in MCVideo
+client 1.
+2\. MCVideo client 1 to MCVideo client N are members of the same MCVideo
+group.
+Figure 7.5.3.4.2-1: Request clients with particular capabilities
+1\. MCVideo client 1 sends a Capability request message with search criteria
+to request MCVideo clients of the MCVideo group, with particular
+characteristics, to share their capabilities.
+2\. Upon receiving a Capability request message with search criteria, all
+MCVideo clients which fulfil the search criteria respond with a Capability
+announcement message, which contains its capability information with other
+relevant information.
+NOTE 1: If the Capability request message does not contain a search criteria,
+all the MCVideo clients that receive the Capability request message respond
+with a Capability announcement message.
+3\. MCVideo clients, upon receiving a Capability announcement message from
+another MCVideo client, cache its presence and capability information along
+with other relevant information.
+NOTE 2: Capability announcement may include specific category tags (e.g.
+certain video camera), video capabilities of the client, location, camera
+angles, camera orientation, etc.
+##### 7.5.3.4.3 Request capabilities from a particular client
+Figure 7.5.3.4.3-1 describes procedures for a mechanism to request a
+particular MCVideo client in proximity, for its capabilities.
+MCVideo client sends a Capability request message to the other MCVideo client.
+Upon receiving the Capability request message, the MCVideo client responds to
+the received Capability request message by sending a Capability announcement
+message to the sender of the Capability request message.
+Pre-conditions:
+1\. Information for ProSe direct communications corresponding to the MCVideo
+client 2 is pre-configured in MCVideo client 1.
+2\. MCVideo client 1 has discovered MCVideo client 2 in proximity using ProSe
+Discovery procedures.
+Figure 7.5.3.4.3-1: Request capabilities from a particular client
+1\. MCVideo client 1 sends a Capability request message towards MCVideo client
+2.
+2\. Upon receiving the Capability request message the MCVideo client 2
+responds with a Capability announcement message, which contains its capability
+information with other relevant information.
+3\. MCVideo client 1, upon receiving a Capability announcement message, caches
+MCVideo client 2\'s presence and capability information along with other
+relevant information.
+NOTE: Capability announcement may include specific category tags (e.g. certain
+video camera), video capabilities of the client, location, camera angles,
+camera orientation, etc.
+#### 7.5.3.5 Request activity status from client(s)
+##### 7.5.3.5.1 General
+The MCVideo client requests activity status information from other members of
+the MCVideo group.
+##### 7.5.3.5.2 Request activity status of group members
+Figure 7.5.3.5.2-1 describes procedures to request activity status of other
+MCVideo clients having particular characteristics.
+MCVideo client sends an activity status request message to other MCVideo
+clients with search criteria. The search criteria may include MCVideo user ID
+or MCVideo client ID or a set of capabilities or a particular category of
+capabilities, or a mix of such criterions, etc.
+Upon receiving the activity status request message, the MCVideo client that
+fulfils the search criteria responds to the received activity status request
+message with an activity status announcement message.
+Pre-conditions:
+1\. Information for ProSe direct communications corresponding to the MCVideo
+group and its mapping to ProSe Layer-2 Group ID are pre-configured in MCVideo
+client 1.
+2\. MCVideo client 1 to MCVideo client N are members of the same MCVideo
+group.
+Figure 7.5.3.5.2-1: Request activity status of group members
+1\. MCVideo client 1 sends an activity status request message with search
+criteria to request MCVideo clients of the MCVideo group, with particular
+characteristics, to share their activity status.
+2\. Upon receiving a activity status request message with search criteria, all
+MCVideo clients which fulfil the search criteria respond with an activity
+status announcement message, which contains its activity status information.
+NOTE 1: If the activity status request message does not contain a search
+criteria, all the MCVideo clients that receive the activity status request
+message respond with an activity status announcement message.
+3\. MCVideo clients, upon receiving an activity status announcement message
+from another MCVideo client, cache its presence and activity status
+information.
+##### 7.5.3.5.3 Request activity status from a particular client
+Figure 7.5.3.5.3-1 describes procedures to request a particular MCVideo client
+in proximity, for its activity status.
+MCVideo client sends an activity status request message to the other MCVideo
+client.
+Upon receiving the activity status request message, the MCVideo client
+responds to the received activity status request message by sending an
+activity status announcement message to the sender of the activity status
+request message.
+Pre-conditions:
+1\. Information for ProSe direct communications corresponding to the MCVideo
+client 2 is pre-configured in MCVideo client 1.
+2\. MCVideo client 1 has discovered MCVideo client 2 in proximity using ProSe
+Discovery procedures.
+Figure 7.5.3.5.3-1: Request activity status from a particular client
+1\. MCVideo client 1 sends an activity status request message towards MCVideo
+client 2.
+2\. Upon receiving the activity status request message the MCVideo client 2
+responds with an activity status announcement message, which contains its
+activity status information.
+3\. MCVideo client 1, upon receiving an activity status announcement message,
+caches MCVideo client 2\'s presence and activity status information.
+## 7.6 Ambient viewing call
+### 7.6.1 General
+The ambient viewing call is a type of a private MCVideo call that only allows
+a \"viewed to\" user to transmit media to a \"viewing\" user such that there
+is no indication on the MCVideo UE of the \"viewed to\" user about the call
+and the media transmission.
+NOTE 1: \"viewed to\" user refers to the user who is transmitting media in an
+ambient viewing call.
+NOTE 2: \"viewing\" user refers to the user who is receiving media in an
+ambient viewing call.
+There are two types of ambient viewing call as below:
+\- Remotely initiated ambient viewing is initiated by the authorized user
+(e.g., dispatcher) who wants to view to another user. In this case, the
+\"viewed to\" user is the called party, and shall automatically accept the
+call without causing any indication about the call and transmit the media to
+the \"viewing\" user.
+\- Locally initiated ambient viewing is initiated by an authorized user who
+wants another user to view to the MCVideo UE communication. In this case, the
+\"viewed to\" user is the calling party and shall automatically transmit the
+media to the \"viewing\" user without causing any indication about the call
+processing and media transmission.
+### 7.6.2 Information flows for ambient viewing call
+#### 7.6.2.1 Ambient viewing call request
+Table 7.6.2.1-1 describes the information flow for the ambient viewing call
+request from MCVideo client and MCVideo sever and MCVideo server to the
+MCVideo client.
+Table 7.6.2.1-1: Ambient viewing call request
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+\"viewing\" user to view MCVideo ID M The MCVideo ID of the \"viewed to\" user
+SDP offer M Media parameters of MCVideo client. Ambient viewing type M The
+ambient viewing type indicates remotely initiated ambient viewing call or
+locally initiated ambient viewing call.
+* * *
+#### 7.6.2.2 Ambient viewing call response
+Table 7.6.2.2-1 describes the information flow ambient viewing call response
+from the MCVideo client to the MCVideo server and MCVideo server to the
+MCVideo client.
+Table 7.6.2.2-1: Ambient viewing call response
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+\"viewing\" user MCVideo ID M The MCVideo ID of the \"viewed to\" user SDP
+answer M Media parameters Ambient viewing type M The ambient viewing type
+indicates remotely initiated ambient viewing call or locally initiated ambient
+viewing call.
+* * *
+#### 7.6.2.3 Ambient viewing call release request
+Table 7.6.2.3-1 describes the information flow ambient viewing call release
+request from the MCVideo client to the MCVideo server and MCVideo server to
+the MCVideo client.
+Table 7.6.2.3-1: Ambient viewing call release request
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+\"viewing\" user MCVideo ID M The MCVideo ID of the \"viewed to\" user Ambient
+viewing type M The ambient viewing type indicates remotely initiated ambient
+viewing call or locally initiated ambient viewing call.
+* * *
+#### 7.6.2.4 Ambient viewing call release response
+Table 7.6.2.4-1 describes the information flow ambient viewing call release
+response from the MCVideo client to the MCVideo server and MCVideo server to
+the MCVideo client.
+Table 7.6.2.4-1: Ambient viewing call release response
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the
+\"viewing\" user MCVideo ID M The MCVideo ID of the \"viewed to\" user Ambient
+viewing type M The ambient viewing type indicates remotely initiated ambient
+viewing call or locally initiated ambient viewing call.
+* * *
+#### 7.6.2.5 Ambient viewing call release notification
+Table 7.6.2.5-1 describes the information flow ambient viewing call release
+notification from the MCVideo server to the MCVideo client.
+Table 7.6.2.5-1: Ambient viewing call release notification
+* * *
+Information Element Status Description MCVideo ID M The MCVideo ID of the user
+to view MCVideo ID M The MCVideo ID of the user to be viewed to Call release
+reason M The reason for call release by the MCVideo server Ambient viewing
+type M The ambient viewing type indicates remotely initiated ambient viewing
+call or locally initiated ambient viewing call.
+* * *
+### 7.6.3 Procedures
+#### 7.6.3.1 Remotely initiated ambient viewing call setup procedure
+The MCVideo service provides the capability for an authorised user to initiate
+a remotely initiated ambient viewing call.
+Figure 7.6.3.1-1 illustrates the high level procedure of remotely initiated
+ambient viewing call setup procedure.
+Pre-conditions:
+\- MCVideo client 1 is the client of the authorized user who is authorized to
+invoke a remotely initiated ambience viewing call with MCVideo client 2.
+\- MCVideo user 1 is the \"viewing\" user at MCVideo client 1, and MCVideo
+user 2 is the \"viewed to\" user at MCVideo client 2.
+Figure 7.6.3.1-1: Remotely initiated ambient viewing call setup
+1\. MCVideo client 1 initiates a remotely initiated ambient viewing call to
+MCVideo client 2 by sending an ambient viewing request to MCVideo server. The
+remotely initiated ambient viewing call type is included.
+2\. The MCVideo server performs an authorization check for the authorized user
+1 for the remotely initiated ambient viewing call. If authorization fails, the
+MCVideo server provides a failure response to MCVideo client 1.
+3\. The MCVideo server sends the ambient viewing call request to MCVideo
+client 2.
+4\. MCVideo client 2 returns the ambient viewing call response to the MCVideo
+server.
+5\. MCVideo server provides an ambient viewing call response to MCVideo client
+1, indicating that whether the remotely initiated ambient viewing call is set
+up successfully or not.
+6\. The transmission control server of the MCVideo server then sends a media
+transmit granted message to MCVideo client 2 according to the ambient viewing
+type received in step 1.
+7\. After receiving the media transmit granted message, the MCVideo client to
+be viewed to transmit video to the MCVideo client 1 for viewing.
+NOTE: MCVideo client 2 does not provide any indication of the ambient viewing
+call release to its user.
+#### 7.6.3.2 Locally initiated ambient viewing call setup procedure
+The MCVideo service provides the capability for an authorised user to initiate
+a locally initiated ambient viewing call.
+Figure 7.6.3.2-1 illustrates the high level procedure of locally initiated
+ambient viewing call setup procedure.
+Pre-conditions:
+\- MCVideo client 2 is the client of the authorized user who is authorized to
+invoke a locally initiated ambient viewing call from MCVideo client 2.
+\- MCVideo user 1 is the \"viewing\" user at MCVideo client 1, and MCVideo
+user 2 is the \"viewed to\" user at MCVideo client 2.
+Figure 7.6.3.2-1: Locally initiated ambient viewing call setup
+1\. MCVideo client 2 initiates a locally initiated ambient viewing call to
+MCVideo client 1 by sending an ambient viewing request to MCVideo server. The
+locally initiated ambient viewing call type is included.
+2\. The MCVideo server performs an authorization check for the authorized user
+2 for the locally initiated ambient viewing call. If authorization fails, the
+MCVideo server provides a failure response to MCVideo client 2.
+3\. The MCVideo server sends the ambient viewing call request to MCVideo
+client 1.
+4\. MCVideo client 1 returns the ambient viewing call response to the MCVideo
+server.
+5\. MCVideo server provides an ambient viewing call response to MCVideo client
+2, indicating that whether the locally initiated ambient viewing call is set
+up successfully or not.
+6\. The transmission control server of the MCVideo server then sends a media
+transmit granted message to MCVideo client 2 according to the ambient viewing
+type received in step 1.
+7\. After receiving the media transmit granted message, the MCVideo client to
+be viewed to, transmits video to the MCVideo client 1 for viewing.
+NOTE: MCVideo client 2 does not provide any indication of the ambient viewing
+call release to its user.
+#### 7.6.3.3 Ambient viewing call release -- server initiated
+Figure 7.6.3.3-1 illustrates the information flow for ambient viewing call
+release -- server initiated when trigger by the MCVideo administrator. This
+procedure is applied for both remotely initiated ambient viewing call and the
+locally initiated ambient viewing call.
+Pre-conditions:
+\- MCVideo client 1 is the MCVideo client of the authorized user, who
+initiated the ambient viewing call at MCVideo client 2.
+\- There is an ongoing ambient viewing call between MCVideo client 2 and
+MCVideo client 1.
+\- MCVideo user 1 is the \"viewing\" user at MCVideo client 1, and MCVideo
+user 2 is the \"viewed to\" user at MCVideo client 2.
+Figure 7.6.3.3-1: Ambient viewing call release -- server initiated
+1\. The ambient viewing call release criteria by the MCVideo administrator.
+2\. The MCVideo server sends an ambient viewing call release request to
+MCVideo client 2.
+3\. MCVideo client 2 stops transmitting media to MCVideo client 1.
+NOTE: MCVideo client 2 does not provide any indication of the ambient viewing
+call release to its user.
+4\. MCVideo client 2 provides an ambient viewing call release response to the
+MCVideo server.
+5\. The MCVideo server sends an ambient viewing call release notification to
+MCVideo client 1 together with a reason code identifying that the call was
+released.
+6\. MCVideo client 1 notifies the authorized MCVideo user 1.
+#### 7.6.3.4 Ambient viewing call release -- \"viewing\" user initiated
+Figure 7.6.3.4-1 illustrates the information flow for ambient viewing call
+release -- \"viewing\" user initiated. This procedure is applied for both
+remotely initiated ambient viewing call and the locally initiated ambient
+viewing call.
+Pre-conditions:
+\- MCVideo client 1 is the client of the authorized user, who is authorized to
+release the ambient viewing call at MCVideo client 2.
+\- There is an ongoing ambient viewing call between MCVideo client 2 and
+MCVideo client 1.
+\- MCVideo user 1 is the \"viewing\" user at MCVideo client 1, and MCVideo
+user 2 is the \"viewed to\" user at MCVideo client 2.
+Figure 7.6.3.4-1: Ambient viewing call release -- \"viewing\" user initiated
+1\. The authorized user 1 at MCVideo client 1 initiates the ambient viewing
+call release to MCVideo client 2 by sending an ambient viewing call release
+request to the MCVideo server.
+2\. The MCVideo server sends an ambient viewing call release request to
+MCVideo client 2.
+3\. MCVideo client 2 stops transmitting media to MCVideo client 1.
+NOTE: MCVideo client 2 does not provide any indication of the ambient viewing
+call release to its user.
+4\. MCVideo client 2 provides an ambient viewing call release response to the
+MCVideo server.
+5\. The MCVideo server provides the ambient viewing call release response to
+MCVideo client 1.
+#### 7.6.3.5 Ambient viewing call release -- \"viewed to\" user initiated
+Figure 7.6.3.5-1 illustrates the information flow for ambient viewing call
+release -- \"viewed to\" user initiated. This procedure is only applied for
+the locally initiated ambient viewing call.
+Pre-conditions:
+\- MCVideo client 2 is the client of the authorized user, who is authorized to
+release the locally initiated ambient viewing call at MCVideo client 2.
+\- There is an ongoing ambient viewing call between MCVideo client 1 and
+MCVideo client 2.
+\- MCVideo user 1 is the current user at MCVideo client 1 who is viewing, and
+MCVideo user 2 is the current user at MCVideo client 2 who is being viewed to.
+Figure 7.6.3.5-1: Ambient viewing call release -- \"viewed to\" user initiated
+1\. The authorized user 2 at MCVideo client 2 initiates the ambient viewing
+call release by sending an ambient viewing call release request to the MCVideo
+server.
+2\. The MCVideo server provides an ambient viewing call release request to
+MCVideo client 1.
+3\. MCVideo client 1 is notified about the ambient viewing call release.
+4\. MCVideo client 1 provides an ambient viewing call release response to the
+MCVideo server.
+5\. The MCVideo server provides the ambient viewing call release response to
+MCVideo client 2.
+6\. MCVideo client 1 stops transmitting media to MCVideo client 2.
+NOTE: MCVideo client 1 does not provide any indication of the ambient viewing
+call release to its user.
+## 7.7 Transmission control
+### 7.7.1 Transmission control for on-network MCVideo service
+#### 7.7.1.1 General
+The procedure is for providing a transmission control to MCVideo UE in an on-
+network case and applies for both private call and group call. Transmission
+control is performed by using transmission control information flows between
+the transmission control participant and the transmission control server.
+#### 7.7.1.2 Information flows for transmission control for on-network
+##### 7.7.1.2.1 General
+When the transmission control server receives a transmit media request from
+the transmission control participant, it decides whether to give a grant or
+not. The result is informed to the requesting transmission control
+participant. When the transmission control participant receives a transmit
+media granted message, it can send video media over the uplink bearer
+established beforehand. The transmit media revoked message can be used as part
+of revoke. The transmit media queue status request can be used to know current
+position in the queue for media transmission.
+Some transmission control information flows can also piggyback call control
+information flows to provide efficient call setup and clearing:
+\- Call setup request is optionally carried in transmit media request
+(uplink); and
+\- Call release request is optionally carried in media transmission release
+(uplink).
+##### 7.7.1.2.2 Transmit media request
+Table 7.7.1.2.2-1 describes the information flow transmit media request, from
+the transmission control participant to the transmission control server, which
+is used to request the transmit media request. This information flow is sent
+in unicast to the transmission control server.
+Table 7.7.1.2.2-1: Transmit media request
+* * *
+Information element Status Description MCVideo ID M Identity of the user whose
+media transmission is requested Media identifier O Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing
+* * *
+##### 7.7.1.2.3 Transmit media granted
+Table 7.7.1.2.3-1 describes the information flow transmit media granted, from
+the transmission control server to the transmission control participant, which
+is used to indicate that a transmit media request is granted and media
+transmission is possible. This information flow is sent in unicast (to the
+granted transmission control participant).
+Table 7.7.1.2.3-1: Transmit media granted
+* * *
+Information element Status Description Media identifier O Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing Acknowledgement required O Indicates if
+acknowledgement from the transmission control participant is required
+* * *
+##### 7.7.1.2.4 Transmit media rejected
+Table 7.7.1.2.4-1 describes the information flow transmit media rejected, from
+the transmission control server to the transmission control participant, which
+is used to indicate that a transmit media request is rejected. This
+information flow is sent in unicast (to the refused transmission control
+participant).
+Table 7.7.1.2.4-1: Transmit media rejected
+* * *
+Information element Status Description Media identifier O Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing Rejection cause O Indicates the cause for
+transmit media rejection Acknowledgement required O Indicates if
+acknowledgement from the transmission control participant is required
+* * *
+##### 7.7.1.2.5 Media transmission notification
+Table 7.7.1.2.5-1 describes the information flow media transmission
+notification, from the transmission control server to the transmission control
+participant, which is used to indicate that a media transmission is available
+from another user. This information flow is sent in unicast (to the receiving
+transmission control participant).
+Table 7.7.1.2.5-1: Media transmission notification
+* * *
+Information element Status Description MCVideo ID M Identity of the user who
+is transmitting the media Media identifier O Identifies the communication,
+e.g. by identifying the media flow within a media multiplex, present only if
+media multiplexing
+* * *
+##### 7.7.1.2.6 Receive media request
+Table 7.7.1.2.6-1 describes the information flow receive media request, from
+the transmission control participant to the transmission control server, which
+is used to request the reception of the media from another user. This
+information flow is sent in unicast (to the transmission control server).
+Table 7.7.1.2.6-1: Receive media request
+* * *
+Information element Status Description MCVideo ID M Identity of the user who
+is requesting the reception of the media Source MCVideo ID M Identify of the
+user who is transmitting the media Media identifier O Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing
+* * *
+##### 7.7.1.2.7 Receive media response
+Table 7.7.1.2.7-1 describes the information flow receive media response, from
+the transmission control server to the transmission control participant, which
+is used to indicate whether the media reception is possible or not. This
+information flow is sent in unicast (to the receiving transmission control
+participant).
+Table 7.7.1.2.7-1: Receive media response
+* * *
+Information element Status Description Result M Indicates whether media
+reception is possible as per the request Rejection cause O Indicates the cause
+for rejecting the media receive request Media identifier O Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing
+* * *
+##### 7.7.1.2.8 Media reception notification
+Table 7.7.1.2.8-1 describes the information flow media reception notification,
+from the transmission control server to the transmission control participant,
+which is used to indicate that a media reception has been initiated to a user.
+This information flow is sent in unicast (to the transmitting transmission
+control participant).
+Table 7.7.1.2.8-1: Media reception notification
+* * *
+Information element Status Description MCVideo ID M Identity of the user who
+is receiving the media Media identifier O Identifies the communication, e.g.
+by identifying the media flow within a media multiplex, present only if media
+multiplexing
+* * *
+##### 7.7.1.2.9 Queue position info
+Table 7.7.1.2.9-1 describes the information flow queue position info, from the
+transmission control server to the transmission control participant, which is
+used to indicate that the transmit media request is queued and the queue
+position to the transmit media requesting UE. The MCVideo server and the
+MCVideo client support queuing of the transmit media requests shall support
+this information flow. This information flow is sent in unicast (to the queued
+transmission control participant).
+Table 7.7.1.2.9-1: Queue position info
+* * *
+Information element Status Description Queue position info M Position of the
+queued transmit media request in the queue Media identifier O Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing Acknowledgement required O Indicates if
+acknowledgement from the transmission control participant is required
+* * *
+##### 7.7.1.2.10 Transmission revoked
+Table 7.7.1.2.10-1 describes the information flow transmission revoked, from
+the transmission control server to the transmission control participant, which
+is used to indicate that the on-going video transmission is queued and the
+queue position is provided or the on-going video transmission is terminated.
+This information flow is sent in unicast (to the queued transmission control
+participant).
+Table 7.7.1.2.10-1: Transmission revoked
++--------------------------+--------------+--------------------------+ | Information element | Status | Description | +--------------------------+--------------+--------------------------+ | Revoke reason | M | The reason for revoke | | | | like queue or | | | | termination of on-going | | | | video transmission | +--------------------------+--------------+--------------------------+ | Queue position info | O | Position of the queued | | | | transmit media request | | | (see NOTE 1) | in the queue | +--------------------------+--------------+--------------------------+ | Media identifier | O | Identifies the | | | | communication, e.g. by | | | (see NOTE 2) | identifying the media | | | | flow within a media | | | | multiplex, present only | | | | if media multiplexing | +--------------------------+--------------+--------------------------+ | Acknowledgement required | O | Indicates if | | | | acknowledgement from the | | | | transmission control | | | | participant is required | +--------------------------+--------------+--------------------------+ | NOTE 1: If revoke reason | | | | is queuing, then queue | | | | position info is | | | | included. | | | | | | | | NOTE 2: If revoke reason | | | | is termination, then | | | | media identifier is | | | | included. | | | +--------------------------+--------------+--------------------------+
+##### 7.7.1.2.11 Queue position request
+Table 7.7.1.2.11-1 describes the information flow queue position request, from
+the transmission control participant to the transmission control server, which
+is used to request the position in the video transmission queue. The MCVideo
+server and the MCVideo client support queuing of the transmission control
+requests shall support this information flow. This information flow is sent in
+unicast to the transmission control server.
+Table 7.7.1.2.11-1: Queue position request
+* * *
+Information element Status Description Media identifier O Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing
+* * *
+##### 7.7.1.2.12 Transmit media cancel request
+Table 7.7.1.2.12-1 describes the information flow transmit media cancel
+request, from the transmission control participant to the transmission control
+server. This information flow is sent in unicast to the transmission control
+server.
+Table 7.7.1.2.12-1: Transmit media cancel request
+* * *
+Information element Status Description MCVideo ID M Identity of the user whose
+media transmission is requested for cancellation Media identifier O Identifies
+the communication, e.g. by identifying the media flow within a media
+multiplex, present only if media multiplexing
+* * *
+##### 7.7.1.2.13 Transmit media cancel response
+Table 7.7.1.2.13-1 describes the information flow transmit media cancel
+response, from the transmission control server to the transmission control
+participant. This information flow is sent in unicast to the transmission
+control server.
+Table 7.7.1.2.13-1: Transmit media cancel response
+* * *
+Information element Status Description Media identifier O Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing
+* * *
+##### 7.7.1.2.14 Transmit media cancel request notify
+Table 7.7.1.2.14-1 describes the information flow transmit media cancel
+request notify, from the transmission control server to the transmission
+control participant. This information flow is sent in unicast to the
+transmission control server.
+Table 7.7.1.2.14-1: Transmit media cancel request notify
+* * *
+Information element Status Description Media identifier O Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing
+* * *
+##### 7.7.1.2.15 Transmit media end request
+Table 7.7.1.2.15-1 describes the information flow transmit media end request,
+from the transmission control participant to the transmission control server
+and from the transmission control server to the transmission control
+participant. This information flow is sent in unicast to the transmission
+control server/transmission control participant.
+Table 7.7.1.2.15-1: Transmit media end request
+* * *
+Information element Status Description MCVideo ID M Identity of the user whose
+media transmission is requested to be terminated. Media identifier O
+Identifies the communication, e.g. by identifying the media flow within a
+media multiplex, present only if media multiplexing
+* * *
+##### 7.7.1.2.16 Transmit media end response
+Table 7.7.1.2.16-1 describes the information flow transmit media end response,
+from the transmission control participant and the transmission control server
+and from the transmission control server to the transmission control
+participant. This information flow is sent in unicast to the transmission
+control server/transmission control participant.
+Table 7.7.1.2.16-1: Transmit media end response
+* * *
+Information element Status Description Media identifier O Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing
+* * *
+##### 7.7.1.2.17 Remote transmit media request
+Table 7.7.1.2.17-1 describes the information flow remote transmit media
+request, from the transmission control participant to the transmission control
+server. This information flow is sent in unicast to the transmission control
+server.
+Table 7.7.1.2.17-1: Remote transmit media request
+* * *
+Information element Status Description MCVideo ID M Identity of the user who
+remotely initiated the media transmission of another user. MCVideo ID M
+Identity of the user whose media transmission is requested Media identifier O
+Identifies the communication, e.g. by identifying the media flow within a
+media multiplex, present only if media multiplexing
+* * *
+##### 7.7.1.2.18 Remote transmit media response
+Table 7.7.1.2.18-1 describes the information flow remote transmit media
+response, from the transmission control server to the transmission control
+participant. This information flow is sent in unicast to the transmission
+control participant.
+Table 7.7.1.2.18-1: Remote transmit media response
+* * *
+Information element Status Description Media identifier O Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing
+* * *
+##### 7.7.1.2.19 Remote transmit media end request
+Table 7.7.1.2.19-1 describes the information flow remote transmit media end
+request, from the transmission control participant to the transmission control
+server. This information flow is sent in unicast to the transmission control
+server.
+Table 7.7.1.2.19-1: Remote transmit media end request
+* * *
+Information element Status Description MCVideo ID M Identity of the user whose
+media transmission is requested for cancellation Media identifier O Identifies
+the communication, e.g. by identifying the media flow within a media
+multiplex, present only if media multiplexing
+* * *
+##### 7.7.1.2.20 Remote transmit media cancel response
+Table 7.7.1.2.20-1 describes the information flow transmit media end response,
+from the transmission control server to the transmission control participant.
+This information flow is sent in unicast to the transmission control server.
+Table 7.7.1.2.20-1: Remote transmit media end response
+* * *
+Information element Status Description Media identifier O Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing
+* * *
+##### 7.7.1.2.21 Media reception end request
+Table 7.7.1.2.21-1 describes the information flow media reception end request,
+from the transmission control server to the transmission control participant
+and from the transmission control participant to the transmission control
+server.
+Table 7.7.1.2.21-1: Media reception end request
+* * *
+Information element Status Description MCVideo ID M Identity of the user whose
+media receipt is requested for cancellation Media identifier M Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing
+* * *
+##### 7.7.1.2.22 Media reception end response
+Table 7.7.1.2.22-1 describes the information flow media reception end
+response, from the transmission control server to the transmission control
+participant and from the transmission control participant to the transmission
+control server.
+Table 7.7.1.2.22-1: Media reception end response
+* * *
+Information element Status Description /Media identifier M Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing
+* * *
+##### 7.7.1.2.23 Media reception override notification
+Table 7.7.1.2.23-1 describes the information flow media reception override
+notification, from the transmission control server to the transmission control
+participant.
+Table 7.7.1.2.23-1: Media reception override notification
+* * *
+Information element Status Description MCVideo ID M Identity of the user who
+is requesting the reception of the media MCVideo ID O Identify of the user of
+the overriding media Media identifier M Identifies the communication of
+overriding media, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing MCVideo ID O Identify of the user of the
+overridden media Media identifier M Identifies the communication of overridden
+media, e.g. by identifying the media flow within a media multiplex, present
+only if media multiplexing
+* * *
+##### 7.7.1.2.24 Transmit media end notify
+Table 7.7.1.2.24-1 describes the information flow transmit media end notify,
+from the transmission control server to the transmission control participant.
+This information flow is sent in unicast to the transmission control server.
+Table 7.7.1.2.24-1: Transmit media end notify
+* * *
+Information element Status Description MCVideo ID M Identity of the user whose
+media transmission has been released Media identifier O Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing
+* * *
+#### 7.7.1.3 Transmission control within one MC system for MCVideo service
+##### 7.7.1.3.1 Transmission control during an MCVideo session
+Figure 7.7.1.3.1-1 describes the procedure for transmission control between
+the transmission control participant and the transmission control server
+during an MCVideo session. Only two UEs involved in the session are shown for
+the simplicity.
+Pre-condition:
+1\. MCVideo session is established between MCVideo clients (client A and
+client B) and MCVideo server
+2\. Transmission control is established between transmission control
+participants and transmission control server and there is no ongoing media
+transmission.
+Figure 7.7.1.3.1-1: Transmission control during an MCVideo session
+1\. Transmission control participant A wants to send video media over the
+session.
+2\. Transmission control participant A sends a transmit media request message
+to transmission control server which includes transmission priority and other
+information as necessary.
+3\. Transmission control server makes the determination on what action (grant,
+deny, or queue) to take on the request based on transmission control criteria
+(e.g., group policy) and determines to accept the transmit media request from
+transmission control participant A.
+4\. Transmission control server responds with a transmit media granted message
+(4a) to transmission control participant A. Transmission control server may
+send transmit media rejected message (4b) indicating the cause of rejection or
+queue position info message (4c) indicating that the transmit media request
+has been queued.
+5\. The transmit media granted shall cause the user of UE A where the
+transmission control participant A is located to be notified.
+6\. Transmission control participant A starts sending video media over the
+session established to the transmission control server.
+##### 7.7.1.3.2 Reception control during an MCVideo session
+Figure 7.7.1.3.2-1 describes the procedure for the reception control between
+the transmission control participant and the transmission control server
+during an MCVideo session. Only two UEs involved in the session are shown for
+the simplicity.
+Pre-condition:
+1\. MCVideo session is established between MCVideo clients (client A and
+client B) and MCVideo server
+2\. Transmission control is established between transmission control
+participants and transmission control server.
+3\. Transmission control participant A has been granted the permission to
+transmit media.
+Figure 7.7.1.3.2-1: Reception control during an MCVideo session
+1\. The transmission control server determines the reception mode for downlink
+transmission control participants for the media transmission permitted to
+transmission control participant A. The manual and forced reception modes are
+determined based on configurations (e.g. auto-receive video transmissions,
+auto-receive emergency video transmissions) as described in Annex A.
+2\. Transmission control server sends a media transmission notification
+message to the transmission control participant B including information about
+the video transmitter and the reception mode.
+3\. The receipt of the media transmission notification is used to inform the
+user of UE B the details of video transmission and the video transmitter.
+4\. Based on the notification received, the user of UE B may want take actions
+(receive, reject or cancel) regarding the media available for reception.
+5\. If user of UE B wants to receive the media or it required to receive the
+media via forced reception, it causes the transmission control participant B
+to send a media receive request message to the transmission control server.
+6\. Transmission control server makes the determination on what action (e.g.,
+real-time stream downlink, make stream downloadable, reject) to take on the
+request based on reception control criteria (e.g., allowed simultaneous
+reception) and determines to accept the media receive request from
+transmission control participant B. Transmission control server will also
+determine the availability of the media at the server to initiate the downlink
+reception.
+7\. Transmission control server sends a receive media response message to
+transmission control participant B.
+8\. Transmission control server sends video media to transmission control
+participant B.
+9\. Optionally, the transmission control server sends media reception
+notification message to transmission control participant A which includes the
+information about the video recipient (transmission control participant B).
+##### 7.7.1.3.2A End media reception -- receiving user initiated
+Figure 7.7.1.3.2A-1 describes the procedure for the receiving user initiated
+media reception end. Only two UEs involved in the session are shown for the
+simplicity.
+Pre-condition:
+1\. MCVideo session is established between MCVideo clients (client A and
+client B) and MCVideo server
+2\. Transmission control is established between transmission control
+participants and transmission control server.
+3\. Transmission control participant A has been granted the permission to
+transmit media.
+Figure 7.7.1.3.2A-1: End media reception -- receiving user initiated
+1\. The MCVideo user determines to end a receiving video stream.
+2\. The user sends an media reception end request including the video stream
+to be ended to the transmission control server.
+3\. The transmission control server returns a media reception end response.
+4\. Upon receiving the media reception end request, the transmission control
+server stops sending the video stream selected to the transmission control
+participant B.
+5\. If the end media reception at transmission control participant B causes
+the video transmission continuation condition to fail, then the transmission
+control server initiates the media transmission end procedure as described in
+subclause 7.7.1.3.6.2.
+##### 7.7.1.3.2B End media reception -- transmission control server initiated
+Figure 7.7.1.3.2B-1 describes the procedure for the transmission control
+server initiated media reception end. Only two UEs involved in the session are
+shown for the simplicity.
+Pre-condition:
+1\. MCVideo session is established between MCVideo clients (client A and
+client B) and MCVideo server
+2\. Transmission control is established between transmission control
+participants and transmission control server.
+3\. Transmission control participant A has been granted the permission to
+transmit media.
+Figure 7.7.1.3.2B-1: End media reception -- transmission control server
+initiated
+1\. The transmission control server determines to end a video stream
+transmitting to transmission control participant B according to events or
+configurations.
+2\. The transmission control server sends an media reception end request
+including the video stream to be ended to the transmission control participant
+B.
+3\. The MCVideo user is notified about the media reception end.
+4\. The transmission control participants B returns a media reception end
+response.
+5\. The transmission control server stops sending the video stream selected to
+the transmission control participant B.
+6\. If the end media reception at transmission control participants B causes
+the continuation conditions to fail, then the transmission control server
+initiates media transmission end procedure as described in subclause
+7.7.1.3.6.2.
+##### 7.7.1.3.2C Reception control on overridden -- mandatory mode
+Figure 7.7.1.3.2C-1 describes the procedure for the reception control on
+overridden with mandatory mode that the transmission control server determines
+the video stream to be overridden. Only two UEs involved in the session are
+shown for the simplicity.
+Pre-condition:
+1\. MCVideo session is established between MCVideo clients (client A and
+client B) and MCVideo server.
+2\. Transmission control is established between transmission control
+participants and transmission control server.
+3\. Transmission control participant A has been granted the permission to
+transmit media.
+Figure 7.7.1.3.2C-1: Reception control on overriding/overridden -- mandatory
+mode
+1\. A new media stream is to be delivered to the transmission control
+participant B while the maximum number of simultaneous streams is reached. The
+transmission control server determines to override another media stream being
+received by the transmission control participant B accord to the media stream
+characteristics.
+2\. Transmission control server sends a media reception override notification
+message to the transmission control participant B including information about
+the video stream being overridden and stop the downlink delivery of the
+overridden video stream to the transmission control participant B. The
+overriding video stream information maybe also included.
+3\. The user of UE B is notified about the details of overriding/overridden.
+4\. The transmission control server initiates the media reception end
+procedure as described in subclause 7.7.1.3.2B. 5. The transmission control
+server performs the normal reception control procedure as described in
+subclause 7.7.1.3.2.
+##### 7.7.1.3.2D Reception control on overridden -- negotiated mode
+Figure 7.7.1.3.2D-1 describes the procedure for the reception control on
+overridden with negotiated mode that the transmission control participant
+determines the video stream to be overridden. Only two UEs involved in the
+session are shown for the simplicity.
+Pre-condition:
+1\. MCVideo session is established between MCVideo clients (client A and
+client B) and MCVideo server
+2\. Transmission control is established between transmission control
+participants and transmission control server.
+3\. Transmission control participant A has been granted the permission to
+transmit media.
+Figure 7.7.1.3.2D-1: Reception control on overriding/overridden -- negotiated
+mode
+1\. A new media stream is to be delivered to the transmission control
+participant B while the maximum number of simultaneous streams is received.
+The transmission control server determines to override another media stream
+being received by the transmission control participant B according to the
+media stream characteristics.
+2\. Transmission control server sends a media transmission notification
+message to the transmission control participant B including information about
+the new video stream.
+3\. The user of transmission control participant B is notified about the
+maximum number of simultaneous streams received. The MCVideo user determines
+to reject the video stream or accept the video streaming by overriding a
+receiving video stream.
+4\. The transmission control participant initiates the media reception end
+procedure as described in subclause 7.7.1.3.2A.
+5\. Then the transmission control participant B requests to receive the new
+video stream as the normal reception control procedure described in subclause
+7.7.1.3.2.
+##### 7.7.1.3.3 Transmission revoke during an MCVideo session
+Figure 7.7.1.3.3-1 describes the procedure for transmission revoke during an
+MCVideo session. Only two UEs involved in the session are shown for the
+simplicity.
+Pre-condition:
+1\. MCVideo session is established between MCVideo clients (client A and
+client B) and MCVideo server
+2\. Transmission control is established between transmission control
+participants and transmission control server.
+3\. Transmission control participant B has been granted the permission to
+transmit media and there may be ongoing media transmission from transmission
+control participant B.
+4\. The maximum media transmission limit for the MCVideo session is reached.
+Figure 7.7.1.3.3-1: Transmission revoke during an MCVideo session
+1\. Transmission control participant A wants to send video media over the
+session.
+2\. Transmission control participant A sends a transmit media request message
+to transmission control server which includes transmission priority and other
+information as necessary.
+3\. Transmission control server determines to accept the transmit media
+request from transmission control participant A and decides to pre-empt the
+on-going video transmission from transmission control participant B by queuing
+or ending the on-going video transmission.
+4\. Transmission control server responds with a transmission revoked message
+(4a) to transmission control participant B with the action of pre-emption
+whether queued or terminated. Transmission control server responds with a
+transmit media granted message (4b) to transmission control participant A.
+5\. The transmission revoked shall cause the transmission control participant
+B to be notified of the revoke (5a) of the on-going video transmission by
+queuing or termination. The transmit media granted shall cause the user of UE
+A where the transmission control participant A is located to be notified.
+6\. Transmission control participant A starts sending video media over the
+session established to the transmission control server.
+##### 7.7.1.3.4 Queue position during an MCVideo session
+Figure 7.7.1.3.4-1 describes the procedure where the transmission control is
+conducted for the MCVideo session already established between MCVideo clients
+(with transmit media granted to transmission control participant B) and server
+(with an revoke determination at transmission control server). Only two UEs
+involved in the session are shown for the simplicity.
+Figure 7.7.1.3.4-1: Queue status during an MCVideo session
+1\. It is assumed that transmission control participant B has been granted
+permission to transmit media and is transmitting video media. There are
+several other transmission control participants (including transmission
+control participant A) requesting video transmission which get queued at the
+transmission control server.
+2\. Transmission control participant A would like to know its current position
+in the video transmission queue.
+3\. Transmission control participant A sends a queue position request message
+to the transmission control server.
+4\. Transmission control server determines the current queue position of
+transmission control participant A from the video transmission queue.
+5\. Transmission control server responds with the current position in queue
+position info message.
+6\. User at transmission control participant A is informed about the current
+queue position.
+##### 7.7.1.3.5 Transmit media request cancellation from the video
+transmission queue
+###### 7.7.1.3.5.1 Transmit media request cancellation from the queue --
+MCVideo user initiated
+Figure 7.7.1.3.5.1-1 illustrates the procedure for transmit media request
+cancellation from the video transmission queue initiated by the MCVideo user.
+The MCVideo user may be an authorized user who has rights to cancel the
+transmit media requests of other MCVideo users, whose transmit media requests
+are in video transmission queue.
+Pre-conditions:
+\- It is assumed that transmission control participant B has been granted the
+permission for video transmission and is transmitting video. There are several
+other transmission control participants (including transmission control
+participant A and transmission control participant C) requesting the
+permission to transmit media which have been queued at the transmission
+control server.
+Figure 7.7.1.3.5.1-1: Transmit media request cancellation from queue initiated
+by MCVideo user
+1\. The transmission control participant A wants to remove the transmit media
+request from the video transmission queue. If transmission control participant
+A is an authorized MCVideo user with the rights to cancel another MCVideo
+user\'s transmit media request, the authorized MCVideo user may request for
+transmit media request cancellation for one or more transmission control
+participants, whose transmit media request needs to be removed from the video
+transmission queue.
+2\. The transmission control participant A sends a transmit media cancel
+request (initiating MCVideo ID) message to the transmission control server. If
+the transmission control participant A wants to remove the transmit media
+request(s) of other participant(s), the target participant(s)\' MCVideo ID
+should be included in this message.
+3\. The transmission control server shall check whether the requesting
+transmission control participant has authorization to cancel the transmit
+media request(s). If authorized, the transmit media request(s) will be removed
+from the video transmission queue. When the on-going transmissions are
+completed and are within the limit of the maximum simultaneous transmissions,
+the transmission control server will process the transmit media request from
+the updated video transmission queue.
+4\. If the transmit media cancel request in step 3 is sent by an authorized
+user (e.g., dispatcher) to cancel the transmit media request(s) of other
+participant(s) from the video transmission queue, the transmit media cancel
+request notify message is sent to the transmission control participant whose
+transmit media request was cancelled from the video transmission queue.
+5\. The transmission control server provides a transmit media cancel response
+to the transmission control participant A when the transmit media request
+cancellation is completed. Optionally, the new queue position information may
+be notified to the transmission control participants whose transmit media
+requests are in the video transmission queue (not shown in the figure).
+###### 7.7.1.3.5.2 Transmit media request cancellation from the queue -
+transmission control server initiated
+Figure 7.7.1.3.5.2-1 illustrates the procedure for transmit media request
+cancellation from the queue initiated by the transmission control server. Only
+two UEs involved in the session are shown for the simplicity.
+Pre-conditions:
+\- It is assumed that transmission control participant B has been granted the
+permission to transmit media and is transmitting video. There are several
+other transmission control participants (including transmission control
+participant A and participant C) requesting the permission to transmit media
+which have been queued at the transmission control server.
+Figure 7.7.1.3.5.2-1: Transmit media request cancellation from queue initiated
+by transmission control server
+1\. The transmission control server removes the transmit media request from
+the video transmission queue based on policy. e.g., expiration of a timer. In
+the case when transmission control server receives repeated transmit media
+requests from a transmission control participant while the limit for maximum
+simultaneous media transmissions has reached, the new transmit media request
+is accepted and added into the video transmission queue and the
+existing/former transmit media request is removed from the video transmission
+queue or the new transmit media request is rejected and the existing/former
+transmit media request of this transmission control participant is retained in
+the video transmission queue.
+2\. The transmission control server sends a transmit media cancel request
+notify to the transmission control participant(s) whose transmit media request
+is removed from the video transmission queue.
+3\. Optionally, the new queue position information is notified to the other
+transmission control participants whose transmit media requests are queued.
+##### 7.7.1.3.6 End a media transmission during an MCVideo session
+###### 7.7.1.3.6.1 End a media transmission -- MCVideo user initiated
+Figure 7.7.1.3.6.1-1 describes the procedure for ending a media transmission
+during an MCVideo session by a MCVideo user. Only two UEs involved in the
+session are shown for the simplicity.
+Pre-condition:
+1\. MCVideo session is established between MCVideo clients (client A and
+client B) and MCVideo server
+2\. Transmission control is established between transmission control
+participants and transmission control server.
+3\. Transmission control participant A and participant B have been granted the
+permission to transmit media and there are ongoing media transmission from
+transmission control participant A and participant B.
+Figure 7.7.1.3.6.1-1: End a media transmission by an MCVideo user
+1\. Transmission control participant A wants to end its media transmission in
+a session and sends a transmit media end request message to transmission
+control server.
+2\. Transmission control server terminates the on-going media transmission
+from transmission control participant A.
+3\. Transmission control server responds with a transmit media end response
+message to transmission control participant A indicating that the transmission
+control server has terminated the media transmission.
+4\. Transmission control server sends a transmit media end notify message to
+transmission control participant B indicating that the media transmission from
+transmission control participant A is terminated by the user.
+5\. The transmit media end notification shall cause the user of the
+transmission control participant B to be notified of the media transmission
+termination by the sending user.
+###### 7.7.1.3.6.2 End a media transmission -- transmission control server
+initiated
+Figure 7.7.1.3.6.2-1 describes the procedure for ending a media transmission
+during an MCVideo session by the transmission control server. Only two UEs
+involved in the session are shown for the simplicity.
+Pre-condition:
+1\. MCVideo session is established between MCVideo clients (client A and
+client B) and MCVideo server
+2\. Transmission control is established between transmission control
+participants and transmission control server.
+3\. Transmission control participant A and participant B have been granted the
+permission to transmit media and there are ongoing media transmission from
+transmission control participant A and participant B.
+Figure 7.7.1.3.6.2-1: End a media transmission by the transmission control
+server
+1\. Transmission control server terminates the on-going media transmission
+from transmission control participant A due to a termination event (e.g.
+revoke for another priority media transmission or there are no receiving
+participants).
+2\. Transmission control server sends a transmit media end request message to
+transmission control participant A indicating the reason for ending the media
+transmission.
+3\. Transmission control participant A responds with a transmit media end
+response message to transmission control server as acknowledgement
+4\. Transmission control server sends a transmit media end notify message to
+transmission control participant B indicating that the media transmission from
+transmission control participant A is terminated by the transmission control
+server.
+5\. The transmit media end notification shall cause the user of the
+transmission control participant B to be notified of the media transmission
+termination by the transmission control server.
+###### 7.7.1.3.6.3 End a media transmission -- remote MCVideo user initiated
+Figure 7.7.1.3.6.3-1 describes the procedure for ending a media transmission
+during an MCVideo session by a remote MCVideo user. Only two UEs involved in
+the session are shown for the simplicity.
+Pre-condition:
+1\. MCVideo session is established between MCVideo clients (client A and
+client B) and MCVideo server
+2\. Transmission control is established between transmission control
+participants and transmission control server.
+3\. Transmission control participant B has been granted the permission to
+transmit media and there is ongoing media transmission from transmission
+control participant B.
+4\. Transmission control participant A is authorized to end the on-going media
+termination from transmission control participant B.
+Figure 7.7.1.3.6.3-1: End a media transmission by a remote MCVideo user
+1\. Transmission control participant A sends a remote transmit media end
+request message to transmission control server including the MCVideo ID of the
+user at the UE of the transmission control participant B and the MCVideo ID of
+the user at the UE of the transmission control participant A.
+2\. Transmission control server checks whether the user at the UE of
+transmission control participant A is authorized to end the on-going media
+transmission from transmission control participant B. If authorized, the
+transmission control server ends the media transmission from transmission
+control participant B.
+3\. Transmission control server ends the on-going media transmission from
+transmission control participant B. The transmission control server shall send
+transmit media end notify messages to the transmission control participants
+receiving the media transmission from transmission control participant B,
+indicating that the transmission has ended.
+4\. Transmission control server responds with a remote transmit media end
+response message to transmission control participant A indicating that the
+transmission control server has ended the requested media transmission.
+##### 7.7.1.3.7 Remotely initiated media transmission during an MCVideo
+session
+Figure 7.7.1.3.7-1 describes the procedure for remotely initiated media
+transmission during an MCVideo session by an authorized user. Only two UEs
+involved in the session are shown for the simplicity.
+Pre-condition:
+1\. MCVideo session is established between MCVideo clients (client A and
+client B) and MCVideo server
+2\. Transmission control is established between transmission control
+participants and transmission control server and there is no ongoing media
+transmission.
+3\. The user of the UE at the transmission control participant A is authorized
+to remotely initiate a media transmission from transmission control
+participant B
+Figure 7.7.1.3.7-1: Remotely initiated media transmission during an MCVideo
+session
+1\. Transmission control participant A sends a remote transmit media request
+message to transmission control server including the MCVideo ID of the user at
+the UE of the transmission control participant B and the MCVideo ID of the
+user at the UE of the transmission control participant A.
+2\. Transmission control server checks whether the user at the UE of
+transmission control participant A is authorized to remotely initiate a media
+transmission from transmission control participant B. If authorized, the
+transmission control server makes the determination on what action (grant,
+deny, or queue) to take on the request based on transmission control criteria
+(e.g., group policy) and determines to accept the remotely initiated transmit
+media request from transmission control participant A.
+3\. Transmission control server sends a transmit media granted message to
+transmission control participant B.
+4\. Transmission control server provides a remote transmit media response
+message to transmission control participant A indicating success (media
+transmission occurs from transmission control participant B) or a failure
+reason.
+5\. Transmission control participant B starts sending video media over the
+session established to the transmission control server.
+### 7.7.2 Off-network transmission control
+#### 7.7.2.1 General
+The procedure is for providing transmission control to MCVideo UE in an off-
+network case. Transmission control is performed by using transmission control
+information flows between the transmission control participant and the
+transmission control arbitrator. The transmission control arbitrator is a
+member MCVideo UE of the MCVideo group where the transmission rules are
+applied.
+Transmission control in off-network can be performed in two ways:
+\- Single arbitrator: transmission participants rely on a single participant
+designated as transmission arbitrator for the arbitraton of transmission
+requests.
+\- Self arbitration: each transmsission participant arbitrates its own
+transmission based on its view of the topology.
+Both of the approaches, as appropriate for the deployment model, can be
+adopted for MCVideo group using a configurable parameter (as defined in Annex
+A.4).
+In the single arbitrator approach, one MCVideo client assumes the
+responsibility for arbitration of transmission requests for all group members
+within range. All requests for transmission are directed to the arbitrator,
+and the arbitrator checks the configured limits on the simultaneous
+transmissions, and grants or denies the request. If an MCVideo client is out
+of range of the current arbitrator, the MCVideo client is allowed to transmit
+and also become a transmission arbitrator. If there is insufficient capacity
+to carry an extra transmission i.e. the configured limit for simultaneous
+transmissions is reached, the MCVideo client may request that an existing
+transmitting MCVideo client is pre-empted; the pre-emption request is sent to
+the transmission arbitrator.
+In the self arbitration approach, each MCVideo client decides for itself
+whether there is sufficient capacity to carry the transmission. If it
+determines that there is insufficient capacity i.e. the configured limit for
+simultaneous transmissions is reached, and from its perspective another
+transmitting MCVideo client has a lower priority, the requesting MCVideo
+client may send an override request directly to this other transmitting
+MCVideo client, which will either accept the override request and give way, or
+deny the override request.
+In both the single arbitrator approach and the self arbitration approach, if
+there is insufficient capacity to carry the communication i.e. the configured
+limit on the simultaneous transmissions is reached, the MCVideo client may
+report this to the MCVideo user. The MCVideo user may decide to transmit
+anyway, and instruct the MCVideo client to proceed with the transmission.
+NOTE: The ProSe function within the MCVideo client could determine that there
+is insufficient capacity to carry an MCVideo call requested by the MCVideo
+client, however interactions between the MCVideo client and the ProSe function
+are outside the scope of the present document.
+Further subclauses apply to one or both of the single arbitrator approach and
+the self arbitration approach. Applicability is explicitly indicated in each
+of the relevant subclauses.
+#### 7.7.2.2 Information flows for off-network transmission control
+##### 7.7.2.2.1 Transmission request
+Table 7.7.2.2.1-1 describes the information flow for the transmission request
+sent by a transmission participant to request for the transmission permission.
+This information flows is sent in unicast or broadcast.
+Table 7.7.2.2.1-1: Transmission request
+* * *
+Information element Status Description MCVideo ID M The identity of the
+MCVideo user requesting the transmission permission Transmission priority M
+Priority of the request Source identifier O Identifies the communication, e.g.
+by identifying the media flow within a media multiplex, present only if media
+multiplexing
+* * *
+##### 7.7.2.2.2 Transmission granted
+Table 7.7.2.2.2-1 describes the information flow for the transmission granted
+sent by the transmission arbitrator, to indicate that a request for
+transmission is granted and media may be transmitted. This information flows
+is sent in unicast or broadcast.
+Table 7.7.2.2.2-1: Transmission granted
+* * *
+Information element Status Description MCVideo ID M Identity of the user whose
+client is acting as transmission arbitrator MCVideo ID M Identity of the user
+that has been granted transmission permission Duration M The time for which
+the granted party is allowed to transmit Source identifier O Identifies the
+communication, e.g. by identifying the media flow within a media multiplex,
+present only if media multiplexing MCVideo ID of subsequent arbitrator O
+Subsequent transmission arbitrator\'s identity Acknowledgement required O
+Indicates if acknowledgement from the transmission participant is required
+* * *
+##### 7.7.2.2.3 Transmission release
+Table 7.7.2.2.3-1 describes the information flow for transmission release sent
+by the transmission participant, to indicate that the media transmission is
+complete and transmission permission is released. This information flows is
+sent in unicast or broadcast.
+Table 7.7.2.2.3-1: Transmission release
+* * *
+Information element Status Description MCVideo ID M Identity of user releasing
+transmission Source identifier O Identifies the communication, e.g. by
+identifying the media flow within a media multiplex, present only if media
+multiplexing
+* * *
+##### 7.7.2.2.4 Transmission rejected
+Table 7.7.2.2.4-1 describes the information flow for transmission rejected
+sent by the transmission arbitrator, to indicate that a request for the
+transmission is rejected. This information flows is sent in unicast or
+broadcast.
+Table 7.7.2.2.4-1: Transmission rejected
+* * *
+Information element Status Description MCVideo ID M Identity of the user whose
+client is acting as transmission arbitrator MCVideo ID of rejected party M
+Identity of user whose transmission request has been rejected Source
+identifier O Identifies the communication, e.g. by identifying the media flow
+within a media multiplex, present only if media multiplexing Rejection cause O
+Indicates the cause for transmission rejection Acknowledgement required O
+Indicates if acknowledgement from the transmission participant is required
+* * *
+##### 7.7.2.2.5 Transmission revoked
+Table 7.7.2.2.5-1 describes the information flow for transmission revoked sent
+by the transmission arbitrator, to indicate that the transmission permission,
+that was earlier granted, is revoked. This information flows is sent in
+unicast or broadcast.
+Table 7.7.2.2.5-1: Transmission revoked
+* * *
+Information element Status Description MCVideo ID M Identity of the user whose
+client is acting as transmission arbitrator MCVideo ID M Identity of user
+whose transmission permission has been revoked Source identifier O Identifies
+the communication, e.g. by identifying the media flow within a media
+multiplex, present only if media multiplexing Acknowledgement required O
+Indicates if acknowledgement from the transmission participant is required
+* * *
+##### 7.7.2.2.6 Transmission arbitration taken
+Table 7.7.2.2.6-1 describes the information flow for transmission taken sent
+by the transmission participant, to indicate that the transmission participant
+has taken the responsibility of transmission arbitration. This information
+flows is sent in unicast or broadcast.
+Table 7.7.2.2.6-1: Transmission arbitration taken
+* * *
+Information element Status Description MCVideo ID M Identity of the MCVideo
+user taking responsibility of transmission arbitration Source identifier O
+Identifies the communication, e.g. by identifying the media flow within a
+media multiplex, present only if media multiplexing Permission to request the
+transmission O Indicates whether receiving parties are allowed to request the
+transmission or not (e.g. broadcast call). Acknowledgement required O
+Indicates if acknowledgement from the transmission participant is required
+* * *
+##### 7.7.2.2.7 Transmission arbitration release
+Table 7.7.2.2.7-1 describes the information flow for transmission arbitration
+release sent by the transmission arbitrator, to indicate that the
+responsibility of transmission arbitration is released. This information flows
+is sent in unicast or broadcast.
+Table 7.7.2.2.7-1: Transmission arbitration release
+* * *
+Information element Status Description MCVideo ID M Identity of the user whose
+client is acting as transmission arbitrator MCVideo ID O Identity of the user
+whose client is being delegated transmission arbitrator function Source
+identifier O Identifies the communication, e.g. by identifying the media flow
+within a media multiplex, present only if media multiplexing
+* * *
+#### 7.7.2.3 Initializing transmission control -- single arbitrator approach
+This subclause is applicable only in single arbitrator approach.
+Figure 7.7.2.3-1 describes procedures for transmission participants when an
+MCVideo client initializes transmission control. The MCVideo client sends a
+transmission request to detect presence of a transmission arbitrator. If the
+MCVideo client does not receive a response to the transmission request, it
+sends a transmission arbitration taken message and becomes the transmission
+arbitrator. The MCVideo client may now transmit a video. This procedure
+applies when either there have been no recent MCVideo transmissions within the
+MCVideo group and therefore no arbitrator has been selected, or where there
+have been recent MCVideo transmissions which may still be ongoing, but the
+arbitrator cannot be reached, e.g. where MCVideo client that wants to transmit
+video has gone out of range of the arbitrator.
+Pre-conditions:
+1\. An off-network group communication has been established.
+2\. MCVideo client 1 wishes to transmit video, and has determined that the
+pre-configured limit on the number of transmissions within the MCVideo group
+has not been reached.
+Figure 7.7.2.3-1: Initializing transmission control, single arbitrator case
+1\. MCVideo client 1 sends a transmission request message to the MCVideo
+group.
+2\. MCVideo client 1 does not detect any response to the transmission request.
+3a. MCVideo client 1 sends a transmission arbitration taken message to the
+MCVideo group.
+3b. MCVideo user may be notified that the video can now be transmitted.
+4\. MCVideo client 1 transmits video to the MCVideo group.
+#### 7.7.2.3A Initializing transmission control -- self arbitration approach
+This subclause is applicable only in self arbitration approach.
+Figure 7.7.2.3a-1 describes procedures for transmission participants when an
+MCVideo client initializes transmission control.
+Pre-conditions:
+1\. An off-network group communication has been established.
+2\. MCVideo client 1 wishes to transmit video.
+Figure 7.7.2.3a-1: Initializing transmission control, self arbitration case
+1\. The MCVideo client checks whether the pre-configured limit on the number
+of transmissions within the MCVideo group has been reached and informs the
+user. If the pre-configured limit on the number of transmissions within the
+MCVideo group has been reached, the MCVideo user may defer the transmission,
+or request an override as specified in subclause 7.7.2.8, or decide to
+continue with the transmission anyway.
+NOTE: If the MCVideo user decides to transmit even if the pre-configured limit
+on the number of transmissions within the MCVideo group has been reached, the
+MCVideo user decides to accept any consequences of interference.
+2\. MCVideo client 1 sends a transmission arbitration taken message to the
+MCVideo group.
+3\. MCVideo client 1 transmits video to the MCVideo group.
+#### 7.7.2.4 Transmission permission granted
+This subclause is applicable only in single arbitrator approach.
+Figure 7.7.2.4-1 describes procedures for transmission participants when an
+MCVideo client requests for transmission permission.
+The MCVideo client has detected presence of a transmission arbitrator e.g., by
+receiving responses to transmission arbitration control message. The MCVideo
+client sends a transmission request and waits for a response. The MCVideo
+client upon receiving a transmission granted message may transmit a video.
+Pre-conditions:
+1\. An off-network group communication has been established.
+2\. At least one participant is currently transmitting video.
+Figure 7.7.2.4-1: Requesting transmission permission
+1\. MCVideo client 2 sends a transmission request message to the MCVideo
+group.
+2\. MCVideo client 1, being the transmission arbitrator, checks if the
+configured limit of maximum simultaneous transmissions is already reached.
+3\. If the maximum simultaneous transmissions limit is not reached, MCVideo
+client 1 sends a transmission granted message to the MCVideo group.
+Transmission granted message indicates MCVideo client 2 as the intended
+recipient.
+4\. MCVideo user at MCVideo client 2 may be notified that the video can now be
+transmitted.
+5\. MCVideo client 2 transmits video to the MCVideo group.
+#### 7.7.2.5 Transmission permission rejected
+This subclause is applicable only in single arbitrator approach.
+Figure 7.7.2.5-1 describes procedures for transmission participants when an
+MCVideo client requests for transmission permission.
+The MCVideo client has detected presence of a transmission arbitrator e.g., by
+receiving responses to transmission arbitration control message. The MCVideo
+client sends a transmission request and waits for a response.
+Pre-conditions:
+1\. An off-network group communication has been established.
+2\. At least one participant is currently transmitting video.
+Figure 7.7.2.5-1: Requesting transmission permission
+1\. MCVideo client 2 sends a transmission request message to the MCVideo
+group.
+2\. MCVideo client 1, being the transmission arbitrator, checks if the
+configured limit of maximum simultaneous transmissions is already reached.
+3\. If the maximum simultaneous transmissions limit has reached, MCVideo
+client 1 sends a transmission rejected message to the MCVideo group.
+Transmission denied message indicates MCVideo client 2 as the intended
+recipient. The transmission rejected message may include a rejection cause
+which indicates that the configured maximum transmissions limit has been
+reached.
+4\. MCVideo user at MCVideo client 2 may be notified that the video cannot be
+transmitted right now.
+Following step 4, the MCVideo user at MCVideo client 2 may decide to transmit
+anyway, for example if the user knows the topology of the off-network MCVideo
+group and locations of the MCVideo group members and needs to transmit video
+to other local MCVideo group members despite causing a potential conflict with
+one or more other existing MCVideo transmissions within the MCVideo group. In
+this case, the MCVideo client follows the procedure in subclause 7.7.2.3.
+#### 7.7.2.6 Releasing transmission permission
+This subclause is applicable in both the single arbitrator and self
+arbitration approaches.
+Figure 7.7.2.6-1 describes procedures for transmission participants when an
+MCVideo client releases transmission permission.
+The MCVideo client has detected presence of a transmission arbitrator e.g., by
+receiving responses to transmission arbitration control message. The MCVideo
+client stops the video transmission and sends a transmission release request.
+Pre-conditions:
+1\. An off-network group communication has been established.
+2\. MCVideo client has requested transmission permission and may have received
+transmission permission.
+Figure 7.7.2.6-1: Requesting transmission permission
+1\. If transmitting, the MCVideo client 2 stops the transmission of the video.
+2\. MCVideo client 2 sends a transmission release message to the MCVideo
+group.
+NOTE: The transmission arbitrator does not respond to a pending (not granted
+or denied) transmission request if a transmission release notification is
+received from the MCVideo client.
+#### 7.7.2.7 Transmission override
+This subclause is applicable in the single arbitrator in the approach.
+Figure 7.7.2.7-1 describes procedures for transmission participants when an
+MCVideo client authorized to override, requests for transmission permission.
+The MCVideo client has detected presence of a transmission arbitrator e.g., by
+receiving responses to transmission arbitration control message. The MCVideo
+client sends a transmission request and waits for a response.
+Pre-conditions:
+1\. An off-network group communication has been established.
+2\. Maximum simultaneous transmissions limit has been reached.
+Figure 7.7.2.7-1: Transmission override
+1\. MCVideo client 2 sends a transmission request message to the MCVideo
+group.
+2\. As the configured limit of maximum simultaneous transmissions is already
+reached, MCVideo client 1, being the transmission arbitrator, checks the
+override policy.
+3\. If MCVideo client 2 is authorized to override (based on e.g., transmission
+priority), MCVideo client 1 sends a transmission revoked message to the
+MCVideo group. Transmission revoked message indicates the MCVideo client from
+which the permission is revoked, as the intended recipient.
+4\. MCVideo client 3 stops transmission of video and MCVideo user at MCVideo
+client 3 may be notified that the transmission permission has been revoked.
+5\. MCVideo client 1 sends a transmission granted message to the MCVideo
+group. Transmission granted message indicates MCVideo client 2 as the intended
+recipient.
+6\. MCVideo user at MCVideo client 2 may be notified that the video can now be
+transmitted.
+7\. MCVideo client 2 transmits video to the MCVideo group.
+#### 7.7.2.8 Transmission override (revoke self)
+This subclause is applicable in the single arbitrator approach.
+Editor\'s note: transmission override in the self arbitration approach is FFS.
+Figure 7.7.2.8-1 describes procedures for transmission participants when an
+MCVideo client authorized to override, requests for transmission permission.
+The MCVideo client has detected presence of a transmission arbitrator e.g., by
+receiving responses to transmission arbitration control message. The MCVideo
+client sends a transmission request and waits for a response.
+Pre-conditions:
+1\. An off-network group communication has been established.
+2\. Maximum simultaneous transmissions limit has been reached.
+Figure 7.7.2.8-1: Transmission override
+1\. MCVideo client 2 sends a transmission request message to the MCVideo
+group.
+2\. As the configured limit of maximum simultaneous transmissions is already
+reached, MCVideo client 1, being a transmission arbitrator, checks the
+override policy.
+3\. If MCVideo client 2 is authorized to override (based on e.g., transmission
+priority), MCVideo client 1 may send a transmission revoked message to the
+MCVideo group. Transmission revoked message indicates the MCVideo client 1,
+the current arbitrator, whose permission is revoked.
+4\. MCVideo client 1 stops transmission of video and MCVideo user at MCVideo
+client 1 may be notified that the transmission permission has been revoked.
+5\. MCVideo client 1 sends a transmission granted message to the MCVideo
+group. The transmission granted message indicates MCVideo client 2 as the
+intended recipient and MCVideo client 2 as the subsequent transmission
+arbitrator.
+6a. MCVideo client 2 sends a transmission arbitration taken message to the
+MCVideo group.
+6b. MCVideo user at MCVideo client 2 may be notified that the video can now be
+transmitted.
+NOTE: Step 6a and step 6b can occur in any order.
+7\. MCVideo client 1, upon receiving the transmission arbitration taken
+message releases transmission arbitration.
+8\. MCVideo client 2 transmits video to the MCVideo group.
+#### 7.7.2.9 Transmission arbitration release
+##### 7.7.2.9.1 Transmission arbitration release
+This subclause is applicable only in single arbitrator approach.
+Figure 7.7.2.9.1-1 describes procedures for an MCVideo client to release
+transmission arbitration. There is no other MCVideo client to which
+transmission arbitration can be delegated.
+Pre-conditions:
+1\. An off-network group communication has been established.
+2\. Only MCVideo client 1 is transmitting a video.
+Figure 7.7.2.9.1-1: Transmission arbitration release without delegation
+1\. MCVideo client 1 sends a transmission release message to the MCVideo
+group.
+2\. MCVideo client 1 stops transmission of the video.
+##### 7.7.2.9.2 Transmission arbitration release with delegation
+This subclause is applicable only in single arbitrator approach.
+Figure 7.7.2.9.2-1 describes procedures for an MCVideo client to release
+transmission arbitration. There are other MCVideo clients currently
+transmitting to which transmission arbitration can be delegated.
+Pre-conditions:
+1\. An off-network group communication has been established.
+2\. At least one more MCVideo client is transmitting video other than the
+current transmission arbitrator.
+Figure 7.7.2.9.2-1: Transmission arbitration release with delegation
+1\. MCVideo client 1 stops video transmission but does not release
+transmission arbitration.
+2\. MCVideo client 1 sends a transmission arbitration release message. The
+transmission arbitration release message indicates a MCVideo client which is
+currently transmitting video, MCVideo client 2, as the subsequent transmission
+arbitrator. The MCVideo client 1 waits for a confirmation before releasing
+transmission arbitration.
+3\. MCVideo client 1 detects no response from MCVideo client 2.
+4\. MCVideo client 1 sends another transmission arbitration release message.
+The transmission arbitration release message indicates another MCVideo client
+which is currently transmitting video, MCVideo client 3, as the subsequent
+transmission arbitrator. The MCVideo client 1 waits for a confirmation before
+releasing transmission arbitration.
+5\. MCVideo client 3 sends a transmission arbitration taken message to the
+MCVideo group.
+6\. MCVideo client 1, upon receiving the transmission arbitration taken
+message releases transmission arbitration.
+#### 7.7.2.10 Simultaneous transmission requests
+This subclause is applicable in both the single arbitrator and self
+arbitration approaches.
+Figure 7.7.2.10-1 describes procedures for transmission participants when
+simultaneous transmission requests are generated when more than one MCVideo
+client initializes transmission control.
+Figure 7.7.2.10-1 shows the expected behaviour if simultaneous transmission
+requests are generated in the following scenarios:
+\- a single arbitrator approach is used but there is currently no arbitrator;
+or
+\- self arbitration is used.
+Pre-conditions:
+1\. An off-network group communication has been established.
+2\. MCVideo client 1 has higher transmission priority than MCVideo client 2.
+Figure 7.7.2.10-1: Simultaneous transmission requests
+1a. The MCVideo client 1 sends the transmission request message to the MCVideo
+group.
+1b. The MCVideo client 2 sends the transmission request message to the MCVideo
+group.
+NOTE: Step 1a and 1b happen in parallel
+2\. On receiving a transmission request message, while waiting for a response
+to the sent transmission request message, the MCVideo client compares its
+transmission priority with the transmission priority indicated in the received
+transmission request message.
+3\. On determining that it has higher transmission priority than the received
+transmission request message(s), and no response to the sent transmission
+request message is received, the MCVideo client 1 sends the transmission
+arbitration taken message to the MCVideo group.
+4\. MCVideo user may be notified that the video can now be transmitted.
+## 7.8 MCVideo service configuration
+The MCVideo service shall support the procedures and related information flows
+as specified in subclause 10.1 of 3GPP TS 23.280 [6] with the following
+clarifications:
+\- The MC service client is the MCVideo client;
+\- The MC service server is the MCVideo server;
+\- The MC service ID is the MCVideo ID; and
+\- The MC service user profile index is the MCVideo user profile index.
+## 7.9 Affiliation and de-affiliation to/from MCVideo group(s)
+The MCVideo service shall support the procedures and related information flows
+as specified in subclause 10.8 of 3GPP TS 23.280 [6] with the following
+clarifications:
+\- The MC service client is the MCVideo client;
+\- The MC service server is the MCVideo server;
+\- The MC service group is the MCVideo group;
+\- The MC service ID is the MCVideo ID; and
+\- The MC service group ID is the MCVideo group ID.
+When an MCVideo user has affiliated to an MCVideo group then the MCVideo user
+can send and receive MCVideo related media for that MCVideo group. When an
+MCVideo user has de‑affiliated from an MCVideo group then the MCVideo user
+cannot send and receive MCVideo related media to and from that MCVideo group.
+## 7.10 Use of MBMS transmission (on-network)
+### 7.10.1 Information flows for MBMS Transmission
+#### 7.10.1.1 General
+Information flows for generic MBMS procedures are defined in 3GPP TS 23.280
+[6].
+#### 7.10.1.2 MapGroupToBearer
+Table 7.10.1.2-1 describes the information flow to associate a MCVideo group
+call to a MBMS bearer. It is sent from the MCVideo server to the MCVideo
+client.
+Table 7.10.1.2-1: MapGroupToBearer
+* * *
+Information element Status Description MCVideo group ID M This element
+identifies the MCVideo group, in which the call is started. Media stream
+identifier (video) M This element identifies the media stream of the SDP used
+for the Video group call (e.g. MBMS subchannel). Media stream identifier
+(audio) O This element identifies the audio media stream of the SDP used for
+the Video group call (e.g. MBMS subchannel). This is used if separate codecs
+are used for video and audio. TMGI (see NOTE) O The MBMS bearer identifier if
+the media of the MCVideo group call is not sent on the same MBMS bearer as
+this MapGroupToBearer message. Call acknowledgement indicator O Indication
+that the MCVideo group call requires acknowledgement from receiving MCVideo
+clients. NOTE: TMGI shall be present if this message is sent over a different
+MBMS bearer than the media of the group call; TMGI may be present if this
+message is sent over the same MBMS bearer as the media of the group call.
+* * *
+#### 7.10.1.3 UnmapGroupFromBearer
+Table 7.10.1.3-1 describes the information flow to disconnect a MCVideo group
+call from a MBMS bearer. It is sent from the MCVideo server to the MCVideo
+client.
+Table 7.10.1.3-1: UnmapGroupFromBearer
+* * *
+Information element Status Description MCVideo group ID M This element
+identifies the MCVideo group which will no longer use the MBMS bearer.
+* * *
+### 7.10.2 Use of pre-established MBMS bearers
+The MCVideo service shall support the procedure for using pre-established MBMS
+bearers as specified 3GPP TS 23.280 [6] with the following clarifications:
+\- The MC service client is the MCVideo client;
+\- The MC service server is the MCVideo server; and
+\- The MC service ID is the MCVideo ID.
+The MCVideo service shall use the MCVideo-1, MCVideo‑8 and MCVideo-9 reference
+points for this procedure.
+MCVideo may use pre-established MBMS bearer for the different types of MCVideo
+group calls. Both pre-arranged group calls and chat group calls can use the
+pre-established MBMS bearer for distributing the media. The MBMS bearer can be
+used by any group. Depending on the capacity of the MBMS bearer, the bearer
+can be used to broadcast one or more group calls in parallel.
+Both the media packets as well as the transmission control messages to the
+receiving MCVideo clients are sent on the MBMS bearer. Optionally a separate
+MBMS bearer could be used for the transmission control messages, due to
+different bearer characteristic requirements.
+When using the pre-established MBMS bearer for MCVideo, the MCVideo server
+perform the procedure of call connect and disconnect over MBMS as defined in
+subclause 7.10.4 at the group communication session establishment step.
+### 7.10.3 Use of dynamic MBMS bearer establishment
+The MCVideo service shall support the procedure for using dynamic MBMS bearers
+as specified 3GPP TS 23.280 [6] with the following clarifications:
+\- The MC service client is the MCVideo client;
+\- The MC service server is the MCVideo server; and
+\- The MC service ID is the MCVideo ID.
+The MCVideo service shall use the MCVideo-1, MCVideo-4, MCVideo-7, MCVideo-8
+and MCVideo-9 reference points for this procedure.
+MCVideo may use dynamic MBMS bearer establishment for the different types of
+MCVideo group calls. Both pre-arranged group calls and chat group calls can
+use the dynamic MBMS bearer for distributing the media.
+Both the media packets as well as the transmission control messages to the
+receiving MCVideo clients are sent on the MBMS bearer.
+When using the procedures for dynamic MBMS bearer establishment for MCVideo,
+the MCVideo server perform the procedure of mapping group communication to
+MBMS bearer as defined in subclause 7.10.4 at the group communication session
+establishment step.
+### 7.10.4 Video call connect and disconnect over MBMS
+#### 7.10.4.1 General
+MBMS bearer can be used for MCVideo group calls. One MBMS bearer is not
+permanently associated to one specific group or group call. Before sending
+media packets of a group call over MBMS bearer, the MCVideo server shall send
+the association information between group call and the MBMS bearer. The group
+call setup procedure indicates the media stream or media streams within one
+MBMS bearer that is used for the specific MCVideo group call. When the group
+call over the MBMS bearer is finished, this temporary association information
+of an MCVideo group call to specific resources on a MBMS bearer is undone. The
+procedure in figure 7.10.4.2.1-1 requires that the group session is setup
+before the call start. This eliminates the need for the receiving clients to
+continuously use a unicast bearer. Prior to this the MBMS bearer is activated
+and announced to the MCVideo clients.
+#### 7.10.4.2 Procedure
+##### 7.10.4.2.1 Call connect over MBMS
+In figure 7.10.4.2.1-1 the MCVideo client 1 is the client that initiate an
+MCVideo chat group call and also the transmitting client. MCVideo client 1
+may, but does not have to be in an MBMS service area. The MCVideo client 2 and
+MCVideo client 3 represents MCVideo clients receiving the MCVideo call over an
+MBMS bearer. There may be other receiving clients both over unicast bearers
+and over this or other MBMS bearer(s), however they are not illustrated in
+this figure.
+The same procedure as for chat group call can also be applied for pre-arranged
+calls.
+Pre-conditions:
+  * All users participating in the MCVideo group call are already affiliated to the group.
+  * All participating users have joined the group session.
+Figure 7.10.4.2.1-1: Chat group call connect on MBMS bearer
+1\. Activation and announcement of MBMS bearer availability.
+NOTE 1: The procedure does not include the steps for MCVideo client location
+reporting, or for MBMS capability information exchange.
+2\. MCVideo client 1 initiate the MCVideo group call by sending an initial
+transmit media request over a unicast bearer to the MCVideo server (reference
+point MCVideo-4).
+3\. The MCVideo server will send a MapGroupToBearer message over a previously
+activated MBMS bearer to all users that will receive the call over an MBMS
+bearer. The MapGroupToBearer message includes association information between
+the group call and MBMS bearer. The MapGroupToBearer message includes MCVideo
+group ID and information about the media stream identifier or media stream
+identifiers of the activated MBMS bearer and may include the identifier (i.e.
+the TMGI) of the MBMS bearer broadcasting the call. The message is sent over
+reference point MCVideo-9.
+NOTE 2: Step 3 can be deferred until step 5 and the MapGroupToBearer message
+can then be included in the transmission arbitration taken message.
+4\. The MCVideo server grants the right to transmit for MCVideo client 1 and
+by that sends a transmit media granted message to the MCVideo client 1\. This
+message is sent over a unicast bearer (reference point MCVideo-4).
+5\. A media transmission notification message is sent from the MCVideo server
+to all receiving users. This message includes the MCVideo ID of the
+transmitting MCVideo client as well as the MCVideo group ID. The message is
+sent over a MBMS bearer to all users that have previously been setup to
+receive calls over the MBMS bearer. The message is sent over reference point
+MCVideo-9.
+6\. The users of MCVideo clients are informed about the details of video
+tranmission and the video transmitter.
+7\. The MCVideo clients may send a receive media request to the MCVideo
+server, to indicate the reception of media over the MBMS bearer.
+8\. MCVideo server accepts the media receive request and sends a receive media
+response message to MCVideo clients over a MBMS bearer by using reference
+point MCVideo-9.
+NOTE 3: The receive media response can also be sent by unicast to the MCVideo
+clients that request to receive media over the MBMS bearer.
+NOTE 4: Step 7 and 8 may be omitted when auto-receive transmission mode is
+used, e.g. for emergency group calls.
+9\. The media is sent from MCVideo client 1 to the MCVideo server over unicast
+bearer and from the MCVideo server to the MCVideo client 2 and MCVideo client
+3 over MBMS bearer.
+NOTE 5: Additional transmission request messages in the same call will not
+trigger the MapGroupToBearer message to be sent.
+##### 7.10.4.2.2 Call disconnect over MBMS
+Figure 7.10.4.2.2-1 shows the high level procedure where an
+UnmapGroupFromBearer message is sent by the MCVideo server to the MCVideo
+clients to indicate that the MCVideo group call is being dissociated from the
+MBMS bearer.
+Figure 7.10.4.2.2-1: Chat group call disconnect on MBMS bearer
+1\. An MCVideo group call is ongoing; the media is broadcasted over MBMS
+bearer to MCVideo client 2 and MCVideo client 3.
+2\. MCVideo server has determined to disconnect the call over the MBMS bearer
+for the MCVideo clients
+3\. An UnmapGroupFromBearer message is sent by the MCVideo server to MCVideo
+client 2, MCVideo client 3 and possibly to MCVideo client 1 (if in MBMS
+coverage area) on MBMS bearer(s).
+NOTE 4: The UnmapGroupFromBearer message can be sent as part of other
+messages.
+NOTE 5: The UnmapGroupFromBearer message and the MapGroupToBearer message can
+be combined, to facilitate switching bearers in one signalling step, as
+necessary.
+### 7.10.5 Switching from MBMS bearer to unicast bearer
+The MCVideo service shall support the procedure for switching from MBMS bearer
+to unicast bearer as specified 3GPP TS 23.280 [6] with the following
+clarifications:
+\- The MC service client is the MCVideo client;
+\- The MC service server is the MCVideo server; and
+\- The MC service ID is the MCVideo ID.
+The MCVideo service shall use the MCVideo-1, MCVideo-4, MCVideo‑7, MCVideo-8
+and MCVideo‑9 reference points for this procedure.
+## 7.11 Simultaneous session for MCVideo calls (on-network)
+An MCVideo client and MCVideo server may use a simultaneous session as defined
+in 3GPP TS 23.280 [6] for MCVideo calls. The MCVideo client becomes involved
+in a simultaneous session for MCVideo calls by inviting, joining or accepting
+more than one MCVideo call, or affiliating to a group.
+NOTE: An MCVideo client affiliating to multiple MCVideo groups with active
+calls will result in the MCVideo client being invited simultaneously to
+multiple MCVideo calls.
+The MCVideo client can also still handle multiple MCVideo calls in parallel at
+the same time i.e. using multiple dialogs.
+The simultaneous session is established during either an originating on-demand
+call establishment or during pre-established session establishment or a
+modification of an already established pre-established session or on-demand
+call.
+It is possible to change the prioritisation while the MCVideo client is
+engaged in multiple MCVideo calls. The setting of the priority can be made at
+MCVideo call setup or by performing a modification after the MCVideo call is
+established. This may result in more than one media bearer.
+## 7.12 User authentication and authorization for MCVideo service
+NOTE: Flow 7.12-1 is a high level user authentication and authorization flow.
+3GPP TS 33.180 [14] defines the specific user authentication and authorization
+architecture required by the MCVideo service in order to realize the MCVideo
+user authentication and authorization requirements as defined in 3GPP TS
+22.280 [2].
+A procedure for user authentication is illustrated in figure 7.12-1. The user
+authentication is performed based on the procedure specified in 3GPP TS 23.280
+[6].
+Figure 7.12-1: MCVideo user authentication and registration, single domain
+1\. The user authentication is performed as per the general user
+authentication procedure specified in 3GPP TS 23.280 [6].
+2\. MCVideo client performs the MCVideo service authorization for the user.
+Step 2 utilizes the results of step 1.
+## 7.13 Support for multiple devices
+An MCVideo user may be authorized to use the MCVideo service from multiple
+MCVideo UEs as per the procedure in subclause 7.12.
+If an MCVideo server receives a service authorization request for an MCVideo
+user who is previously MCVideo service authorized on another MCVideo UE, then
+the MCVideo server shall process this service authorization request as
+described in subclause 7.12. In the MCVideo service authorization response to
+the MCVideo user, the MCVideo server shall also indicate that the MCVideo user
+is already MCVideo service authorized from another MCVideo UE.
+## 7.14 Location information (on-network)
+The MCVideo system makes use of all of the procedures for location management
+as specified in 3GPP TS 23.280 [6], utilising the CSC-14 reference point
+between the location management client and location management server and the
+CSC‑15 reference point between the MCVideo server and location management
+server.
+\- The MC service client is the MCVideo client;
+\- The MC service server is the MCVideo server;
+\- The MC service group is the MCVideo group;
+\- The MC service ID is the MCVideo ID; and
+\- The MC service group ID is the MCVideo group ID.
+## 7.15 MCVideo resource management (on-network)
+Procedures for resource management are defined in subclause 10.11 of 3GPP TS
+23.280 [6].
+## 7.16 MCVideo client query
+### 7.16.1 General
+The MCVideo client query is used by an authorized MCVideo client to retrieve
+the characteristics of the MCVideo clients in an area with certain criteria.
+The query criteria may be a set of capabilities, or category tags, or a mix of
+such criterions, etc.
+### 7.16.2 Information flows for MCVideo client query
+#### 7.16.2.1 MCVideo client query request
+Table 7.16.2.1-1 describes the information flow for the MCVideo client query
+request from MCVideo client to MCVideo sever.
+Table 7.16.2.1-1: MCVideo client query request
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+MCVideo user requesting MCVideo client query Location information M The
+location information where the query to be applied Query criteria O A criteria
+filter for the query (e.g. category tags, video capabilities, etc.)
+* * *
+#### 7.16.2.2 MCVideo client query response
+Table 7.16.2.2-1 describes the information flow for the MCVideo client query
+response from the MCVideo server to the MCVideo client.
+Table 7.16.2.2-1: MCVideo client query response
+* * *
+Information Element Status Description MCVideo ID list O The MCVideo clients
+that fulfil the query criteria
+* * *
+### 7.16.3 MCVideo client query procedure
+Figure 7.16.3-1 describes the procedure for MCVideo client query in on-
+network. This procedure is applicable to query the MCVideo clients belonging
+to the same MCVideo system as the requesting MCVideo user.
+Pre-conditions:
+1\. The video capabilities have been collected at MCVideo server during the
+update MCVideo capabilities information at the MCVideo server procedure in
+subclause 7.5.2.3.
+Figure 7.16.3-1: MCVideo client query procedure
+1\. MCVideo client A sends a MCVideo client query request to the MCVideo
+server with certain search criteria.
+2\. MCVideo server checks whether the MCVideo user of MCVideo client A has the
+authorization to perform MCVideo client query. If success, MCVideo server
+retrieves the MCVideo clients that fulfils the search criteria. If MCVideo
+group ID list is included in the MCVideo client query request, MCVideo server
+retrieves the affiliated group members that fulfil the query criteria in each
+affiliated MCVideo group in the received MCVideo group ID list.
+3\. MCVideo server returns the MCVideo client query response to the MCVideo
+client A with the retrieved MCVideo clients.
+Editor\'s note: It is FFS when the requesting MCVideo user and the MCVideo
+users or the affiliated groups to be requested are not within the same MCVideo
+system.
+## 7.17 MCVideo adaptation during MCVideo communication
+### 7.17.1 General
+The MCVideo adaption is used by an authorized MCVideo client to automatically
+change the video communication parameters including codec, resolution etc.
+according to the network conditions changes detected through such as packet
+loss or packet delay.
+### 7.17.2 Information flows for MCVideo adaptation
+#### 7.17.2.1 MCVideo communication parameter update request
+Table 7.17.2.1-1 describes the information flow for the MCVideo communication
+parameter update request from MCVideo client to MCVideo sever and from MCVideo
+server to MCVideo client.
+Table 7.17.2.1-1: MCVideo communication parameter update request
+* * *
+Information Element Status Description MCVideo ID M The identity of the
+MCVideo user requesting to update MCVideo communication parameter MCVideo
+group ID O (NOTE) The identity of the MCVideo group which the MCVideo
+communication parameter to be updated (Only used in group communication)
+MCVideo ID O (NOTE) The identity of the MCVideo user ID which the MCVideo
+communication parameter to be updated (Only used in private communication) SDP
+M The new SDP including codec, resolution, frame rate and etc. for MCVideo
+communication NOTE: At least one of these information elements shall be
+present
+* * *
+#### 7.17.2.2 MCVideo communication parameter update response
+Table 7.17.2.2-1 describes the information flow for the MCVideo communication
+parameter update response from the MCVideo server to the MCVideo client and
+from MCVideo client to MCVideo server.
+Table 7.17.2.2-1: MCVideo communication parameter update response
+* * *
+Information Element Status Description Result M Indicates success or failure
+* * *
+### 7.17.3 MCVideo adaptation procedure
+#### 7.17.3.1 MCVideo adaptation during group communication procedure --
+transmitting client triggered
+Figure 7.17.3.1-1 describes the procedure for transmitting MCVideo client
+triggered MCVideo communication parameters update in on-network. For
+simplicity, only one receiving user is shown in the figure. This procedure is
+applicable to only one MCVideo transmitting user during the MCVideo group
+call, e.g., broadcast group call.
+NOTE: The MCVideo adaptation for MCVideo group communication allows multiple
+transmitting users are not specified in this release.
+Pre-conditions:
+1\. MCVideo client 1 and MCVideo client 2 are the group communication
+participants, and the MCVideo client 1 is transmitting video in the MCVideo
+group communication.
+Figure 7.17.3.1-1: Transmitting user triggered MCVideo adaptation in group
+communication
+1\. MCVideo client 1 sends MCVideo communication parameter update request to
+the MCVideo server to adjust the video communication parameters due to network
+conditions changes detected, e.g., through packet loss or packet delay. The
+new parameters including codec, resolution, frame rate and etc. are included.
+2\. MCVideo server checks whether the MCVideo user of MCVideo client 1 has the
+authorization to update the MCVideo communication parameters.
+3\. When authorized, MCVideo server sends the MCVideo communication parameter
+update request to the MCVideo client 2.
+4\. The MCVideo user of MCVideo client 2 is notified about the changes of
+MCVideo communication parameters.
+5\. The MCVideo client 2 accepts the request, and sends the MCVideo
+communication parameter update response to the MCVideo server.
+6\. The MCVideo server sends the MCVideo communication parameter update
+response to the MCVideo client 1 with the result.
+7\. Then, the MCVideo group communication applies the new MCVideo
+communication parameters.
+#### 7.17.3.2 MCVideo adaptation during group communication procedure --
+receiving user triggered
+Figure 7.17.3.2-1 describes the procedure for MCVideo server initiated MCVideo
+communication parameters update in on-network. For simplicity, only one
+receiving user is shown in the figure. This procedure is applicable to only
+one MCVideo transmitting user during the MCVideo group call e.g., broadcast
+group call.
+Pre-conditions:
+1\. MCVideo cient 1 and MCVideo client 2 are the group communication
+participants. MCVideo client 2 is transmitting video, and MCVideo client 1 is
+receiving video.
+Figure 7.17.3.2-1: Receiving user triggered MCVideo adaptation in group
+communication
+1\. MCVideo client 1 sends MCVideo communication parameter update request to
+the MCVideo server to request the video communication parameters due to
+network conditions changes detected, e.g., through packet loss. The expected
+parameters including codec, resolution, frame rate and etc. are included.
+2\. MCVideo server may receive a multitude of notifications from the receiving
+users. The MCVideo server performs authorization check and determines to
+update the MCVideo communication parameters according to the received
+notifications.
+NOTE 1: The determination of update the MCVIdeo communication parameters is
+implementation.
+3\. When authorized, MCVideo server sends the MCVideo communication parameter
+update request to the MCVideo client 2.
+4\. The MCVideo users of MCVideo client 1 and MCVideo client are notified
+about the changes of MCVideo communication parameters.
+5\. The MCVideo client 1 and MCVideo client 2 accepts the request, and sends
+the MCVideo communication parameter update response to the MCVideo server.
+6\. Then, the MCVideo group communication applies the new MCVideo
+communication parameters.
+#### 7.17.3.3 MCVideo adaptation during private communication procedure --
+transmitting client triggered
+Figure 7.17.3.3-1 describes the procedure for transmitting MCVideo client
+initiated MCVideo communication parameters update in on-network. This
+procedure is applicable to the video push and video pull.
+Pre-conditions:
+1\. The private communication is ongoing between MCVideo cient 1 and MCVideo
+client 2, and MCVideo client 1 is transmitting video to MCVideo client 2.
+Figure 7.17.3.3-1: Transmitting user initiated MCVideo adaptation in private
+communication
+1\. MCVideo client 1 sends MCVideo communication parameter update request to
+the MCVideo server to adjust the video communication parameters due to network
+conditions changes detected, e.g., through packet loss. The new parameters
+including codec, resolution, frame rate and etc. are included.
+2\. MCVideo server checks whether the MCVideo user of MCVideo client 1 has the
+authorization to update the MCVideo communication parameters.
+3\. When authorized, MCVideo server sends the MCVideo communication parameter
+update request to the MCVideo client 2.
+4\. The MCVideo user of MCVideo client 2 is notified about the changes of
+MCVideo communication parameters.
+5\. The MCVideo client 2 accepts the request, and sends the MCVideo
+communication parameter update response to the MCVideo server.
+6\. The MCVideo server sends the MCVideo communication parameter update
+response to the MCVideo client 1 with the result.
+7\. Then, the MCVideo communication applies the new MCVideo communication
+parameters.
+#### 7.17.3.4 MCVideo adaptation during group communication procedure --
+receiving user triggered
+Figure 7.17.3.4-1 describes the procedure for receiving user initiated MCVideo
+communication parameters update in on-network. This procedure is applicable in
+video push and video pull.
+Pre-conditions:
+1\. The private communication is ongoing between MCVideo cient 1 and MCVideo
+client 2, and the MCVideo client 1 is receiving video from MCVideo client 2.
+Figure 7.17.3.4-1: Receiving user triggered MCVideo adaptation in private
+communication
+1\. MCVideo client 1 sends MCVideo communication parameter update request to
+the MCVideo server to request the video communication parameters due to
+network conditions changes detected, e.g., through packet loss. The expected
+parameters including codec, resolution, frame rate and etc. are included.
+2\. MCVideo server checks whether the MCVideo user of MCVideo client 1 has the
+authorization to update the MCVideo communication parameters.
+3\. When authorized, MCVideo server sends the MCVideo communication parameter
+update request to the MCVideo client 2.
+4\. The MCVideo user of MCVideo client 2 is notified about the request of
+MCVideo communication parameters update.
+5\. The MCVideo client 2 accepts the request, and sends the MCVideo
+communication parameter update response to the MCVideo server.
+6\. The MCVideo server sends the MCVideo communication parameter update
+response to the MCVideo client 1 with the result.
+7\. Then, the MCVideo communication applies the new MCVideo communication
+parameters.
+###### ## Annex A (normative): MCVideo related configuration data
+# A.1 General
+This Annex provides information about the static data needed for configuration
+for the MCVideo service, which belongs to one of the following categories:
+\- MCVideo UE configuration data (see subclause A.2);
+\- MCVideo user profile configuration data (see subclause A.3);
+\- MCVideo related group configuration data (see subclause A.4); and
+\- MCVideo service configuration data (see subclause A.5).
+For each configuration category, data is split between configuration data that
+is applicable to both on network and off network, configuration data that is
+applicable to on-network only, and configuration data that is applicable to
+off-network only. The configuration data in each configuration category
+corresponds to a single instance of the category type i.e. the MCVideo UE,
+MCVideo group, MCVideo user and MCVideo service configuration data refers to
+the information that will be stored against each MCVideo UE, MCVideo group,
+MCVideo user and MCVideo service. This means that the three separate tables
+(on-network and off-network, on-network only, off-network only) for each
+configuration category represent the complete set of data for each
+configuration data category element.
+The columns in the tables have the following meanings:
+\- Reference: the reference of the corresponding requirement in 3GPP TS 22.281
+[3] or 3GPP TS 22.280 [2] or the corresponding subclause from either the
+present document or the referenced document.
+\- Parameter description: A short definition of the semantics of the
+corresponding item of data, including denotation of the level of the parameter
+in the configuration hierarchy.
+\- When it is not clear to which functional entities the parameter is
+configured, then one or more columns indicating this are provided where the
+following nomenclature is used:
+\- \"Y\" to denote \"Yes\" i.e. the parameter denoted for the row needs to be
+configured to the functional entity denoted for the column.
+\- \"N\" to denote \"No\" i.e. the parameter denoted for the row does not need
+to be configured to the functional entity denoted for the column.
+Parameters within a set of configuration data have a level within a hierarchy
+that pertains only to that configuration data. The hierarchy of the
+configuration data is common across all three tables of on-network and off-
+network, on network only and off network only. The level of a parameter within
+the hierarchy of the configuration data is denoted by use of the character
+\">\" in the parameter description field within each table, one per level.
+Parameters that are at the top most level within the hierarchy have no \">\"
+character. Parameters that have one or more \">\" characters are child
+parameters of the first parameter above them that has one less \">\"
+character. Parent parameters are parameters that have one or more child
+parameters. Parent parameters act solely as a \"grouping\" of their child
+parameters and therefore do not contain an actual value themselves i.e. they
+are just containers for their child parameters.
+Each parameter that can be configured online shall only be configured through
+one online reference point. Each parameter that can be configured offline
+shall only be configured through one offline reference point. The most recent
+configuration data made available to the MCVideo UE shall always overwrite
+previous configuration data, irrespective of whether the configuration data
+was provided via the online or offline mechanism.
+# A.2 MCVideo UE configuration data
+The general aspects of UE configuration are specified in 3GPP TS 23.280 [6].
+Data in tables A.2-1 and A.2-2 have to be known by the MCVideo UE after
+MCVideo authorization.
+Data in table A.2-1 can be configured offline using the CSC-11 reference
+point. Table A.2-1 contains the UE configuration required to support the use
+of off-network MCVideo service.
+Table A.2-1: UE configuration data (on and off network)
+* * *
+Reference Parameter description [R-5.4.2-002] of 3GPP TS 22.280 [2] Maximum
+number of simultaneous MCVideo group calls (Nc4) [R-5.4.2-003] of 3GPP TS
+22.280 [2] Maximum number of video transmissions (Nc5) in a group
+* * *
+Table A.2-2: UE configuration data (on network)
+* * *
+Reference Parameter description Subclause 5.2.3 of 3GPP TS 23.280 [6] Relay
+service (Y/N) Subclause 5.2.3 of 3GPP TS 23.280 [6] List of allowed relayed
+MCVideo groups and their relay service code (as specified in 3GPP TS 23.303
+[7]) (optional) (see NOTE) > MCVideo group ID > Relay service code (as
+specified in 3GPP TS 23.303 [7]) NOTE: When the value of the parameter Relay
+service is N, this parameter and its child parameters are not needed.
+* * *
+# A.3 MCVideo user profile configuration data
+The general aspects of MC service user profile configuration data are
+specified in 3GPP TS 23.280 [6]. The MCVideo user profile configuration data
+is stored in the MCVideo user database. The MCVideo server obtains the MCVideo
+user profile configuration data from the MCVideo user database (MCVideo-2).
+Tables A.3-1 and A.3-2 contain the MCVideo user profile configuration required
+to support the use of on-network MCVideo service. Tables A.3-1 and A.3-3
+contain the MCVideo user profile configuration required to support the use of
+off-network MCVideo service. Data in table A.3-1 and table A.3-3 can be
+configured offline using the CSC-11 reference point.
+Table A.3-1: MCVideo user profile configuration data (on and off network)
++----------+----------+----------+----------+----------+----------+ | R | P | MCVideo | MCVideo | Confi | MCVideo | | eference | arameter | UE | Server | guration | user | | | des | | | ma | database | | | cription | | | nagement | | | | | | | server | | +----------+----------+----------+----------+----------+----------+ | Subclaus | MCVideo | Y | Y | Y | Y | | e 5.2.11 | identity | | | | | | of | (MCVideo | | | | | | 3GPP | ID) | | | | | | TS 23.2 | | | | | | | 80 [6] | | | | | | +----------+----------+----------+----------+----------+----------+ | 3GPP | KMSUri | Y | Y | Y | Y | | TS 33.18 | for | | | | | | 0 [14] | security | | | | | | | domain | | | | | | | of | | | | | | | MCVideo | | | | | | | ID (see | | | | | | | NOTE 1) | | | | | +----------+----------+----------+----------+----------+----------+ | Subclaus | Pre‑ | Y | Y | Y | Y | | e 5.2.11 | selected | | | | | | of | MCVideo | | | | | | 3GPP | user | | | | | | TS 23.2 | profile | | | | | | 80 [6] | in | | | | | | | dication | | | | | | | (see | | | | | | | NOTE 2) | | | | | +----------+----------+----------+----------+----------+----------+ | Subclaus | MCVideo | Y | Y | Y | Y | | e 5.2.11 | user | | | | | | of | profile | | | | | | 3GPP | index | | | | | | TS 23.2 | | | | | | | 80 [6] | | | | | | +----------+----------+----------+----------+----------+----------+ | Subclaus | MCVideo | Y | Y | Y | Y | | e 5.2.11 | user | | | | | | of | profile | | | | | | 3GPP | name | | | | | | TS 23.2 | | | | | | | 80 [6] | | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5.1 | User | | Y | Y | Y | | 7-007], | profile | | | | | | | status | | | | | | [R-6.13 | (e | | | | | | .4-002] | nabled/d | | | | | | of | isabled) | | | | | | 3GPP | | | | | | | TS 22.2 | | | | | | | 80 [2] | | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5 | Au | | | Y | Y | | .7-001] | thorised | | | | | | | to | | | | | | [R-6 | create | | | | | | .9-003] | and | | | | | | of | delete | | | | | | 3GPP | aliases | | | | | | TS 22.2 | of an | | | | | | 80 [2] | MCVideo | | | | | | | user and | | | | | | | its | | | | | | | as | | | | | | | sociated | | | | | | | user | | | | | | | p | | | | | | | rofiles. | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5. | Alph | Y | Y | Y | Y | | 7-002], | anumeric | | | | | | | aliases | | | | | | [R-6 | of user | | | | | | .9-003] | | | | | | | of | | | | | | | 3GPP | | | | | | | TS 22.2 | | | | | | | 80 [2] | | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5.1. | Par | Y | Y | Y | Y | | 1-005], | ticipant | | | | | | | type of | | | | | | [R-5 | the user | | | | | | .9-001] | | | | | | | of | | | | | | | 3GPP | | | | | | | TS 22.2 | | | | | | | 80 [2] | | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5.1. | User\'s | Y | Y | Y | Y | | 8-006], | Mission | | | | | | | Critical | | | | | | [R-5. | Orga | | | | | | 3-002], | nization | | | | | | | (i.e. | | | | | | [R-5. | which | | | | | | 9-001], | orga | | | | | | | nization | | | | | | \ | a user | | | | | | [R-5.16. | belongs | | | | | | 2-001], | to) | | | | | | | | | | | | | [R-5.16 | | | | | | | .2-002] | | | | | | | of | | | | | | | 3GPP | | | | | | | TS 22.2 | | | | | | | 80 [2] | | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5.2 | Autho | | | Y | Y | | .2-003] | risation | | | | | | of | to | | | | | | 3GPP | create a | | | | | | TS 22.2 | group-b | | | | | | 80 [2] | roadcast | | | | | | | group | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5.2 | Autho | | | Y | Y | | .2-003] | risation | | | | | | of | to | | | | | | 3GPP | create a | | | | | | TS 22.2 | user-b | | | | | | 80 [2] | roadcast | | | | | | | group | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Au | Y | Y | Y | Y | | -5.6.2.4 | thorised | | | | | | .1-002] | to | | | | | | of | activate | | | | | | 3GPP | MCVideo | | | | | | TS 22.2 | e | | | | | | 80 [2] | mergency | | | | | | | alert | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Autom | Y | Y | Y | Y | | -5.6.2.4 | atically | | | | | | .1-013] | trigger | | | | | | of | a | | | | | | 3GPP | MCVideo | | | | | | TS 22.28 | e | | | | | | 0 [17] | mergency | | | | | | | commu | | | | | | | nication | | | | | | | after | | | | | | | in | | | | | | | itiating | | | | | | | the | | | | | | | MCVideo | | | | | | | e | | | | | | | mergency | | | | | | | alert | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Group | Y | Y | Y | Y | | -5.6.2.4 | used on | | | | | | .1-004] | in | | | | | | | itiation | | | | | | [R | of an | | | | | | -5.6.2.4 | MCVideo | | | | | | .1-008] | e | | | | | | | mergency | | | | | | [R | group | | | | | | -5.6.2.4 | call | | | | | | .1-012] | (see | | | | | | of | NOTE 5) | | | | | | 3GPP | | | | | | | TS 22.2 | | | | | | | 80 [2] | | | | | | +----------+----------+----------+----------+----------+----------+ | [R- | R | | | | | | 5.6.2.4. | ecipient | | | | | | 1-004], | for an | | | | | | | e | | | | | | [R- | mergency | | | | | | 5.6.2.4. | private | | | | | | 1-008], | MCVideo | | | | | | | call | | | | | | [R | (see | | | | | | -5.6.2.4 | NOTE 5) | | | | | | .1-012] | | | | | | | of | | | | | | | 3GPP | | | | | | | TS 22.28 | | | | | | | 0 [17] | | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | Y | Y | Y | | | MCVideo | | | | | | | ID | | | | | +----------+----------+----------+----------+----------+----------+ | 3GPP | > | Y | Y | Y | Y | | TS 33.18 | KMSUri | | | | | | 0 [19] | for | | | | | | | security | | | | | | | domain | | | | | | | of | | | | | | | MCVideo | | | | | | | ID (see | | | | | | | NOTE 1) | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Autho | Y | Y | Y | Y | | -5.6.2.4 | risation | | | | | | .2-002] | to | | | | | | of | cancel | | | | | | 3GPP | an | | | | | | TS 22.2 | MCVideo | | | | | | 80 [2] | e | | | | | | | mergency | | | | | | | alert | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Autho | Y | Y | Y | Y | | -5.1.2.1 | risation | | | | | | .2-004] | to | | | | | | of | modify | | | | | | 3GPP | the | | | | | | TS 22.2 | video | | | | | | 81 [3] | settings | | | | | | | of the | | | | | | | tra | | | | | | | nsmitted | | | | | | | video | | | | | | | stream | | | | | | | of | | | | | | | another | | | | | | | MCVideo | | | | | | | User | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Autho | Y | Y | Y | Y | | -5.1.2.1 | risation | | | | | | .2-006] | to | | | | | | of | ren | | | | | | 3GPP | egotiate | | | | | | TS 22.2 | a codec | | | | | | 81 [3] | during a | | | | | | | video | | | | | | | trans | | | | | | | mission. | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Autho | Y | Y | Y | Y | | -5.1.2.1 | risation | | | | | | .2-007] | to | | | | | | of | remotely | | | | | | 3GPP | control | | | | | | TS 22.2 | the | | | | | | 81 [3] | video | | | | | | | capa | | | | | | | bilities | | | | | | | or | | | | | | | pa | | | | | | | rameters | | | | | | | for a | | | | | | | camera | | | | | | | on an | | | | | | | MCVideo | | | | | | | UE | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Autho | Y | Y | Y | Y | | -5.1.2.2 | risation | | | | | | .2-001] | to | | | | | | of | remotely | | | | | | 3GPP | control | | | | | | TS 22.2 | the | | | | | | 81 [3] | video | | | | | | | capa | | | | | | | bilities | | | | | | | or | | | | | | | pa | | | | | | | rameters | | | | | | | of a | | | | | | | remote | | | | | | | MCVideo | | | | | | | UE | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Autho | Y | Y | Y | Y | | -5.1.2.2 | risation | | | | | | .2-004] | to | | | | | | of | receive | | | | | | 3GPP | and | | | | | | TS 22.2 | display | | | | | | 81 [3] | the | | | | | | | capa | | | | | | | bilities | | | | | | | of a | | | | | | | remote | | | | | | | MCVideo | | | | | | | UE | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Autho | Y | Y | Y | Y | | -5.1.3.1 | risation | | | | | | .2-004] | to | | | | | | of | remotely | | | | | | 3GPP | activate | | | | | | TS 22.2 | another | | | | | | 81 [3] | MCVideo | | | | | | | User\'s | | | | | | | camera | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Autho | Y | Y | Y | Y | | -5.1.9.2 | risation | | | | | | .2-002] | to push | | | | | | of | a video | | | | | | 3GPP | to | | | | | | TS 22.2 | another | | | | | | 81 [3] | MCVideo | | | | | | | user . | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Autho | Y | Y | Y | Y | | -5.1.9.2 | risation | | | | | | .2-003] | to | | | | | | of | enable | | | | | | 3GPP | and to | | | | | | TS 22.2 | disable | | | | | | 81 [3] | the | | | | | | | a | | | | | | | utomatic | | | | | | | sending | | | | | | | of | | | | | | | noti | | | | | | | fication | | | | | | | to a | | | | | | | second | | | | | | | MCVideo | | | | | | | User | | | | | | | that a | | | | | | | video is | | | | | | | being | | | | | | | pushed | | | | | | | to a | | | | | | | third | | | | | | | MCVideo | | | | | | | User | | | | | +----------+----------+----------+----------+----------+----------+ | [R | List of | Y | Y | Y | Y | | -5.1.9.2 | MCVideo | | | | | | .2-004] | users | | | | | | of | for whom | | | | | | 3GPP | to | | | | | | TS 22.2 | receive | | | | | | 81 [3] | notif | | | | | | | ications | | | | | | | about | | | | | | | video | | | | | | | being | | | | | | | pushed | | | | | | | to them | | | | | +----------+----------+----------+----------+----------+----------+ | | > | | | | | | | MCVideo | | | | | | | IDs | | | | | +----------+----------+----------+----------+----------+----------+ | [R | List of | Y | Y | Y | Y | | -5.1.9.2 | specific | | | | | | .2-005] | video | | | | | | of | ca | | | | | | 3GPP | tegories | | | | | | TS 22.2 | to | | | | | | 81 [3] | receive | | | | | | | (see | | | | | | | NOTE 3) | | | | | +----------+----------+----------+----------+----------+----------+ | | > Video | | | | | | | ca | | | | | | | tegories | | | | | +----------+----------+----------+----------+----------+----------+ | [R-6.7 | List of | | | | | | .3-007] | user(s) | | | | | | of | who can | | | | | | 3GPP | be | | | | | | TS 22.2 | called | | | | | | 80 [2] | in | | | | | | | MCVideo | | | | | | | private | | | | | | | call | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | Y | Y | Y | | | MCVideo | | | | | | | ID | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | Y | Y | Y | | | Pres | | | | | | | entation | | | | | | | priority | | | | | | | relative | | | | | | | to other | | | | | | | users | | | | | | | and | | | | | | | groups | | | | | | | (see | | | | | | | NOTE 4) | | | | | +----------+----------+----------+----------+----------+----------+ | 3GPP T | > | Y | Y | Y | Y | | S 33.180 | KMSUri | | | | | | | for | | | | | | | security | | | | | | | domain | | | | | | | of | | | | | | | MCVideo | | | | | | | ID (see | | | | | | | NOTE 1) | | | | | +----------+----------+----------+----------+----------+----------+ | [R-6.7 | Au | Y | Y | Y | Y | | .3-007] | thorised | | | | | | of | to make | | | | | | 3GPP | a | | | | | | TS 22.2 | private | | | | | | 80 [2] | video | | | | | | | call | | | | | | | towards | | | | | | | users | | | | | | | not | | | | | | | included | | | | | | | in | | | | | | | \"list | | | | | | | of | | | | | | | user(s) | | | | | | | who can | | | | | | | be | | | | | | | called | | | | | | | in | | | | | | | MCVideo | | | | | | | private | | | | | | | call\" | | | | | +----------+----------+----------+----------+----------+----------+ | [ | List of | | | | | | R-5.1.10 | category | | | | | | .2-002] | tags | | | | | | of | | | | | | | 3GPP | | | | | | | TS 22.2 | | | | | | | 81 [3] | | | | | | +----------+----------+----------+----------+----------+----------+ | | > Video | Y | Y | Y | Y | | | category | | | | | | | tag | | | | | +----------+----------+----------+----------+----------+----------+ | [ | Autho | Y | Y | Y | Y | | R-5.1.10 | rization | | | | | | .2-002] | to query | | | | | | of | MCVideo | | | | | | 3GPP | client | | | | | | TS 22.2 | | | | | | | 81 [3] | | | | | | +----------+----------+----------+----------+----------+----------+ | [R | List of | | | | | | -5.1.3.2 | category | | | | | | .2-004] | tags | | | | | | | that | | | | | | [ | au | | | | | | R-5.1.10 | thorized | | | | | | .2-002] | to query | | | | | | of | MCVideo | | | | | | 3GPP | client | | | | | | TS 22.2 | | | | | | | 81 [3] | | | | | | +----------+----------+----------+----------+----------+----------+ | | > Video | Y | Y | Y | Y | | | category | | | | | | | tag for | | | | | | | query | | | | | +----------+----------+----------+----------+----------+----------+ | [R | List of | | | | | | -5.1.3.2 | g | | | | | | .2-004] | eography | | | | | | | areas | | | | | | [ | that | | | | | | R-5.1.10 | au | | | | | | .2-002] | thorized | | | | | | of | to query | | | | | | 3GPP | MCVideo | | | | | | TS 22.2 | client | | | | | | 81 [3] | | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | Y | Y | Y | | | G | | | | | | | eography | | | | | | | area to | | | | | | | query | | | | | +----------+----------+----------+----------+----------+----------+ | \ | Autho | Y | Y | Y | Y | | [R-5.1.1 | rization | | | | | | .1-015] | to | | | | | | of | perform | | | | | | 3GPP | video | | | | | | TS 22.2 | ad | | | | | | 81 [3] | aptation | | | | | +----------+----------+----------+----------+----------+----------+ | NOTE 1: | | | | | | | If this | | | | | | | p | | | | | | | arameter | | | | | | | is | | | | | | | absent, | | | | | | | the | | | | | | | KMSUri | | | | | | | shall be | | | | | | | that | | | | | | | id | | | | | | | entified | | | | | | | in the | | | | | | | initial | | | | | | | MC | | | | | | | service | | | | | | | UE | | | | | | | confi | | | | | | | guration | | | | | | | data | | | | | | | (on- | | | | | | | network) | | | | | | | co | | | | | | | nfigured | | | | | | | in table | | | | | | | A.6-1 of | | | | | | | 3GPP | | | | | | | TS 23.28 | | | | | | | 0 [6]. | | | | | | | | | | | | | | NOTE 2: | | | | | | | As | | | | | | | s | | | | | | | pecified | | | | | | | in | | | | | | | 3GPP | | | | | | | TS 23.28 | | | | | | | 0 [6], | | | | | | | for each | | | | | | | MCVideo | | | | | | | user\'s | | | | | | | set of | | | | | | | MCVideo | | | | | | | user | | | | | | | p | | | | | | | rofiles, | | | | | | | only one | | | | | | | MCVideo | | | | | | | user | | | | | | | profile | | | | | | | shall be | | | | | | | i | | | | | | | ndicated | | | | | | | as being | | | | | | | the | | | | | | | pre‑ | | | | | | | selected | | | | | | | MCVideo | | | | | | | user | | | | | | | profile. | | | | | | | | | | | | | | NOTE 3: | | | | | | | If this | | | | | | | list is | | | | | | | blank | | | | | | | then | | | | | | | this | | | | | | | implies | | | | | | | that all | | | | | | | video | | | | | | | ca | | | | | | | tegories | | | | | | | are | | | | | | | ac | | | | | | | ceptable | | | | | | | for the | | | | | | | MCVideo | | | | | | | user. | | | | | | | | | | | | | | NOTE 4: | | | | | | | The use | | | | | | | of this | | | | | | | p | | | | | | | arameter | | | | | | | by the | | | | | | | MCVideo | | | | | | | UE is | | | | | | | outside | | | | | | | the | | | | | | | scope of | | | | | | | the | | | | | | | present | | | | | | | d | | | | | | | ocument. | | | | | | | | | | | | | | NOTE 5: | | | | | | | This | | | | | | | p | | | | | | | arameter | | | | | | | is used | | | | | | | for the | | | | | | | e | | | | | | | mergency | | | | | | | commu | | | | | | | nication | | | | | | | and also | | | | | | | used as | | | | | | | a target | | | | | | | of the | | | | | | | e | | | | | | | mergency | | | | | | | alert | | | | | | | request. | | | | | | | At most | | | | | | | one of | | | | | | | them is | | | | | | | con | | | | | | | figured; | | | | | | | i.e. | | | | | | | e | | | | | | | mergency | | | | | | | commu | | | | | | | nication | | | | | | | will go | | | | | | | to | | | | | | | either a | | | | | | | group or | | | | | | | a user. | | | | | | | If both | | | | | | | are not | | | | | | | co | | | | | | | nfigured | | | | | | | the | | | | | | | MCVideo | | | | | | | user\'s | | | | | | | c | | | | | | | urrently | | | | | | | selected | | | | | | | group | | | | | | | will be | | | | | | | used. | | | | | | +----------+----------+----------+----------+----------+----------+
+Table A.3-2: MCVideo user profile configuration data (on network)
++----------+----------+----------+----------+----------+----------+ | R | P | MCVideo | MCVideo | Confi | MCVideo | | eference | arameter | UE | Server | guration | user | | | des | | | ma | database | | | cription | | | nagement | | | | | | | server | | +----------+----------+----------+----------+----------+----------+ | [R-5.1. | List of | | | | | | 5-001], | on | | | | | | | -network | | | | | | [R-5.1. | MCVideo | | | | | | 5-002], | groups | | | | | | | for use | | | | | | [R-5.1 | by an | | | | | | 0-001], | MCVideo | | | | | | | user | | | | | | [R-6.4. | | | | | | | 7-002], | | | | | | | | | | | | | | [R-6.8. | | | | | | | 1-008], | | | | | | | | | | | | | | [R-6.7 | | | | | | | .4-002] | | | | | | | of | | | | | | | 3GPP | | | | | | | TS 22.2 | | | | | | | 80 [2] | | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | Y | Y | Y | | | MCVideo | | | | | | | Group ID | | | | | +----------+----------+----------+----------+----------+----------+ | | > | | | | | | | App | | | | | | | lication | | | | | | | plane | | | | | | | server | | | | | | | identity | | | | | | | inf | | | | | | | ormation | | | | | | | of group | | | | | | | ma | | | | | | | nagement | | | | | | | server | | | | | | | where | | | | | | | group is | | | | | | | defined | | | | | +----------+----------+----------+----------+----------+----------+ | | >> | Y | Y | Y | Y | | | Server | | | | | | | URI | | | | | +----------+----------+----------+----------+----------+----------+ | | > | | | | | | | App | | | | | | | lication | | | | | | | plane | | | | | | | server | | | | | | | identity | | | | | | | inf | | | | | | | ormation | | | | | | | of | | | | | | | identity | | | | | | | ma | | | | | | | nagement | | | | | | | server | | | | | | | which | | | | | | | provides | | | | | | | autho | | | | | | | rization | | | | | | | for | | | | | | | group | | | | | | | (see | | | | | | | NOTE 1) | | | | | +----------+----------+----------+----------+----------+----------+ | | >> | Y | Y | Y | Y | | | Server | | | | | | | URI | | | | | +----------+----------+----------+----------+----------+----------+ | 3GPP T | > | Y | Y | Y | Y | | S 33.180 | KMSUri | | | | | | [14] | for | | | | | | | security | | | | | | | domain | | | | | | | of group | | | | | | | (see | | | | | | | NOTE 4) | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | Y | Y | Y | | | Pres | | | | | | | entation | | | | | | | priority | | | | | | | of the | | | | | | | group | | | | | | | relative | | | | | | | to other | | | | | | | groups | | | | | | | and | | | | | | | users | | | | | | | (see | | | | | | | NOTE 2) | | | | | +----------+----------+----------+----------+----------+----------+ | Subclau | List of | | | | | | se 5.2.5 | groups | | | | | | of | user | | | | | | 3GPP | im | | | | | | TS 23.2 | plicitly | | | | | | 80 [6] | af | | | | | | | filiates | | | | | | | to after | | | | | | | MCVideo | | | | | | | service | | | | | | | autho | | | | | | | rization | | | | | | | for the | | | | | | | user | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | Y | Y | Y | | | MCVideo | | | | | | | Group ID | | | | | +----------+----------+----------+----------+----------+----------+ | [R-6.4 | Autho | | Y | Y | Y | | .2-006] | risation | | | | | | of | of an | | | | | | 3GPP | MCVideo | | | | | | TS 22.2 | user to | | | | | | 80 [2] | request | | | | | | | a list | | | | | | | of which | | | | | | | MCVideo | | | | | | | groups a | | | | | | | user has | | | | | | | af | | | | | | | filiated | | | | | | | to | | | | | +----------+----------+----------+----------+----------+----------+ | [ | Autho | | Y | Y | Y | | R-6.4.6. | risation | | | | | | 1-002], | to | | | | | | | change | | | | | | \ | af | | | | | | [R-6.4.6 | filiated | | | | | | .1-003] | groups | | | | | | of | of other | | | | | | 3GPP | s | | | | | | TS 22.2 | pecified | | | | | | 80 [2] | user(s) | | | | | +----------+----------+----------+----------+----------+----------+ | [ | Autho | | Y | Y | Y | | R-6.4.6. | risation | | | | | | 2-001], | to | | | | | | | r | | | | | | \ | ecommend | | | | | | [R-6.4.6 | to | | | | | | .2-002] | s | | | | | | of | pecified | | | | | | 3GPP | user(s) | | | | | | TS 22.2 | to | | | | | | 80 [2] | a | | | | | | | ffiliate | | | | | | | to | | | | | | | specific | | | | | | | group(s) | | | | | +----------+----------+----------+----------+----------+----------+ | [R-6.6 | Autho | Y | Y | Y | Y | | .1-004] | risation | | | | | | of | to | | | | | | 3GPP | perform | | | | | | TS 22.2 | re | | | | | | 80 [2] | grouping | | | | | +----------+----------+----------+----------+----------+----------+ | [R-6.7 | Presence | Y | Y | Y | Y | | .2-001] | status | | | | | | of | is | | | | | | 3GPP | avail | | | | | | TS 22.2 | able/not | | | | | | 80 [2] | a | | | | | | | vailable | | | | | | | to other | | | | | | | users | | | | | +----------+----------+----------+----------+----------+----------+ | [R-6.7. | List of | | | | | | 1-002], | MCVideo | | | | | | | users | | | | | | [R-6.7 | that | | | | | | .2-002] | MCVideo | | | | | | of | user is | | | | | | 3GPP | au | | | | | | TS 22.2 | thorised | | | | | | 80 [2] | to | | | | | | | obtain | | | | | | | presence | | | | | | | of | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | Y | Y | Y | | | MCVideo | | | | | | | IDs | | | | | +----------+----------+----------+----------+----------+----------+ | [R-6 | Autho | | Y | Y | Y | | .8.7.4.2 | risation | | | | | | -001],\ | of a | | | | | | [R | user to | | | | | | -6.8.7.4 | cancel | | | | | | .2-002] | an | | | | | | of | e | | | | | | 3GPP | mergency | | | | | | TS 22.2 | alert on | | | | | | 80 [2] | any | | | | | | | MCVideo | | | | | | | UE of | | | | | | | any user | | | | | +----------+----------+----------+----------+----------+----------+ | [R-6.13 | Autho | | Y | Y | Y | | .4-001] | risation | | | | | | of | for an | | | | | | 3GPP | MCVideo | | | | | | TS 22.2 | user to | | | | | | 80 [2] | enable | | | | | | | /disable | | | | | | | an | | | | | | | MCVideo | | | | | | | user | | | | | +----------+----------+----------+----------+----------+----------+ | [ | Autho | | Y | Y | Y | | R-6.13.4 | risation | | | | | | -003],\ | for an | | | | | | [ | MCVideo | | | | | | R-6.13.4 | user to | | | | | | -005],\ | (per | | | | | | [ | manently | | | | | | R-6.13.4 | /temp | | | | | | -006],\ | orarily) | | | | | | [R-6.13 | enable | | | | | | .4-007] | /disable | | | | | | of | a UE | | | | | | 3GPP | | | | | | | TS 22.2 | | | | | | | 80 [2] | | | | | | +----------+----------+----------+----------+----------+----------+ | [R-7.1 | Autho | Y | Y | Y | Y | | 4-002], | rization | | | | | | | for | | | | | | [R-7. | manual | | | | | | 14-003] | switch | | | | | | of | to | | | | | | 3GPP | off | | | | | | TS 22.2 | -network | | | | | | 80 [2] | while in | | | | | | | on | | | | | | | -network | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5.1 | Li | N | Y | Y | Y | | .5-004] | mitation | | | | | | of | of | | | | | | 3GPP | number | | | | | | TS 22.2 | of | | | | | | 80 [2] | affi | | | | | | | liations | | | | | | | per user | | | | | | | (Nc2) | | | | | +----------+----------+----------+----------+----------+----------+ | [ | List of | | | | | | R-6.4.6. | MCVideo | | | | | | 1-001], | users | | | | | | | whose | | | | | | \ | selected | | | | | | [R-6.4.6 | groups | | | | | | .1-004] | are | | | | | | of | au | | | | | | 3GPP | thorized | | | | | | TS 22.2 | to be | | | | | | 80 [2] | remotely | | | | | | | changed | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | Y | Y | Y | | | MCVideo | | | | | | | ID | | | | | +----------+----------+----------+----------+----------+----------+ | [ | Period | Y | Y | Y | Y | | R-5.2.3. | after | | | | | | 2-002], | which | | | | | | | MCVideo | | | | | | \ | data on | | | | | | [R-5.2.3 | a | | | | | | .2-003] | MCVideo | | | | | | of | UE is to | | | | | | 3GPP | be | | | | | | TS 22.2 | deleted | | | | | | 81 [3] | if no | | | | | | | action | | | | | | | is taken | | | | | | | by an | | | | | | | au | | | | | | | thorized | | | | | | | MCVideo | | | | | | | user | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Maximum | Y | Y | Y | Y | | -5.2.6.2 | number | | | | | | .2-004] | of | | | | | | of | simu | | | | | | 3GPP | ltaneous | | | | | | TS 22.2 | video | | | | | | 81 [3] | streams | | | | | | | that can | | | | | | | be | | | | | | | received | | | | | | | (see | | | | | | | NOTE 3) | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Autho | Y | Y | Y | Y | | -5.2.6.2 | risation | | | | | | .2-005] | to | | | | | | of | autom | | | | | | 3GPP | atically | | | | | | TS 22.2 | receive | | | | | | 81 [3] | video | | | | | | | commun | | | | | | | ications | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Autho | Y | Y | Y | Y | | -5.2.6.2 | risation | | | | | | .2-006] | to | | | | | | of | autom | | | | | | 3GPP | atically | | | | | | TS 22.2 | receive | | | | | | 81 [3] | e | | | | | | | mergency | | | | | | | video | | | | | | | streams | | | | | +----------+----------+----------+----------+----------+----------+ | [R | Autho | Y | Y | Y | Y | | -5.2.6.2 | risation | | | | | | .2-007] | to | | | | | | of | autom | | | | | | 3GPP | atically | | | | | | TS 22.2 | receive | | | | | | 81 [3] | imminent | | | | | | | peril | | | | | | | video | | | | | | | streams | | | | | +----------+----------+----------+----------+----------+----------+ | [R | List of | | | | | | -5.2.6.2 | MCVideo | | | | | | .2-008] | groups | | | | | | of | for | | | | | | 3GPP | which | | | | | | TS 22.2 | video | | | | | | 81 [3] | can be | | | | | | | a | | | | | | | utomatic | | | | | | | ally/man | | | | | | | datorily | | | | | | | received | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | Y | Y | Y | | | MCVideo | | | | | | | group | | | | | | | IDs | | | | | +----------+----------+----------+----------+----------+----------+ | \ | Autho | Y | Y | Y | Y | | [R-5.2.7 | risation | | | | | | .2-001] | to | | | | | | of | request | | | | | | 3GPP | to | | | | | | TS 22.2 | override | | | | | | 81 [3] | an | | | | | | | active | | | | | | | MCVideo | | | | | | | tran | | | | | | | smission | | | | | +----------+----------+----------+----------+----------+----------+ | \ | Autho | Y | Y | Y | Y | | [R-5.2.7 | risation | | | | | | .2-002] | to | | | | | | of | select | | | | | | 3GPP | MCVideo | | | | | | TS 22.2 | trans | | | | | | 81 [3] | missions | | | | | | | that can | | | | | | | be | | | | | | | ov | | | | | | | erridden | | | | | +----------+----------+----------+----------+----------+----------+ | \ | Autho | Y | Y | Y | Y | | [R-5.2.7 | risation | | | | | | .2-004] | to allow | | | | | | of | MCVideo | | | | | | 3GPP | private | | | | | | TS 22.2 | commun | | | | | | 81 [3] | ications | | | | | | | to | | | | | | | override | | | | | | | or not | | | | | | | to | | | | | | | override | | | | | | | active | | | | | | | MCVideo | | | | | | | group | | | | | | | commun | | | | | | | ications | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5.2. | Maximum | Y | Y | Y | Y | | 8-005], | length | | | | | | | of time | | | | | | [R-5.2 | of a | | | | | | .8-006] | single | | | | | | of | video | | | | | | 3GPP | tran | | | | | | TS 22.2 | smission | | | | | | 81 [3] | | | | | | +----------+----------+----------+----------+----------+----------+ | [R-6.7. | List of | | | | | | 3-007a] | user(s) | | | | | | of | from | | | | | | 3GPP | which | | | | | | TS 22.2 | MCVideo | | | | | | 80 [2] | private | | | | | | | calls | | | | | | | can be | | | | | | | received | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | Y | Y | Y | | | MCVideo | | | | | | | ID | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | Y | Y | Y | | | Pres | | | | | | | entation | | | | | | | priority | | | | | | | relative | | | | | | | to other | | | | | | | users | | | | | | | and | | | | | | | groups | | | | | +----------+----------+----------+----------+----------+----------+ | 3GPP | > | Y | Y | Y | Y | | TS 33.18 | KMSUri | | | | | | 0 [18] | for | | | | | | | security | | | | | | | domain | | | | | | | of | | | | | | | MCVideo | | | | | | | ID | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5. | Au | | Y | Y | Y | | 9a-012] | thorised | | | | | | of | to | | | | | | 3GPP | request | | | | | | TS 22.2 | ass | | | | | | 80 [2] | ociation | | | | | | | between | | | | | | [R-5. | active | | | | | | 9a-013] | fu | | | | | | of | nctional | | | | | | 3GPP | a | | | | | | TS 22.2 | lias(es) | | | | | | 80 [2] | and | | | | | | | MCVideo | | | | | | | ID(s) | | | | | +----------+----------+----------+----------+----------+----------+ | S | List of | | | | | | ubclause | partner | | | | | | 5.2.9 of | MCVideo | | | | | | * | systems | | | | | | _3GPP TS | in which | | | | | | 23.280 | this | | | | | | [16]__| profile | | | | | | | is valid | | | | | | | for use | | | | | | | during | | | | | | | m | | | | | | | igration | | | | | +----------+----------+----------+----------+----------+----------+ | S | > | Y | N | Y | Y | | ubclause | Identity | | | | | | 5.2.9 of | of | | | | | | * | partner | | | | | | _3GPP TS | MCVideo | | | | | | 23.280 | system | | | | | | [16]**| | | | | | +----------+----------+----------+----------+----------+----------+ | S | > | Y | N | Y | Y | | ubclause | Access | | | | | | 10.1.1 | inf | | | | | | of | ormation | | | | | | * | for | | | | | | *3GPP TS | partner | | | | | | 23.280 | MCVideo | | | | | | [16]** | system | | | | | | | (see | | | | | | | NOTE 5) | | | | | +----------+----------+----------+----------+----------+----------+ | [ | List of | | | | | | R-6.6.4. | groups | | | | | | 2-002a] | the | | | | | | and | client | | | | | | [ | affiliat | | | | | | R-6.6.4. | es/de-af | | | | | | 2-002b] | filiates | | | | | | of 3GPP | when | | | | | | TS | criteria | | | | | | 22.280 | is met | | | | | | [2] | | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | Y | Y | Y | | | MCVideo | | | | | | | Group ID | | | | | +----------+----------+----------+----------+----------+----------+ | | >> | Y | Y | Y | Y | | | Criteria | | | | | | | for | | | | | | | aff | | | | | | | iliation | | | | | | | (see | | | | | | | NOTE 7) | | | | | +----------+----------+----------+----------+----------+----------+ | | >> | Y | Y | Y | Y | | | Criteria | | | | | | | for | | | | | | | de-aff | | | | | | | iliation | | | | | | | (see | | | | | | | NOTE 7) | | | | | +----------+----------+----------+----------+----------+----------+ | | >> | Y | Y | Y | Y | | | Manual | | | | | | | de-aff | | | | | | | iliation | | | | | | | is not | | | | | | | allowed | | | | | | | if the | | | | | | | criteria | | | | | | | for | | | | | | | aff | | | | | | | iliation | | | | | | | are met | | | | | +----------+----------+----------+----------+----------+----------+ | \ | List of | | | | | | [R-6.6.4 | groups | | | | | | .2-002] | the | | | | | | of 3GPP | client | | | | | | TS | af | | | | | | 22.280 | filiates | | | | | | [2] | after | | | | | | | r | | | | | | | eceiving | | | | | | | an | | | | | | | e | | | | | | | mergency | | | | | | | alert | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | Y | Y | Y | | | MCVideo | | | | | | | Group ID | | | | | +----------+----------+----------+----------+----------+----------+ | | >> | Y | Y | Y | Y | | | Manual | | | | | | | de-aff | | | | | | | iliation | | | | | | | is not | | | | | | | allowed | | | | | | | if the | | | | | | | criteria | | | | | | | for | | | | | | | aff | | | | | | | iliation | | | | | | | are met | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5. | Au | N | Y | Y | Y | | 9a-012] | thorised | | | | | | of 3GPP | to take | | | | | | TS | over a | | | | | | 22.280 | fu | | | | | | [2] | nctional | | | | | | | alias | | | | | | | from | | | | | | | another | | | | | | | MCVideo | | | | | | | user | | | | | +----------+----------+----------+----------+----------+----------+ | | List of | | | | | | | fu | | | | | | | nctional | | | | | | | a | | | | | | | lias(es) | | | | | | | of the | | | | | | | MCVideo | | | | | | | user | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5. | > | Y | Y | Y | Y | | 9a-005] | Fu | | | | | | of 3GPP | nctional | | | | | | TS | alias | | | | | | 22.280 | | | | | | | [2] | | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5. | >> | N | Y | Y | Y | | 9a-018] | MCVideo | | | | | | of 3GPP | server | | | | | | TS 22.2 | trigger | | | | | | 80 [2] | criteria | | | | | | | for | | | | | | | ac | | | | | | | tivation | | | | | | | (see | | | | | | | NOTE 6) | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5.9 | >> | N | Y | Y | Y | | a-017], | MCVideo | | | | | | [R-5. | server | | | | | | 9a-018] | trigger | | | | | | of | criteria | | | | | | 3GPP TS | for | | | | | | 22.2 | de-ac | | | | | | 80 [2] | tivation | | | | | | | (see | | | | | | | NOTE 6) | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5. | >> | Y | Y | Y | Y | | 9a-019] | MCVideo | | | | | | of | client | | | | | | 3GPP | trigger | | | | | | TS 22.28 | criteria | | | | | | 0 [16] | for | | | | | | | ac | | | | | | | tivation | | | | | | | (see | | | | | | | NOTE 6) | | | | | +----------+----------+----------+----------+----------+----------+ | [R-5. | >> | Y | Y | Y | Y | | 9a-019] | MCVideo | | | | | | of | client | | | | | | 3GPP | trigger | | | | | | TS 22.28 | criteria | | | | | | 0 [16] | for | | | | | | | de-ac | | | | | | | tivation | | | | | | | (see | | | | | | | NOTE 6) | | | | | +----------+----------+----------+----------+----------+----------+ | | >> | Y | Y | Y | Y | | | Manual | | | | | | | de-ac | | | | | | | tivation | | | | | | | is not | | | | | | | allowed | | | | | | | if the | | | | | | | criteria | | | | | | | are met | | | | | | | (see | | | | | | | NOTE 6) | | | | | +----------+----------+----------+----------+----------+----------+ | NOTE 1: | | | | | | | If this | | | | | | | p | | | | | | | arameter | | | | | | | is not | | | | | | | con | | | | | | | figured, | | | | | | | autho | | | | | | | rization | | | | | | | to use | | | | | | | the | | | | | | | group | | | | | | | shall be | | | | | | | obtained | | | | | | | from the | | | | | | | identity | | | | | | | ma | | | | | | | nagement | | | | | | | server | | | | | | | id | | | | | | | entified | | | | | | | in the | | | | | | | initial | | | | | | | MC | | | | | | | service | | | | | | | UE | | | | | | | confi | | | | | | | guration | | | | | | | data | | | | | | | (on- | | | | | | | network) | | | | | | | co | | | | | | | nfigured | | | | | | | in table | | | | | | | A.6-1 of | | | | | | | 3GPP | | | | | | | TS 23.28 | | | | | | | 0 [6]. | | | | | | | | | | | | | | NOTE 2: | | | | | | | The use | | | | | | | of this | | | | | | | p | | | | | | | arameter | | | | | | | by the | | | | | | | MCVideo | | | | | | | UE is | | | | | | | outside | | | | | | | the | | | | | | | scope of | | | | | | | the | | | | | | | present | | | | | | | d | | | | | | | ocument. | | | | | | | | | | | | | | NOTE 3: | | | | | | | The | | | | | | | p | | | | | | | arameter | | | | | | | can be | | | | | | | set to | | | | | | | an | | | | | | | u | | | | | | | nlimited | | | | | | | number | | | | | | | of | | | | | | | simu | | | | | | | ltaneous | | | | | | | streams | | | | | | | received | | | | | | | that can | | | | | | | be | | | | | | | r | | | | | | | eceived. | | | | | | | | | | | | | | NOTE 4: | | | | | | | If this | | | | | | | p | | | | | | | arameter | | | | | | | is | | | | | | | absent, | | | | | | | the | | | | | | | KMSUri | | | | | | | shall be | | | | | | | that | | | | | | | id | | | | | | | entified | | | | | | | in the | | | | | | | initial | | | | | | | MC | | | | | | | service | | | | | | | UE | | | | | | | confi | | | | | | | guration | | | | | | | data | | | | | | | (on- | | | | | | | network) | | | | | | | co | | | | | | | nfigured | | | | | | | in table | | | | | | | A.6-1 of | | | | | | | 3GPP | | | | | | | TS 23.28 | | | | | | | 0 [6]. | | | | | | | | | | | | | | NOTE 5: | | | | | | | Access | | | | | | | inf | | | | | | | ormation | | | | | | | for each | | | | | | | partner | | | | | | | MCVideo | | | | | | | system | | | | | | | c | | | | | | | omprises | | | | | | | the list | | | | | | | of | | | | | | | inf | | | | | | | ormation | | | | | | | required | | | | | | | for | | | | | | | initial | | | | | | | UE | | | | | | | confi | | | | | | | guration | | | | | | | to | | | | | | | access | | | | | | | an | | | | | | | MCVideo | | | | | | | system, | | | | | | | as | | | | | | | defined | | | | | | | in table | | | | | | | A.6-1 of | | | | | | | * | | | | | | | _3GPP TS | | | | | | | 23.280 | | | | | | | [16]_ * | | | | | | | | | | | | | | NOTE 6: | | | | | | | The | | | | | | | criteria | | | | | | | may | | | | | | | consist | | | | | | | of | | | | | | | co | | | | | | | nditions | | | | | | | like the | | | | | | | location | | | | | | | of the | | | | | | | MCVideo | | | | | | | user, | | | | | | | local | | | | | | | time | | | | | | | etc. | | | | | | | | | | | | | | NOTE 7: | | | | | | | The | | | | | | | criteria | | | | | | | may | | | | | | | consist | | | | | | | of | | | | | | | co | | | | | | | nditions | | | | | | | such as | | | | | | | the | | | | | | | location | | | | | | | of the | | | | | | | MCVideo | | | | | | | user or | | | | | | | the | | | | | | | active | | | | | | | fu | | | | | | | nctional | | | | | | | alias of | | | | | | | the | | | | | | | MCVideo | | | | | | | user. | | | | | | +----------+----------+----------+----------+----------+----------+
+Table A.3-3: MCVideo user profile configuration data (off network)
++----------+----------+----------+----------+----------+----------+ | R | P | MCVideo | MCVideo | Confi | MCVideo | | eference | arameter | UE | Server | guration | user | | | des | | | ma | database | | | cription | | | nagement | | | | | | | server | | +----------+----------+----------+----------+----------+----------+ | [R-7. | List of | | | | | | 2-003], | off | | | | | | | -network | | | | | | [R-7 | MCVideo | | | | | | .6-004] | groups | | | | | | of | for use | | | | | | 3GPP | by an | | | | | | TS 22.2 | MCVideo | | | | | | 80 [2] | user | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | N | Y | Y | | | MCVideo | | | | | | | Group | | | | | | | IDs | | | | | +----------+----------+----------+----------+----------+----------+ | | > | | | | | | | App | | | | | | | lication | | | | | | | plane | | | | | | | server | | | | | | | identity | | | | | | | inf | | | | | | | ormation | | | | | | | of group | | | | | | | ma | | | | | | | nagement | | | | | | | server | | | | | | | where | | | | | | | group is | | | | | | | defined | | | | | +----------+----------+----------+----------+----------+----------+ | | >> | Y | N | Y | Y | | | Server | | | | | | | URI | | | | | +----------+----------+----------+----------+----------+----------+ | | > | | | | | | | App | | | | | | | lication | | | | | | | plane | | | | | | | server | | | | | | | identity | | | | | | | inf | | | | | | | ormation | | | | | | | of | | | | | | | identity | | | | | | | ma | | | | | | | nagement | | | | | | | server | | | | | | | which | | | | | | | provides | | | | | | | autho | | | | | | | rization | | | | | | | for | | | | | | | group | | | | | | | (see | | | | | | | NOTE 1) | | | | | +----------+----------+----------+----------+----------+----------+ | | >> | Y | N | Y | Y | | | Server | | | | | | | URI | | | | | +----------+----------+----------+----------+----------+----------+ | 3GPP T | > | Y | N | Y | Y | | S 33.180 | KMSUri | | | | | | [14] | for | | | | | | | security | | | | | | | domain | | | | | | | of group | | | | | | | (see | | | | | | | NOTE 3) | | | | | +----------+----------+----------+----------+----------+----------+ | | > | Y | N | Y | Y | | | Pres | | | | | | | entation | | | | | | | priority | | | | | | | of the | | | | | | | group | | | | | | | relative | | | | | | | to other | | | | | | | groups | | | | | | | and | | | | | | | users | | | | | | | (see | | | | | | | NOTE 2) | | | | | +----------+----------+----------+----------+----------+----------+ | [R-7.1 | Autho | Y | N | Y | Y | | 2-002], | rization | | | | | | | for | | | | | | [R-7. | off | | | | | | 12-003] | -network | | | | | | of | services | | | | | | 3GPP | | | | | | | TS 22.2 | | | | | | | 80 [2] | | | | | | +----------+----------+----------+----------+----------+----------+ | S | User | Y | N | Y | Y | | ubclause | info id | | | | | | 7.2.3.3 | (as | | | | | | | s | | | | | | | pecified | | | | | | | in | | | | | | | 3GPP | | | | | | | TS 23.30 | | | | | | | 3 [7]) | | | | | +----------+----------+----------+----------+----------+----------+ | NOTE 1: | | | | | | | If this | | | | | | | p | | | | | | | arameter | | | | | | | is not | | | | | | | con | | | | | | | figured, | | | | | | | autho | | | | | | | rization | | | | | | | to use | | | | | | | the | | | | | | | group | | | | | | | shall be | | | | | | | obtained | | | | | | | from the | | | | | | | identity | | | | | | | ma | | | | | | | nagement | | | | | | | server | | | | | | | id | | | | | | | entified | | | | | | | in the | | | | | | | initial | | | | | | | MC | | | | | | | service | | | | | | | UE | | | | | | | confi | | | | | | | guration | | | | | | | data | | | | | | | (on- | | | | | | | network) | | | | | | | co | | | | | | | nfigured | | | | | | | in table | | | | | | | A.6-1 of | | | | | | | 3GPP | | | | | | | TS 23.28 | | | | | | | 0 [6]. | | | | | | | | | | | | | | NOTE 2: | | | | | | | The use | | | | | | | of this | | | | | | | p | | | | | | | arameter | | | | | | | by the | | | | | | | MCVideo | | | | | | | UE is | | | | | | | outside | | | | | | | the | | | | | | | scope of | | | | | | | the | | | | | | | present | | | | | | | d | | | | | | | ocument. | | | | | | | | | | | | | | NOTE 3: | | | | | | | If this | | | | | | | p | | | | | | | arameter | | | | | | | is | | | | | | | absent, | | | | | | | the | | | | | | | KMSUri | | | | | | | shall be | | | | | | | that | | | | | | | id | | | | | | | entified | | | | | | | in the | | | | | | | initial | | | | | | | MC | | | | | | | service | | | | | | | UE | | | | | | | confi | | | | | | | guration | | | | | | | data | | | | | | | (on- | | | | | | | network) | | | | | | | co | | | | | | | nfigured | | | | | | | in table | | | | | | | A.6-1 of | | | | | | | 3GPP | | | | | | | TS 23.28 | | | | | | | 0 [6]. | | | | | | +----------+----------+----------+----------+----------+----------+
+# A.4 MCVideo related Group configuration data
+The general aspects of group configuration are specified in 3GPP TS 23.280
+[6].
+Parameters specified in table A.4-1 are child parameters of the MCVideo
+configuration parameter specified in table A.4-1 in 3GPP TS 23.280 [6].
+Parameters specified in table A.4-2 are child parameters of the MCVideo
+configuration parameter specified in table A.4-2 in 3GPP TS 23.280 [6].
+Parameters specified in table A.4-3 are child parameters of the MCVideo
+configuration parameter specified in table A.4-3 in 3GPP TS 23.280 [6].
+Table A.4-1: Group configuration data (on and off network)
+* * *
+Reference Parameter description MCVideo UE MCVideo Server Group management
+server [R-5.12-001] of 3GPP TS 22.280 [2] >> Media confidentiality and
+integrity protection (see NOTE) Y Y Y [R-5.12-001] of 3GPP TS 22.280 [2] >>
+Transmission control confidentiality and integrity protection (see NOTE) Y Y Y
+[R-5.12-001] of 3GPP TS 22.280 [2] >> Group media protection security material
+(see NOTE) Y N Y [R-5.1.1.1-010] of 3GPP TS 22.281 [3] >> List of allowed sets
+of video codecs and related information in order of preference  
+[R-5.1.1.1-010] of 3GPP TS 22.281 [3] >>> Video codecs Y Y Y [R-5.1.1.1-010]
+of 3GPP TS 22.281 [3] >>> List of allowed video resolution  
+>>>> Video resolutions Y Y Y [R-5.1.1.1-010] of 3GPP TS 22.281 [3] >>> List of
+allowed video frame rates  
+>>>> Video frame rates Y Y Y [R-5.1.1.3.2-002] of 3GPP TS 22.281 [3] >>
+Allowed video modes  
+>>> Urgent real time mode allowed N Y Y >>> Non-urgent real time mode allowed
+N Y Y >>> Non real time mode allowed N Y Y [R-5.1.1.3.2-002] of 3GPP TS 22.281
+[3] >> Active video mode (urgent real time mode, non urgent real time mode,
+non real time mode) Y Y Y [R-5.3.2.2-002] of 3GPP TS 22.281 [3] >> Allowed
+maximum simultaneous MCVideo transmitting group members N Y Y NOTE: Security
+mechanisms are specified in 3GPP TS 33.180 [14].
+* * *
+Table A.4-2: Group configuration data (on network)
++-------------+-------------+------------+-------------+-------------+ | Reference | Parameter | MCVideo UE | MCVideo | Group | | | description | | Server | management | | | | | | server | +-------------+-------------+------------+-------------+-------------+ | [R-6 | >> | Y | Y | Y | | .4.5-001], | Au | | | | | | thorisation | | | | | [R- | of a user | | | | | 6.4.5-003] | to request | | | | | of | a list of | | | | | 3GPP TS 2 | affiliated | | | | | 2.280 [2] | members of | | | | | | a group | | | | +-------------+-------------+------------+-------------+-------------+ | [R-5 | >> | N | Y | Y | | .1.7-002], | Priority of | | | | | | the group | | | | | [R-6 | | | | | | .2.2-001], | | | | | | | | | | | | [R-6.6 | | | | | | .2.2-006], | | | | | | | | | | | | [R-6. | | | | | | 8.7.2-003] | | | | | | of | | | | | | 3GPP TS 2 | | | | | | 2.280 [2] | | | | | +-------------+-------------+------------+-------------+-------------+
+Table A.4-3: Group configuration data (off network)
+* * *
+Reference Parameter description MCVideo UE MCVideo Server Group management
+server Subclause 7.7.2.1 >> Indication of whether the UE shall use single
+arbitrator approach or self arbitration approach. Y N Y [R-5.3.2.2-003] of
+3GPP TS 22.281 [3] >> Allowed maximum number of simultaneous transmissions
+(N9) Y Y Y Subclause 7.1.3 >> Default ProSe Per-Packet priority (as specified
+in 3GPP TS 23.303 [7]) values  
+>>> MCVideo group call signalling Y N Y >>> MCVideo group call media Y N Y >>>
+MCVideo emergency group call signalling Y N Y >>> MCVideo emergency group call
+media Y N Y >>> MCVideo imminent peril group call signalling Y N Y >>> MCVideo
+imminent peril group call media Y N Y
+* * *
+# A.5 MCVideo service configuration data
+The general aspects of MC service configuration are specified in 3GPP TS
+23.280 [6]. The MCVideo service configuration data is stored in the MCVideo
+server.
+Tables A.5-1 and A.5-2 describe the configuration data required to support the
+use of on-network MCVideo service. Tables A.5-1 and A.5-3 describe the
+configuration data required to support the use of off-network MCVideo service.
+Data in table A.5-1 and table A.5-3 can be configured offline using the CSC-11
+reference point.
+Table A.5-1: MCVideo service configuration data (on and off network)
+* * *
+Reference Parameter description MCVideo UE MCVideo Server Configuration
+management server [R-5.2.2-001] of 3GPP TS 22.280 [2] Levels of group
+hierarchy for group-broadcast groups (Bc1) Y Y Y [R-5.2.3-001] of 3GPP TS
+22.280 [2] Levels of user hierarchy for user-broadcast groups (Bc2) Y Y Y
+[R-5.7-002] of 3GPP TS 22.280 [2] Minimum length (Nc3) of an alphanumeric
+identifier (i.e. alias) assigned by an MCVideo administrator. Y N Y
+* * *
+Table A.5-2: MCVideo service configuration data (on network)
++-------------+-------------+------------+-------------+-------------+ | Reference | Parameter | MCVideo UE | MCVideo | Co | | | description | | Server | nfiguration | | | | | | management | | | | | | server | +-------------+-------------+------------+-------------+-------------+ | [R | Protect | Y | Y | Y | | -5.12-001] | conf | | | | | of | identiality | | | | | 3GPP TS 2 | of | | | | | 2.280 [2] | signalling | | | | | | (see NOTE | | | | | | 1) | | | | +-------------+-------------+------------+-------------+-------------+ | [R | Protect | Y | Y | Y | | -5.12-001] | integrity | | | | | of | of | | | | | 3GPP TS 2 | signalling | | | | | 2.280 [2] | ( | | | | | | see NOTE 1) | | | | +-------------+-------------+------------+-------------+-------------+ | [R | Use | N | Y | Y | | -5.12-001] | signalling | | | | | of | protection | | | | | 3GPP TS 2 | between | | | | | 2.280 [2] | MCVideo | | | | | | servers | | | | | | (see | | | | | | NOTE 1) | | | | +-------------+-------------+------------+-------------+-------------+ | [R | Use | N | Y | Y | | -5.12-001] | t | | | | | of | ransmission | | | | | 3GPP TS 2 | control | | | | | 2.280 [2] | protection | | | | | | between | | | | | | MCVideo | | | | | | servers | | | | | | (see | | | | | | NOTE 1) | | | | +-------------+-------------+------------+-------------+-------------+ | [R- | Maximum | N | Y | Y | | 5.10-001a] | number of | | | | | of | successful | | | | | 3GPP TS 2 | s | | | | | 2.280 [2] | imultaneous | | | | | | service | | | | | | aut | | | | | | horizations | | | | | | of clients | | | | | | from a user | | | | +-------------+-------------+------------+-------------+-------------+ | | List of | | | | | | functional | | | | | | alias | | | | | | identities | | | | +-------------+-------------+------------+-------------+-------------+ | [R | > | N | Y | Y | | -5.9a-005] | Functional | | | | | of 3GPP TS | alias | | | | | 22.280 | | | | | | [2] | | | | | +-------------+-------------+------------+-------------+-------------+ | [R | >> Limit | N | Y | Y | | -5.9a-005] | number of | | | | | of 3GPP TS | s | | | | | 22.280 | imultaneous | | | | | [2] | activations | | | | +-------------+-------------+------------+-------------+-------------+ | [R | >> This | N | Y | Y | | -5.9a-005] | functional | | | | | of 3GPP TS | alias can | | | | | 22.280 | be taken | | | | | [2] | over | | | | +-------------+-------------+------------+-------------+-------------+ | | >> List | | | | | | of users | | | | | | who can | | | | | | activate | | | | | | this | | | | | | functional | | | | | | alias | | | | +-------------+-------------+------------+-------------+-------------+ | [R | >>> | N | Y | Y | | -5.9a-005] | MCVideo ID | | | | | of 3GPP TS | | | | | | 22.280 | | | | | | [2] | | | | | +-------------+-------------+------------+-------------+-------------+ | [R | >> | N | Y | Y | | -5.9a-016] | Co | | | | | of | mmunication | | | | | 3GPP TS 2 | priority | | | | | 2.280 [2] | ( | | | | | | see NOTE 2) | | | | +-------------+-------------+------------+-------------+-------------+ | NOTE 1: | | | | | | Security | | | | | | mechanisms | | | | | | are | | | | | | specified | | | | | | in | | | | | | 3GP | | | | | | P TS 33.180 | | | | | | [14]. | | | | | | | | | | | | NOTE 2: The | | | | | | usage of | | | | | | this | | | | | | parameter | | | | | | by the | | | | | | MCVideo | | | | | | server is | | | | | | up to | | | | | | impl | | | | | | ementation. | | | | | +-------------+-------------+------------+-------------+-------------+
+Table A.5-3: MCVideo service configuration data (off network)
+* * *
+Reference Parameter description MCVideo UE MCVideo Server Configuration
+management server [R-7.6-001], [R-7.6-002], [R-7.6-003] of 3GPP TS 22.280 [2]
+Default ProSe Per-Packet priority (as specified in 3GPP TS 23.303 [7]) values  
+> MCVideo private call signalling Y N Y > MCVideo private call media Y N Y >
+> MCVideo Emergency private call signalling Y N Y > MCVideo Emergency private
+> call media Y N Y Subclause 7.5.3.3 Periodicity interval (in seconds) of
+> Capability announcement (see NOTE) Y N Y NOTE: If the value of the
+> periodicity interval is set to zero, the capability announcement is not
+> sent.
+* * *
+#

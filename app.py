@@ -13,7 +13,8 @@ app = Flask(__name__)
 chatbot = ALBERTChatbot()
 
 # Set the input directory
-input_directory = os.path.join('C:', 'Users', 'Mahta', 'projectcs', 'TSpec-LLM', 'test')
+#input_directory = os.path.join('C:', 'Users', 'Administrator', 'Desktop','cleaned_data', 'Rel-8','21_series')
+input_directory = r'C:\Users\Administrator\Desktop\cleaned_data\Rel-8\21_series'
 
 # Convert Windows path to WSL path if necessary
 if os.name == 'posix' and input_directory.startswith('C:'):

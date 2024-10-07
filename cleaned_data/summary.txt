@@ -1,0 +1,2 @@
+Total number of .md files: 13457
+Total size of .md files: 1732.07 MB
