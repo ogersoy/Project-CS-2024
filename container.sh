@@ -2,32 +2,32 @@
 # // Run sbatch container.sh
 
 !/bin/bash
-
-interactive -A UPPMAX 2024/2-18 -t 1:00:00
+#interactive should be run to create the node
+#interactive -A uppmax2024-2-18 -t 1:00:00 -M snowy
 module load python3
 module load git
 module load git-lfs
-module load tensorflow
-module load gh
 module load python_ML_packages/3.11.8-cpu
-
 
 pip install --upgrade pip
 pip install numpy
 pip install pandas
 pip install matplotlib
+pip install markdown
+pip install  torch
 # pip install -r seaborn
 # pip install -r scikit-learn
 # pip install -r tensorflow
 # pip install -r keras
-pip install  torch
 
-git clone https://github.com/ogersoy/Project-CS-2024
-cd /Project-CS-2024
+#rm -r Project-CS-2024
+#git clone https://github.com/ogersoy/Project-CS-2024
+git fetch https://github.com/ogersoy/Project-CS-2024
+cd Project-CS-2024
 
 #Run the python script in the container
-sbatch /lib/markdown_cleaner.py
-sbatch app.py
+python /lib/markdown_cleaner.py
+python app.py
 
 
 #install github cli, no GH on rackham so cannot do this
