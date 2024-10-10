@@ -33,7 +33,6 @@
                     data: { question: userInput },
                     success: function(response) {
                         $('#chatbox').append('<p><strong>Bot:</strong> ' + response.answer + '</p>');
-                        $('#chatbox').append('<p><em>Relevance: ' + response.relevance + '</em></p>');
                         $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
                     }
                 });

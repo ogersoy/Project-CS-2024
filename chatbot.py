@@ -1,48 +1,62 @@
-from lib.utils import process_documents, answer_question
-from pathlib import Path
+import os
 import logging
+from lib.utils import process_documents, answer_question, setup_sentence_bert, create_document_embeddings
+from transformers import pipeline
 
 logger = logging.getLogger(__name__)
 
-class ALBERTChatbot:
-    def __init__(self):
-        self.chunks = None
-        self.doc_embeddings = None
-        self.tokenizer = None
-        self.embedding_model = None
-        self.classification_model = None
-
-    def load_documents(self, input_directory):
-        logger.info(f"Attempting to load and process documents from {input_directory}...")
-        
-        input_directory = Path(input_directory)
-        
+class HuggingFaceChatbot:
+    def __init__(self, input_directory):
+        """Initialize the chatbot by processing markdown documents in the input directory."""
         try:
-            if not input_directory.exists():
-                raise FileNotFoundError(f"Directory not found: '{input_directory}'")
+            logger.info(f"Loading and processing documents from {input_directory}")
+            # Set up Sentence-BERT for better embeddings
+            self.embedding_model = setup_sentence_bert()
             
-            md_files = list(input_directory.glob('**/*.md'))
-            if not md_files:
-                raise FileNotFoundError(f"No markdown files found in '{input_directory}'")
+            # Load text generation model (e.g., GPT-2 or similar)
+            self.generator = pipeline('text-generation', model='gpt2')  # You can choose a more suitable model
             
-            logger.info(f"Found {len(md_files)} markdown files in {input_directory}")
+            # Process the documents and create embeddings
+            self.chunks, self.tokenizer, self.embedding_model, self.classification_model = process_documents(input_directory)
+            self.doc_embeddings = create_document_embeddings(self.chunks, self.embedding_model)
             
-            self.chunks, self.doc_embeddings, self.tokenizer, self.embedding_model, self.classification_model = process_documents(input_directory)
-            
-            logger.info(f"Documents loaded, cleaned, and processed. Number of chunks: {len(self.chunks)}")
+            logger.info(f"Documents loaded and processed successfully")
         except Exception as e:
-            logger.error(f"Error in load_documents: {str(e)}")
+            logger.error(f"Error initializing chatbot: {str(e)}", exc_info=True)
             raise
 
+    def generate_answer(self, context):
+        """Generate a more coherent answer based on the context."""
+        prompt = f"Based on the following information, provide a concise explanation: {context}"
+        generated = self.generator(prompt, max_new_tokens=100, num_return_sequences=1, do_sample=True, truncation=True)
+        return generated[0]['generated_text']
+
     def ask_question(self, query):
-        if self.chunks is None or len(self.chunks) == 0:
-            logger.warning("No documents loaded or processed. Cannot process the query.")
-            return "Please load documents first.", "No documents loaded"
-        
+        """Process a query and return a coherent answer."""
+        # Handle simple queries like "hi", "hello", etc.
+        if query.lower() in ["hi", "hello", "hey"]:
+            return "Hello! How can I assist you with the documents?"
+
         try:
-            answer, relevance = answer_question(query, self.chunks, self.doc_embeddings, self.tokenizer, self.embedding_model, self.classification_model)
-            logger.info(f"Processed query: '{query}'. Relevance: {relevance}")
-            return answer, relevance
+            logger.debug(f"Processing query: {query}")
+            relevant_chunk = answer_question(
+                query=query, 
+                chunks=self.chunks, 
+                doc_embeddings=self.doc_embeddings, 
+                tokenizer=self.tokenizer, 
+                embedding_model=self.embedding_model, 
+                classification_model=self.classification_model
+            )
+
+            # Ensure relevant_chunk is a string before passing to the generator
+            if isinstance(relevant_chunk, tuple):
+                relevant_chunk = relevant_chunk[0]  # Extract the string if it's a tuple
+
+            # Generate a coherent answer using the retrieved chunk
+            answer = self.generate_answer(relevant_chunk)
+            logger.debug(f"Generated coherent answer: {answer[:100]}...")  # Log first 100 chars of generated answer
+
+            return answer
         except Exception as e:
-            logger.error(f"Error processing query '{query}': {str(e)}")
-            return f"An error occurred while processing your question: {str(e)}", "Error"
+            logger.error(f"Error processing query '{query}': {str(e)}", exc_info=True)
+            return f"An error occurred: {str(e)}"
