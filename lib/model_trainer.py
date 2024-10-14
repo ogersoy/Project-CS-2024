@@ -28,7 +28,7 @@ class TextDataset(Dataset):
 
     def __getitem__(self, index):
         text = self.texts[index]
-        inputs = self.tokenizer(text, max_length=self.max_len, padding='max_length', truncation=True, return_tensors="pt", clean_up_tokenization_spaces=True)
+        inputs = self.tokenizer(text, max_length=self.max_len, padding='max_length', truncation=True, return_tensors="pt")
         return {
             'input_ids': inputs['input_ids'].squeeze(0),
             'attention_mask': inputs['attention_mask'].squeeze(0),
@@ -69,7 +69,9 @@ def train_model(md_folder_path, model_name='albert-base-v2', batch_size=16, epoc
     model.train()
     for epoch in range(epochs):
         epoch_loss = 0
-        for batch in dataloader:
+        for batch_idx, batch in enumerate(dataloader, 0):
+            if (batch_idx + 1) % 10 == 0 or batch_idx == 0:
+                print(f"Processing batch {batch_idx + 1}/{len(dataloader)}...")
             input_ids = batch['input_ids'].to(device)
             attention_mask = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device)
@@ -96,6 +98,7 @@ def train_model(md_folder_path, model_name='albert-base-v2', batch_size=16, epoc
 # Evaluation using QA pairs
 def evaluate_model(model_path, tokenizer_path, json_file_path):
     # Load trained model and tokenizer
+    print("Loading trained model and tokenizer for evaluation...")
     tokenizer = AlbertTokenizer.from_pretrained(tokenizer_path)
     model = AlbertForSequenceClassification.from_pretrained(model_path)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -105,7 +108,7 @@ def evaluate_model(model_path, tokenizer_path, json_file_path):
     # Load question and answer pairs
     with open(json_file_path, 'r', encoding='utf-8') as f:
         qa_data = json.load(f)
-
+    print(f"Loaded {len(qa_data)} question and answer pairs.")
     qa_pairs = []
     for key, value in qa_data.items():
         question = value['question']
