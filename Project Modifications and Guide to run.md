@@ -3,9 +3,6 @@
 **Author**: Yixin Huang
 **Date**: 2024-10-14
 
-## Overview
-This document outlines the modifications made to the project on October 14, 2024. The goal of the updates was to integrate the self-RAG (self-retrieval augmented generation) mechanism into the chatbot system, enhancing its ability to retrieve relevant document chunks and generate more accurate responses using GPT-2.
-
 ## Summary of Modifications
 The following components of the project were modified or enhanced to support the self-RAG functionality:
 
