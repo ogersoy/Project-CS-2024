@@ -21,6 +21,9 @@ app = Flask(__name__)
 # Set the input directory for documents
 input_directory = os.path.join('C:', 'Users', 'Mahta', 'projectcs', 'TSpec-LLM', 'test')
 
+# in window yixin'example
+#input_directory = r'D:\Python\TsLLM\TSpec-LLM\3GPP-clean\Rel-8\21_series'
+
 # Convert Windows path to WSL path if necessary
 if os.name == 'posix' and input_directory.startswith('C:'):
     input_directory = '/mnt/c' + input_directory[2:].replace('\\', '/')
