@@ -35,3 +35,4 @@ tornado==6.4.1
 transformers==4.45.1
 trove_classifiers==2024.9.12
 urllib3_secure_extra==0.1.0
+sentencepiece==0.2.0
