@@ -3,7 +3,7 @@
 
 !/bin/bash
 #interactive should be run to create the node
-#interactive -A uppmax2024-2-18 -t 1:00:00 -M snowy
+interactive -A uppmax2024-2-18 -t 1:00:00 -M snowy
 module load python3
 module load git
 module load git-lfs
