@@ -1031,7 +1031,7 @@
         "answer": "option_2: 60 kbps",
         "explanation": "The minimum downlink data rate for C&C for aerial vehicles is 60 kbps as per Table 5.1-1 in section 5.1.",
         "category": "3GPP TR 36.777",
-        "difficulty": "Intermediate",
+        "difficulty": "Intermediate"
     },
     "question_95": {
         "question": "What is the system bandwidth specified for the S-band?",

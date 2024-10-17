@@ -36,7 +36,7 @@ class TextDataset(Dataset):
         }
 
 # Step 3: Train model
-def train_model(md_folder_path, model_name='albert-base-v2', batch_size=16, epochs=3, learning_rate=2e-5):
+def train_model(md_folder_path, model_name='albert-base-v2', batch_size=32, epochs=3, learning_rate=2e-5):
     # Load md files
     print("Loading markdown files...")
     md_texts = read_md_files_from_folder(md_folder_path)
@@ -60,7 +60,7 @@ def train_model(md_folder_path, model_name='albert-base-v2', batch_size=16, epoc
     print("Model loaded.")
 
     # Set device
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda")
     model.to(device)
     print(f"Using device: {device}")
 
@@ -109,33 +109,51 @@ def evaluate_model(model_path, tokenizer_path, json_file_path):
     with open(json_file_path, 'r', encoding='utf-8') as f:
         qa_data = json.load(f)
     print(f"Loaded {len(qa_data)} question and answer pairs.")
+
     qa_pairs = []
     for key, value in qa_data.items():
         question = value['question']
-        options = [value.get(f'option_{i}') for i in range(1, 5) if value.get(f'option_{i}')]
-        correct_answer = value['answer']
+        options = [value.get(f'option_{i}') for i in range(1, 5) if value.get(f'option_{i}') is not None]
+        correct_answer = value['answer']  # Correct answer in 'option_x: description' format
         qa_pairs.append({"question": question, "options": options, "correct_answer": correct_answer})
+
+    # Track correct predictions
+    correct_predictions = 0
+    total_questions = len(qa_pairs)
 
     # Generate answers
     for qa_pair in qa_pairs:
         question = qa_pair['question']
         options = qa_pair['options']
-        correct_answer = qa_pair['correct_answer']
+        correct_answer = qa_pair['correct_answer']  # Example: 'option_2: 6.5 dB'
+
+        # Extract correct option index from the correct_answer
+        correct_answer_index = int(
+            correct_answer.split(':')[0].split('_')[1])  # Extracts the option number from 'option_x'
 
         # Prepare input for the model
         inputs = tokenizer(question, return_tensors='pt').to(device)
         outputs = model(**inputs)
-        predicted_label = torch.argmax(outputs.logits, dim=1).item()
+        predicted_label = torch.argmax(outputs.logits, dim=1).item() + 1  # Predicted option is 1-indexed
+
+        # Check if the prediction is correct
+        if predicted_label == correct_answer_index:
+            correct_predictions += 1
 
         # Print question, options, and predicted answer
         print(f"Question: {question}")
         for i, option in enumerate(options, 1):
             print(f"Option {i}: {option}")
-        print(f"Predict: Answer {predicted_label + 1}")
+        print(f"Predicted: Answer {predicted_label}")
         print(f"Correct Answer: {correct_answer}\n")
 
+    # Calculate and print accuracy
+    accuracy = correct_predictions / total_questions * 100
+    print(f"Evaluation completed. Accuracy: {accuracy:.2f}% ({correct_predictions}/{total_questions})")
+
+
 # Train the model
-train_model("../cleaned_data")
+#train_model("../cleaned_data")
 
 # Evaluate the model
 evaluate_model('./trained_albert', './trained_albert', '../Q-small_Sampled_3GPP_TR_Questions.json')
