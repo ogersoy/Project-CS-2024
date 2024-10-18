@@ -110,47 +110,31 @@ def evaluate_model(model_path, tokenizer_path, json_file_path):
         qa_data = json.load(f)
     print(f"Loaded {len(qa_data)} question and answer pairs.")
 
-    qa_pairs = []
+    correct_predictions = 0
+    total_questions = len(qa_data)
+
+    # Iterate over each question
     for key, value in qa_data.items():
         question = value['question']
-        options = [value.get(f'option_{i}') for i in range(1, 5) if value.get(f'option_{i}') is not None]
-        correct_answer = value['answer']  # Correct answer in 'option_x: description' format
-        qa_pairs.append({"question": question, "options": options, "correct_answer": correct_answer})
+        correct_answer = value['answer'].split(":")[1].strip()
 
-    # Track correct predictions
-    correct_predictions = 0
-    total_questions = len(qa_pairs)
+        # Tokenize the question and generate the answer
+        inputs = tokenizer.encode(question, return_tensors='pt').to(device)
+        outputs = model.generate(inputs, max_length=50)
+        generated_answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-    # Generate answers
-    for qa_pair in qa_pairs:
-        question = qa_pair['question']
-        options = qa_pair['options']
-        correct_answer = qa_pair['correct_answer']  # Example: 'option_2: 6.5 dB'
-
-        # Extract correct option index from the correct_answer
-        correct_answer_index = int(
-            correct_answer.split(':')[0].split('_')[1])  # Extracts the option number from 'option_x'
-
-        # Prepare input for the model
-        inputs = tokenizer(question, return_tensors='pt').to(device)
-        outputs = model(**inputs)
-        predicted_label = torch.argmax(outputs.logits, dim=1).item() + 1  # Predicted option is 1-indexed
-
-        # Check if the prediction is correct
-        if predicted_label == correct_answer_index:
-            correct_predictions += 1
-
-        # Print question, options, and predicted answer
+        # Print question and generated answer
         print(f"Question: {question}")
-        for i, option in enumerate(options, 1):
-            print(f"Option {i}: {option}")
-        print(f"Predicted: Answer {predicted_label}")
-        print(f"Correct Answer: {correct_answer}\n")
+        print(f"Generated Answer: {generated_answer}")
+        print(f"Correct Answer: {correct_answer}")
+
+        # Compare generated answer with correct answer (you can use more advanced comparison)
+        if generated_answer.lower() == correct_answer.lower():
+            correct_predictions += 1
 
     # Calculate and print accuracy
     accuracy = correct_predictions / total_questions * 100
     print(f"Evaluation completed. Accuracy: {accuracy:.2f}% ({correct_predictions}/{total_questions})")
-
 
 # Train the model
 #train_model("../cleaned_data")
