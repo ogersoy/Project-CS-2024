@@ -4,21 +4,6 @@ from torch.utils.data import Dataset, DataLoader
 from torch.optim import AdamW
 from transformers import AlbertTokenizer, AlbertForSequenceClassification
 import json
-import torch.nn as nn
-from torch.cuda.amp import autocast, GradScaler
-
-
-class AlbertBinaryClassifier(nn.Module):
-    def __init__(self, model_name='albert-base-v2'):
-        super(AlbertBinaryClassifier, self).__init__()
-        self.albert = AlbertModel.from_pretrained(model_name)
-        self.classifier = nn.Linear(self.albert.config.hidden_size, 1)  # Single output for binary classification
-
-    def forward(self, input_ids, attention_mask):
-        outputs = self.albert(input_ids=input_ids, attention_mask=attention_mask)
-        pooled_output = outputs[1]  # Get the pooled output from Albert
-        logits = self.classifier(pooled_output)
-        return logits
 
 # Load dataset
 def read_md_files_from_folder(folder_path):
@@ -64,8 +49,8 @@ def train_model(md_folder_path, model_name='albert-base-v2', batch_size=32, epoc
 
     # Create Dataset and Dataloader
     print("Creating dataset and dataloader...")
-    dataset = TextDataset(md_texts, tokenizer, max_len=256)
-    dataloader = DataLoader(dataset, batch_size=32, shuffle=False, num_workers=14, pin_memory=True)
+    dataset = TextDataset(md_texts, tokenizer, max_len=512)
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
     print("Dataset and dataloader created.")
 
     # Load pre-trained Albert model
@@ -78,12 +63,8 @@ def train_model(md_folder_path, model_name='albert-base-v2', batch_size=32, epoc
     device = torch.device("cuda")
     model.to(device)
     print(f"Using device: {device}")
-    
-    
-    scaler = GradScaler()
 
     # Start training
-    loss_fn = nn.BCEWithLogitsLoss()
     print("Starting training...")
     model.train()
     for epoch in range(epochs):
@@ -96,21 +77,14 @@ def train_model(md_folder_path, model_name='albert-base-v2', batch_size=32, epoc
             labels = batch['labels'].to(device)
 
             # Forward
-            with torch.amp.autocast(device_type='cuda'):
-                outputs = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)  # Include labels here
-                loss = outputs.loss  # Use the loss directly from the outputs
-            
-            # print(outputs)  # This will show you what is being returned by the model
-            # print(f"Loss is {type(loss)}")  # Should output: <class 'torch.Tensor'>
+            outputs = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
+            loss = outputs.loss
 
-            # Backward pass with gradient scaling
-            scaler.scale(loss).backward()
+            # Backward
+            loss.backward()
+            optimizer.step()
+            optimizer.zero_grad()
 
-            # Optimizer step with gradient scaling
-            scaler.step(optimizer)
-            scaler.update()
-            optimizer.zero_grad()           # Clear gradients
-            torch.cuda.empty_cache() #Very important, clearing the gpu cache to avoid running out of memory
             epoch_loss += loss.item()
 
         print(f"Epoch {epoch + 1}/{epochs} finished with loss: {epoch_loss / len(dataloader)}")
@@ -136,52 +110,34 @@ def evaluate_model(model_path, tokenizer_path, json_file_path):
         qa_data = json.load(f)
     print(f"Loaded {len(qa_data)} question and answer pairs.")
 
-    qa_pairs = []
+    correct_predictions = 0
+    total_questions = len(qa_data)
+
+    # Iterate over each question
     for key, value in qa_data.items():
         question = value['question']
-        options = [value.get(f'option_{i}') for i in range(1, 5) if value.get(f'option_{i}') is not None]
-        correct_answer = value['answer']  # Correct answer in 'option_x: description' format
-        qa_pairs.append({"question": question, "options": options, "correct_answer": correct_answer})
+        correct_answer = value['answer'].split(":")[1].strip()
 
-    # Track correct predictions
-    correct_predictions = 0
-    total_questions = len(qa_pairs)
+        # Tokenize the question and generate the answer
+        inputs = tokenizer.encode(question, return_tensors='pt').to(device)
+        outputs = model.generate(inputs, max_length=50)
+        generated_answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-    # Generate answers
-    for qa_pair in qa_pairs:
-        question = qa_pair['question']
-        options = qa_pair['options']
-        correct_answer = qa_pair['correct_answer']  # Example: 'option_2: 6.5 dB'
-
-        # Extract correct option index from the correct_answer
-        correct_answer_index = int(
-            correct_answer.split(':')[0].split('_')[1])  # Extracts the option number from 'option_x'
-
-        # Prepare input for the model
-        inputs = tokenizer(question, return_tensors='pt').to(device)
-        outputs = model(**inputs)
-        predicted_label = torch.argmax(outputs.logits, dim=1).item() + 1  # Predicted option is 1-indexed
-
-        # Check if the prediction is correct
-        if predicted_label == correct_answer_index:
-            correct_predictions += 1
-
-        # Print question, options, and predicted answer
+        # Print question and generated answer
         print(f"Question: {question}")
-        for i, option in enumerate(options, 1):
-            print(f"Option {i}: {option}")
-        print(f"Predicted Answer: {predicted_label}")
-        print(f"Correct Answer: {correct_answer}\n")
+        print(f"Generated Answer: {generated_answer}")
+        print(f"Correct Answer: {correct_answer}")
+
+        # Compare generated answer with correct answer (you can use more advanced comparison)
+        if generated_answer.lower() == correct_answer.lower():
+            correct_predictions += 1
 
     # Calculate and print accuracy
     accuracy = correct_predictions / total_questions * 100
     print(f"Evaluation completed. Accuracy: {accuracy:.2f}% ({correct_predictions}/{total_questions})")
 
-
-# # Train the model
-# if __name__ == "__main__":
-#     torch.multiprocessing.set_start_method('spawn', force=True)  # To explicitly set the multiprocessing start method
-#     train_model("../cleaned_data")
+# Train the model
+#train_model("../cleaned_data")
 
 # Evaluate the model
 evaluate_model('./trained_albert', './trained_albert', '../Q-small_Sampled_3GPP_TR_Questions.json')
