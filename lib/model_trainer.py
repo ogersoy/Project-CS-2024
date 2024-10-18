@@ -4,6 +4,21 @@ from torch.utils.data import Dataset, DataLoader
 from torch.optim import AdamW
 from transformers import AlbertTokenizer, AlbertForSequenceClassification
 import json
+import torch.nn as nn
+from torch.cuda.amp import autocast, GradScaler
+
+
+class AlbertBinaryClassifier(nn.Module):
+    def __init__(self, model_name='albert-base-v2'):
+        super(AlbertBinaryClassifier, self).__init__()
+        self.albert = AlbertModel.from_pretrained(model_name)
+        self.classifier = nn.Linear(self.albert.config.hidden_size, 1)  # Single output for binary classification
+
+    def forward(self, input_ids, attention_mask):
+        outputs = self.albert(input_ids=input_ids, attention_mask=attention_mask)
+        pooled_output = outputs[1]  # Get the pooled output from Albert
+        logits = self.classifier(pooled_output)
+        return logits
 
 # Load dataset
 def read_md_files_from_folder(folder_path):
@@ -49,8 +64,8 @@ def train_model(md_folder_path, model_name='albert-base-v2', batch_size=32, epoc
 
     # Create Dataset and Dataloader
     print("Creating dataset and dataloader...")
-    dataset = TextDataset(md_texts, tokenizer, max_len=512)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    dataset = TextDataset(md_texts, tokenizer, max_len=256)
+    dataloader = DataLoader(dataset, batch_size=32, shuffle=False, num_workers=14, pin_memory=True)
     print("Dataset and dataloader created.")
 
     # Load pre-trained Albert model
@@ -63,8 +78,12 @@ def train_model(md_folder_path, model_name='albert-base-v2', batch_size=32, epoc
     device = torch.device("cuda")
     model.to(device)
     print(f"Using device: {device}")
+    
+    
+    scaler = GradScaler()
 
     # Start training
+    loss_fn = nn.BCEWithLogitsLoss()
     print("Starting training...")
     model.train()
     for epoch in range(epochs):
@@ -77,14 +96,21 @@ def train_model(md_folder_path, model_name='albert-base-v2', batch_size=32, epoc
             labels = batch['labels'].to(device)
 
             # Forward
-            outputs = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
-            loss = outputs.loss
+            with torch.amp.autocast(device_type='cuda'):
+                outputs = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)  # Include labels here
+                loss = outputs.loss  # Use the loss directly from the outputs
+            
+            # print(outputs)  # This will show you what is being returned by the model
+            # print(f"Loss is {type(loss)}")  # Should output: <class 'torch.Tensor'>
 
-            # Backward
-            loss.backward()
-            optimizer.step()
-            optimizer.zero_grad()
+            # Backward pass with gradient scaling
+            scaler.scale(loss).backward()
 
+            # Optimizer step with gradient scaling
+            scaler.step(optimizer)
+            scaler.update()
+            optimizer.zero_grad()           # Clear gradients
+            torch.cuda.empty_cache() #Very important, clearing the gpu cache to avoid running out of memory
             epoch_loss += loss.item()
 
         print(f"Epoch {epoch + 1}/{epochs} finished with loss: {epoch_loss / len(dataloader)}")
@@ -144,7 +170,7 @@ def evaluate_model(model_path, tokenizer_path, json_file_path):
         print(f"Question: {question}")
         for i, option in enumerate(options, 1):
             print(f"Option {i}: {option}")
-        print(f"Predicted: Answer {predicted_label}")
+        print(f"Predicted Answer: {predicted_label}")
         print(f"Correct Answer: {correct_answer}\n")
 
     # Calculate and print accuracy
@@ -152,8 +178,10 @@ def evaluate_model(model_path, tokenizer_path, json_file_path):
     print(f"Evaluation completed. Accuracy: {accuracy:.2f}% ({correct_predictions}/{total_questions})")
 
 
-# Train the model
-#train_model("../cleaned_data")
+# # Train the model
+# if __name__ == "__main__":
+#     torch.multiprocessing.set_start_method('spawn', force=True)  # To explicitly set the multiprocessing start method
+#     train_model("../cleaned_data")
 
 # Evaluate the model
 evaluate_model('./trained_albert', './trained_albert', '../Q-small_Sampled_3GPP_TR_Questions.json')
